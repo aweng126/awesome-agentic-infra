@@ -2,7 +2,9 @@
 
 本目录使用 Astro 将仓库内容构建为静态网站。部署完成后的地址为：
 
-**https://aweng126.github.io/awesome-agentic-infra/**
+**https://blog.kingwen.cn/awesome-agentic-infra/**
+
+项目站点继承账号个人站点的自定义域名 `blog.kingwen.cn`，原地址 `https://aweng126.github.io/awesome-agentic-infra/` 会跳转到上述地址。这是 [GitHub Pages 的域名继承规则](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages#using-a-custom-domain-across-multiple-repositories)。本仓库的 **Custom domain** 保持为空即可，路径前缀仍为 `/awesome-agentic-infra/`。
 
 站点在构建时读取根目录的 `resources/`、`notes/` 和 `CONTRIBUTING.md`。日常整理资源或修改笔记时，直接编辑这些 Markdown 文件即可，GitHub 文档和网页共用一份内容。
 
@@ -55,6 +57,8 @@ Markdown 内继续使用仓库相对链接，站点构建负责转换对应的�
 2. 在 **Build and deployment → Source** 中选择 **GitHub Actions**。仓库已有工作流，无需再添加 GitHub 建议的模板。
 3. 将站点代码推送到 `main`；如果代码已推送，在 **Actions → Build and deploy website → Run workflow** 中选择 `main` 手动运行一次。
 4. 等待 **Check and build** 与 **Publish to GitHub Pages** 成功，在部署任务或 Pages 设置中打开站点地址。
+
+当前站点已完成首次部署。保持 **Source → GitHub Actions**；若 **Enforce HTTPS** 可选，建议勾选以统一使用 HTTPS 访问。后续无需重新配置发布模板。
 
 配置发布源需要仓库管理员、维护者或相应的 Pages 管理权限；GitHub 的默认工作流令牌不能代替这次启用操作。参见 [配置 Pages 发布源](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) 和 [configure-pages 的启用参数](https://github.com/actions/configure-pages/blob/main/action.yml)。
 

@@ -4,7 +4,7 @@
 
 A curated collection of infrastructure resources and research notes for agentic systems.
 
-**在线阅读**：[Agentic Infra](https://aweng126.github.io/awesome-agentic-infra/) · [站点开发与部署](site/README.md)
+**在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/) · [站点开发与部署](site/README.md)
 
 以中文介绍为主，保留英文项目名与技术术语。资源按基础设施能力分类，各主题按实际内容收录项目、论文、规范与技术资料。
 
