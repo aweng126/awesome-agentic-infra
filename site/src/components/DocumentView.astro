@@ -27,8 +27,8 @@ const {
 } = Astro.props;
 const notes = await getNotes();
 const toc = headings.filter((heading) => heading.depth <= 3);
-const section = kind === 'topic' ? '主题资源' : kind === 'note' ? '研究笔记' : '参与共建';
-const sectionPath = kind === 'topic' ? 'resources/' : kind === 'note' ? 'notes/' : 'contributing/';
+const section = kind === 'topic' ? '主题导读' : kind === 'note' ? '研究笔记' : '参与共建';
+const sectionPath = kind === 'topic' ? '#topics' : kind === 'note' ? 'notes/' : 'contributing/';
 const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
 ---
 
@@ -39,9 +39,9 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
       <nav class="chapter-nav" aria-label="主题与笔记">
         <p class="sidebar-label">THE COLLECTION</p>
         <a class="all-resources" href={sitePath('resources/')}>
-          <span>全部资源</span><span aria-hidden="true">↗</span>
+          <span>搜索与筛选全部资源</span><span aria-hidden="true">→</span>
         </a>
-        <p class="sidebar-label category-label">主题索引</p>
+        <p class="sidebar-label category-label">主题导航</p>
         <ol class="chapter-list">
           {topics.map((topic, index) => (
             <li>

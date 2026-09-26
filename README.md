@@ -36,7 +36,7 @@ A curated collection of infrastructure resources and research notes for agentic 
 ## Where to Start
 
 1. 先读 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md)，建立整体认识。
-2. 搭建执行链路时，从 [运行时与编排](resources/runtime-and-orchestration.md) → [工具与协议](resources/tools-and-protocols.md) → [执行环境](resources/sandbox-and-execution.md) 阅读。
+2. 研究长任务的执行机制时，阅读 [任务失败后如何恢复](notes/task-recovery-and-side-effects.md)，再结合 [运行时与编排](resources/runtime-and-orchestration.md) 中的项目资料理解具体实现。
 3. 研究长任务与规模化运行时，结合 [记忆与上下文](resources/memory-and-context.md)、[部署与调度](resources/deployment-and-scheduling.md) 和 [模型服务](resources/inference-and-model-serving.md)。
 4. 设计验证与运行管理时，结合 [可观测性与评估](resources/observability-and-evaluation.md) 和 [安全与治理](resources/security-and-governance.md)。
 
@@ -53,14 +53,15 @@ awesome-agentic-infra/
 ├── resources/                # 八个主题的资源索引
 ├── notes/                    # 原创概览、解读与比较
 │   ├── README.md
-│   └── agentic-infra-overview.md
+│   ├── agentic-infra-overview.md
+│   └── task-recovery-and-side-effects.md
 ├── site/                     # Astro 静态站点，直接读取上述 Markdown
 └── .github/workflows/        # 站点验证与 GitHub Pages 自动部署
 ```
 
 资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)；出现独立图片文件时再建立 `assets/`。
 
-网页提供主题导航、资源搜索与筛选、深浅色切换，以及带目录的笔记阅读页。回访时可先查看 [更新日志](CHANGELOG.md)，直接前往新增或修改的内容。修改 Markdown 并同步补充日志后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
+网页的主题页组织导读、相关学习笔记与参考资料；资源库提供跨主题搜索与筛选；笔记页展开完整分析。主题页与资源库共用 `resources/` 中的条目，笔记正文在 `notes/` 维护。回访时可先查看 [更新日志](CHANGELOG.md)，直接前往新增或修改的内容。修改 Markdown 并同步补充日志后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
 
 ## Curation
 

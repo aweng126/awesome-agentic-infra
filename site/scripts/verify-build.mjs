@@ -70,10 +70,19 @@ for (const filename of resourceFiles) {
   assert.ok(topic, `${filename}: topic page must be generated`);
   const tree = parser.parse(await readFile(`../resources/${filename}`, 'utf8'));
   const anchors = new Set();
+  const learningLinks = new Set();
   let inResourceSection = false;
+  let inLearningSection = false;
   for (const node of tree.children) {
     if (node.type === 'heading' && node.depth <= 2) {
       inResourceSection = resourceSections.has(textContent(node));
+      inLearningSection = textContent(node) === '学习笔记';
+    }
+    if (inLearningSection) {
+      visit(node, 'link', (link) => {
+        const notePath = path.posix.normalize(path.posix.join('resources', link.url.split(/[?#]/u)[0]));
+        learningLinks.add(`${base}${notePath.replace(/\.md$/u, '/')}`);
+      });
     }
     if (node.type !== 'list' || !inResourceSection) continue;
     // Only a top-level item's own first paragraph is a resource. Related
@@ -95,11 +104,16 @@ for (const filename of resourceFiles) {
       assert.ok([...target.querySelectorAll('a[href]')].some((link) => link.getAttribute('href') === primaryLink.url), `${filename}: #${anchor} must contain its original source link`);
       const card = explorer.getElementById(`${topicSlug}-${anchor}`);
       assert.ok(card?.matches('article.resource-card'), `${filename}: ${anchor} must have a directly addressable resource card`);
-      assert.equal(card.querySelector('h2 a')?.getAttribute('href'), primaryLink.url, `${filename}: ${anchor} card must link to its original source`);
-      assert.equal(card.querySelector('.resource-topic-link')?.getAttribute('href'), `${base}topics/${topicSlug}/#${anchor}`, `${filename}: ${anchor} card must link directly to its topic entry`);
+      assert.equal(card.querySelector('.resource-source-link')?.getAttribute('href'), primaryLink.url, `${filename}: ${anchor} must expose its original source explicitly`);
+      assert.equal(card.querySelector('.resource-topic-link')?.getAttribute('href'), `${base}topics/${topicSlug}/`, `${filename}: ${anchor} must distinguish its topic guide from the external source`);
     }
   }
   assert.equal(topic.querySelectorAll('li[id^="resource-"]').length, anchors.size, `${filename}: every rendered resource anchor must match the source`);
+  assert.ok(topic.querySelector(`a[href="${base}resources/?topic=${topicSlug}"]`), `${filename}: topic must lead to its filtered resource index`);
+  assert.ok(!topic.querySelector('.reading-navigation'), `${filename}: topic navigation must not imitate article pagination`);
+  const renderedLearningLinks = new Set([...topic.querySelectorAll('.learning-notes h3 a')].map((link) => link.getAttribute('href')));
+  assert.deepEqual(renderedLearningLinks, learningLinks, `${filename}: learning notes must match the Markdown source`);
+  assert.equal(Boolean(topic.getElementById('learning-notes')), learningLinks.size > 0, `${filename}: omit empty learning sections`);
   assert.equal(explorer.querySelector(`.topic-filters button[data-topic="${topicSlug}"] [data-topic-count]`)?.textContent, String(anchors.size), `${filename}: the initial topic count must match its resources and be available to the filter script`);
 }
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');

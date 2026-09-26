@@ -2,6 +2,10 @@
 
 收录支撑 Agent 执行循环、工作流、多 Agent 协作、持久执行与失败恢复的框架和运行时。重点是任务如何推进、暂停和恢复；计算资源分配见 [Deployment & Scheduling](deployment-and-scheduling.md)，跨会话记忆的组织与检索见 [Memory & Context](memory-and-context.md)。
 
+## 学习笔记
+
+- [任务失败后如何恢复：检查点、重试与外部副作用](../notes/task-recovery-and-side-effects.md) — 从报告任务中断的例子理解检查点、重放、重试与幂等性，明确外部写入和人工审批的恢复边界。
+
 ## Projects & Platforms
 
 - <a id="resource-autogen"></a> [AutoGen](https://github.com/microsoft/autogen) — 采用分层设计的多 Agent 框架，可用于研究消息传递、事件驱动 Agent 与分布式运行时；关注：Core 与 AgentChat 的抽象边界。官方已标注进入维护模式，并建议新用户使用 Microsoft Agent Framework。

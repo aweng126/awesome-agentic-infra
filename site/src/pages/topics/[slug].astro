@@ -1,34 +1,140 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import DocumentView from '../../components/DocumentView.astro';
-import { getTopics, sitePath } from '../../lib/content';
+import Icon from '../../components/Icon.astro';
+import { getTopics, sitePath, repoUrl } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const topics = await getTopics();
-  return topics.map((topic, index) => ({
+  return (await getTopics()).map((topic) => ({
     params: { slug: topic.slug },
-    props: {
-      topic,
-      previous: index > 0 ? topics[index - 1] : undefined,
-      next: index < topics.length - 1 ? topics[index + 1] : undefined,
-    },
+    props: { topic },
   }));
 }
 
-const { topic, previous, next } = Astro.props;
+const { topic } = Astro.props;
+const topics = await getTopics();
+const filterPath = `${sitePath('resources/')}?topic=${topic.slug}`;
+const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 ---
 
-<SiteLayout title={`${topic.zhTitle} · ${topic.title}`} description={topic.description} active="resources">
-  <DocumentView
-    title={topic.zhTitle}
-    subtitle={topic.title}
-    kind="topic"
-    slug={topic.slug}
-    html={topic.html}
-    headings={topic.headings}
-    sourcePath={topic.sourcePath}
-    itemCount={topic.entries.length}
-    previous={previous ? { href: sitePath(`topics/${previous.slug}/`), title: previous.zhTitle, label: '上一个主题' } : { href: sitePath('resources/'), title: '全部资源', label: '返回索引' }}
-    next={next ? { href: sitePath(`topics/${next.slug}/`), title: next.zhTitle, label: '下一个主题' } : { href: sitePath('notes/'), title: '研究笔记', label: '继续探索' }}
-  />
+<SiteLayout title={`${topic.zhTitle} · 主题导读`} description={topic.description} active="topics">
+  <main id="main-content" class="topic-shell">
+    <aside class="topic-sidebar" aria-label="主题导航">
+      <details class="topic-menu" open>
+        <summary>主题导航 <span aria-hidden="true">⌄</span></summary>
+        <nav aria-label="主题导航">
+          <p class="sidebar-label">主题导航</p>
+          <ol class="topic-navigation">
+            {topics.map((entry, index) => <li>
+              <a href={sitePath(`topics/${entry.slug}/`)} aria-current={entry.slug === topic.slug ? 'page' : undefined}>
+                <span class="topic-order">{String(index + 1).padStart(2, '0')}</span>
+                <span>{entry.zhTitle}</span>
+              </a>
+            </li>)}
+          </ol>
+          <a class="sidebar-resource-link" href={sitePath('resources/')}>
+            搜索与筛选全部资源 <Icon name="arrow" size={16} />
+          </a>
+        </nav>
+      </details>
+    </aside>
+
+    <div class="topic-content">
+      <nav class="breadcrumbs" aria-label="面包屑">
+        <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
+        <a href={`${sitePath()}#topics`}>主题导读</a><span aria-hidden="true">/</span>
+        <span aria-current="page">{topic.zhTitle}</span>
+      </nav>
+      <header class="topic-header">
+        <p class="eyebrow">TOPIC GUIDE</p>
+        <h1>{topic.zhTitle}</h1>
+        <p class="topic-subtitle">{topic.title}</p>
+      </header>
+
+      <section class="topic-section topic-intro" aria-labelledby="topic-guide">
+        <h2 id="topic-guide">主题导读</h2>
+        <div class="prose" set:html={topic.introHtml} />
+      </section>
+
+      {topic.learningNotes.length > 0 && <section class="topic-section learning-section" aria-labelledby="learning-notes">
+        <div class="section-top"><h2 id="learning-notes">学习笔记</h2><span>沿着具体问题深入</span></div>
+        <ol class="learning-notes">
+          {topic.learningNotes.map((note, index) => <li>
+            <span class="learning-order" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <div>
+              <h3><a href={sitePath(`notes/${note.slug}/`)}>{note.title}</a></h3>
+              <p>{note.description}</p>
+              <a class="note-read" href={sitePath(`notes/${note.slug}/`)}>阅读笔记 <span>约 {note.readingMinutes} 分钟</span><Icon name="arrow" size={16} /></a>
+            </div>
+          </li>)}
+        </ol>
+      </section>}
+
+      <section class="topic-section reference-section" aria-labelledby="reference-materials">
+        <div class="section-top"><h2 id="reference-materials">参考资料</h2><span>{topic.entries.length} 条资料</span></div>
+        <p class="reference-intro">相关项目、论文与一手文档。<a href={filterPath}>在资源库筛选本主题 <Icon name="arrow" size={14} /></a></p>
+        <div class="prose reference-list" set:html={topic.resourceHtml} />
+      </section>
+      <footer class="topic-footer"><a href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 改进本主题 <Icon name="external" size={14} /></a></footer>
+    </div>
+  </main>
 </SiteLayout>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.topic-menu');
+  const desktop = window.matchMedia('(min-width: 960px)');
+  const syncMenu = () => { if (menu) menu.open = desktop.matches; };
+  syncMenu();
+  desktop.addEventListener('change', syncMenu);
+</script>
+
+<style>
+  .topic-shell { display: grid; grid-template-columns: 220px minmax(0, 820px); gap: 66px; max-width: 1210px; margin: 0 auto; padding: 42px 36px 80px; align-items: start; }
+  .topic-sidebar { min-width: 0; position: sticky; top: 110px; }
+  .topic-menu summary { display: none; }
+  .sidebar-label { font-size: 11px; color: var(--muted); letter-spacing: .06em; margin: 0 12px 16px; }
+  .topic-navigation { list-style: none; padding: 0; margin: 0; }
+  .topic-navigation a { display: flex; align-items: baseline; gap: 12px; padding: 12px; font-size: 12px; line-height: 1.6; color: var(--muted); border-radius: 6px; margin: 3px 0; }
+  .topic-navigation a:hover { color: var(--accent); background: var(--surface-alt); }
+  .topic-navigation a[aria-current] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .topic-order { font: 10px/1.6 var(--font-mono); opacity: .6; }
+  .sidebar-resource-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 27px 12px 0; padding-top: 22px; border-top: 1px solid var(--line); font-size: 11px; color: var(--accent); }
+  .topic-content { min-width: 0; }
+  .breadcrumbs { display: flex; flex-wrap: wrap; gap: 9px; font-size: 11px; line-height: 1.7; color: var(--muted); margin-bottom: 36px; }
+  .breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumbs [aria-current] { color: var(--text); }
+  .topic-header { padding-bottom: 29px; border-bottom: 1px solid var(--line); }
+  .topic-header .eyebrow { margin-bottom: 14px; }
+  h1 { font-size: clamp(29px, 3.2vw, 40px); line-height: 1.4; letter-spacing: -.045em; }
+  .topic-subtitle { margin-top: 10px; font-size: 15px; color: var(--muted); }
+  .topic-section { margin-top: 36px; }
+  .topic-section h2 { font-size: 19px; line-height: 1.5; scroll-margin-top: 140px; }
+  .topic-intro > h2 { margin-bottom: 17px; }
+  .section-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+  .section-top > span { font-size: 11px; color: var(--muted); }
+  .learning-section { margin-top: 42px; }
+  .learning-notes { list-style: none; padding: 0; margin: 0; border-block: 1px solid var(--line); }
+  .learning-notes > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 18px; padding: 25px 0; }
+  .learning-notes > li + li { border-top: 1px solid var(--line); }
+  .learning-order { color: var(--accent); font: 11px/2 var(--font-mono); }
+  .learning-notes h3 { font-size: 23px; line-height: 1.5; }
+  .learning-notes h3 a:hover { color: var(--accent); }
+  .learning-notes p { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.85; }
+  .note-read { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 16px; font-size: 11px; color: var(--accent); }
+  .note-read span { color: var(--muted); }
+  .reference-section { margin-top: 44px; }
+  .reference-intro { color: var(--muted); font-size: 12px; line-height: 1.9; margin-top: -6px; }
+  .reference-intro a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); }
+  .reference-list { font-size: 13px; line-height: 1.95; }
+  .reference-list :global(h2), .reference-list :global(h3) { font-size: 14px; font-weight: 600; margin-top: 26px; margin-bottom: 12px; padding-top: 0; }
+  .reference-list :global(ul) { padding-left: 1.1em; }
+  .reference-list :global(li) { padding-left: .2em; }
+  .reference-list :global(li + li) { margin-top: 12px; }
+  .reference-list :global(li > a:first-child) { font-weight: 550; }
+  .topic-footer { margin-top: 35px; padding-top: 23px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .topic-footer a { display: inline-flex; align-items: center; gap: 6px; }
+  .topic-footer a:hover { color: var(--accent); }
+  @media (min-width: 960px) { .topic-menu:not([open]) > nav { display: block; } }
+  @media (max-width: 1100px) { .topic-shell { gap: 38px; grid-template-columns: 205px minmax(0, 1fr); padding-inline: 28px; } }
+  @media (max-width: 959px) { .topic-shell { display: block; max-width: 820px; padding: 24px 26px 60px; } .topic-sidebar { position: static; margin-bottom: 30px; } .topic-menu { border: 1px solid var(--line); border-radius: 8px; } .topic-menu summary { display: flex; justify-content: space-between; padding: 14px 18px; font-size: 12px; color: var(--muted); cursor: pointer; } .topic-menu[open] summary { border-bottom: 1px solid var(--line); } .topic-menu nav { padding: 14px 10px 20px; } .topic-menu .sidebar-label { display: none; } .topic-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; } .sidebar-resource-link { margin-top: 14px; padding-top: 16px; } .breadcrumbs { margin-bottom: 29px; } }
+  @media (max-width: 560px) { .topic-shell { padding-inline: 20px; } .topic-navigation { display: block; } .topic-header { padding-bottom: 25px; } h1 { font-size: 29px; } .topic-subtitle { font-size: 13px; } .section-top { align-items: baseline; gap: 12px; } .section-top > span { font-size: 10px; } .learning-notes > li { grid-template-columns: 20px minmax(0, 1fr); gap: 11px; } .learning-notes h3 { font-size: 20px; } .learning-notes p { font-size: 12px; } .breadcrumbs { gap: 7px; font-size: 10px; } }
+</style>

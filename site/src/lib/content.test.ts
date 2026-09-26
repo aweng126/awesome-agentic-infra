@@ -8,12 +8,14 @@ import {
   getNotes,
   getResources,
   getTopics,
+  getTopicSections,
   renderMarkdown,
   resourcePath,
   repoUrl,
   rewriteMarkdownUrl,
   sitePath,
   topics,
+  type Note,
 } from './content';
 
 const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url));
@@ -42,7 +44,40 @@ test('topic sources produce nonempty, unique resources in metadata order', async
     }
     assert.doesNotMatch(topic.html, /<h1(?:\s|>)/u);
     assert.doesNotMatch(topic.html, /返回首页/u);
+    for (const resource of topic.entries) {
+      assert.ok(topic.resourceHtml.includes(`id="${resource.anchor}"`), 'the reference section retains each published resource target');
+    }
+    assert.doesNotMatch(topic.resourceHtml, /<h2(?:\s|>)/u);
   }
+});
+
+test('topic introductions, linked notes and reference sections share one Markdown source', async () => {
+  const note: Note = {
+    slug: 'recovery', title: '任务恢复', description: '理解任务恢复', html: '<p>机制解释</p>',
+    headings: [], sourcePath: 'notes/recovery.md', readingMinutes: 3,
+  };
+  const markdown = `# 运行时
+理解 **持久执行**。
+
+## 学习笔记
+- [任务恢复](../notes/recovery.md) — 检查点与副作用。
+
+## Projects & Platforms
+- <a id="resource-example"></a> [Example](https://example.org) — 执行系统。
+
+[返回首页](../README.md)
+`;
+  const sections = await getTopicSections(markdown, 'resources/runtime-and-orchestration.md', [note]);
+  assert.match(sections.introHtml, /<strong>持久执行<\/strong>/u);
+  assert.doesNotMatch(sections.introHtml, /任务恢复|Example/u);
+  assert.deepEqual(sections.learningNotes, [note]);
+  assert.match(sections.resourceHtml, /<h3 id="projects--platforms">/u);
+  assert.match(sections.resourceHtml, /<li id="resource-example">/u);
+  assert.doesNotMatch(sections.resourceHtml, /学习笔记|任务恢复|返回首页/u);
+  assert.equal(extractResources(markdown, topics[0]).length, 1);
+  const withoutNotes = await getTopicSections(markdown.replace(/## 学习笔记[\s\S]*?(?=## Projects)/u, ''), 'resources/runtime-and-orchestration.md', [note]);
+  assert.deepEqual(withoutNotes.learningNotes, []);
+  await assert.rejects(getTopicSections(markdown, 'resources/runtime-and-orchestration.md', []), /existing notes\/\*\.md article/);
 });
 
 test('resource sections classify all four types without counting implementation or learning-note links', () => {

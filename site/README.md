@@ -48,6 +48,14 @@ npm run preview
 
 Markdown 内继续使用仓库相对链接，站点构建负责转换对应的网页链接。资源条目格式与收录规则见 [贡献指南](../CONTRIBUTING.md)。
 
+### 主题导读、资源库与笔记
+
+- `/topics/<slug>/` 从对应的 `resources/<slug>.md` 生成导读、已关联的学习笔记与参考资料。`## 学习笔记` 中的本站 Markdown 链接决定笔记关联与顺序，其他资源分类继续生成固定锚点。
+- `/resources/` 从同一批主题文件抽取资源，展示紧凑资料列表并提供搜索、主题与类型筛选。来源链接打开原始资料，“主题导读”链接进入对应主题页。
+- `/notes/<slug>/` 展示笔记全文。新增笔记后更新 `notes/README.md`，并在相关主题中添加学习笔记链接。
+
+主题页不复制笔记正文。现有 `/topics/<slug>/#resource-*` 定位链接继续有效，供日志、笔记引用和全站搜索使用；主题页的“在资源库筛选本主题”链接使用 `/resources/?topic=<slug>`。
+
 ### 维护更新日志
 
 导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容，无需另行编辑网页。

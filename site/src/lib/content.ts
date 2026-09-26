@@ -130,6 +130,9 @@ export interface Topic {
   html: string;
   headings: Heading[];
   entries: Resource[];
+  introHtml: string;
+  resourceHtml: string;
+  learningNotes: Note[];
   sourcePath: string;
 }
 
@@ -230,6 +233,7 @@ export async function renderMarkdown(
   markdown: string,
   sourcePath: string,
   headingPrefix = '',
+  headingOffset = 0,
 ): Promise<{ html: string; headings: Heading[] }> {
   const headings: Heading[] = [];
   const result = await unified()
@@ -247,6 +251,9 @@ export async function renderMarkdown(
         }
       }
       visit(tree, (node) => {
+        if (node.type === 'heading' && headingOffset) {
+          node.depth = Math.min(6, node.depth + headingOffset) as typeof node.depth;
+        }
         if (node.type === 'link' || node.type === 'image' || node.type === 'definition') {
           const rewritten = rewriteMarkdownUrl(node.url, sourcePath);
           node.url = rewritten ?? '';
@@ -394,6 +401,7 @@ async function loadNote(sourcePath: string, slug: string, titleOverride?: string
 }
 
 export async function getTopics(): Promise<Topic[]> {
+  const notes = await getNotes();
   return Promise.all(topics.map(async (topic) => {
     const sourcePath = `resources/${topic.slug}.md`;
     const markdown = await readFile(`${repositoryRoot}/${sourcePath}`, 'utf8');
@@ -401,9 +409,37 @@ export async function getTopics(): Promise<Topic[]> {
       ...topic,
       ...(await renderMarkdown(markdown, sourcePath)),
       entries: extractResources(markdown, topic),
+      ...(await getTopicSections(markdown, sourcePath, notes)),
       sourcePath,
     };
   }));
+}
+
+/** Derive a topic's reading path and references from its single Markdown source. */
+export async function getTopicSections(markdown: string, sourcePath: string, notes: Note[]) {
+  const tree = parse(markdown);
+  const sections = tree.children.filter(node => node.type === 'heading' && node.depth === 2);
+  const title = tree.children.find(node => node.type === 'heading' && node.depth === 1);
+  const intro = markdown.slice(title?.position?.end.offset ?? 0, sections[0]?.position?.start.offset ?? markdown.length);
+  const resourceSections: string[] = [];
+  const learningNotes: Note[] = [];
+  for (const [index, section] of sections.entries()) {
+    const sectionMarkdown = markdown.slice(section.position!.start.offset!, sections[index + 1]?.position?.start.offset ?? markdown.length);
+    const name = readableText(section);
+    if (sectionTypes[name]) resourceSections.push(sectionMarkdown);
+    if (name !== '学习笔记') continue;
+    visit(parse(sectionMarkdown), 'link', link => {
+      const localPath = posix.normalize(posix.join(posix.dirname(sourcePath), decodeURIComponent(link.url.split(/[?#]/u)[0])));
+      const note = notes.find(note => note.sourcePath === localPath);
+      if (!note) throw new Error(`${sourcePath}: learning note must link to an existing notes/*.md article: ${link.url}`);
+      if (!learningNotes.some(existing => existing.slug === note.slug)) learningNotes.push(note);
+    });
+  }
+  const [introduction, references] = await Promise.all([
+    renderMarkdown(intro, sourcePath),
+    renderMarkdown(resourceSections.join('\n'), sourcePath, '', 1),
+  ]);
+  return { introHtml: introduction.html, resourceHtml: references.html, learningNotes };
 }
 
 export async function getResources(): Promise<Resource[]> {

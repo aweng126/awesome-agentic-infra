@@ -1,17 +1,73 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, getResources, sitePath, resourcePath } from '../../lib/content';
+import { getTopics, getResources, sitePath } from '../../lib/content';
+import { getResourceSource } from '../../lib/resource-source';
 const topics = await getTopics();
 const resources = await getResources();
 const types = [{id:'all',label:'全部类型'},{id:'project',label:'项目与平台'},{id:'paper',label:'论文'},{id:'spec',label:'协议规范'},{id:'article',label:'文章与文档'}];
 const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
 ---
-<SiteLayout title="资源库" description="按主题、资源类型和关键词，探索 Agent 基础设施项目、论文与技术资料。" active="resources">
+<SiteLayout title="资源库" description="按主题、资源类型和关键词，查找 Agent 基础设施项目、论文与技术资料。" active="resources">
   <main id="main-content" class="container explorer" data-resource-explorer>
-    <div class="page-heading"><p class="eyebrow">THE RESOURCE LIBRARY</p><h1>找到下一块基础设施<span class="accent-dot">。</span></h1><p>项目、论文与技术资料，按它们解决的问题连接起来。</p></div>
+    <div class="page-heading"><p class="eyebrow">THE RESOURCE LIBRARY</p><h1>查找基础设施资料<span class="accent-dot">。</span></h1><p>按主题、类型或关键词筛选，前往项目、论文与文档的来源。</p></div>
     <div class="explorer-search"><Icon name="search" size={22}/><label class="sr-only" for="resource-search">搜索资源</label><input id="resource-search" type="search" autocomplete="off" placeholder="搜索名称、技术机制或关键词，如 sandbox、记忆、MCP…"/><span>已收录 {resources.length} 条</span></div>
-    <div class="explorer-layout"><aside class="filter-sidebar" aria-label="按主题筛选"><h2>基础设施主题</h2><p class="filter-count-hint" id="topic-count-hint">数量随搜索词和资料类型更新</p><div class="topic-filters" aria-describedby="topic-count-hint"><button type="button" data-topic="all" aria-pressed="true">全部主题<span data-topic-count>{resources.length}</span></button>{topics.map(topic=><button type="button" data-topic={topic.slug} aria-pressed="false">{topic.zhTitle}<span data-topic-count>{topic.entries.length}</span></button>)}</div><div class="sidebar-note"><Icon name="book" size={20}/><p>不确定从哪里开始？</p><a href={sitePath('notes/agentic-infra-overview/')}>先读基础设施概览 ↗</a></div></aside><section class="resource-results" aria-label="资源列表"><div class="type-filters" aria-label="按资料类型筛选">{types.map(type=><button type="button" data-type={type.id} aria-pressed={type.id==='all'?'true':'false'}>{type.label}</button>)}</div><div class="results-meta"><p id="resource-count" role="status">共 {resources.length} 条资源</p><button class="reset-filters" type="button" id="reset-filters" hidden>清除筛选</button></div><div class="resource-grid">{resources.map(resource=><article class="resource-card" id={resource.id} data-id={resource.id} data-topic={resource.topicSlug} data-type={resource.type} data-search={`${resource.name} ${resource.description} ${resource.topicTitle} ${resource.topicZhTitle}`}><div class="resource-card-meta"><span class={`type-badge type-${resource.type}`}>{typeLabel[resource.type]}</span><Icon name="external" size={17}/></div><h2><a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.name}<span class="sr-only">（在新窗口打开官方来源）</span></a></h2><p>{resource.description}</p><a class="resource-topic-link" href={resourcePath(resource)}>{resource.topicZhTitle}<Icon name="arrow" size={14}/></a></article>)}</div><div id="no-results" class="empty-state" hidden><Icon name="search" size={34}/><h2>还没有找到匹配的资源</h2><p>试试更短的关键词，或放宽主题与类型筛选。</p><button class="button outline" type="button" data-reset-all>查看全部资源</button></div></section></div>
+    <div class="explorer-layout">
+      <aside class="filter-sidebar" aria-label="按主题筛选">
+        <h2>按主题筛选</h2>
+        <p class="filter-count-hint" id="topic-count-hint">数量随搜索词和资料类型更新</p>
+        <div class="topic-filters" aria-describedby="topic-count-hint">
+          <button type="button" data-topic="all" aria-pressed="true">全部主题<span data-topic-count>{resources.length}</span></button>
+          {topics.map(topic => <button type="button" data-topic={topic.slug} aria-pressed="false">{topic.zhTitle}<span data-topic-count>{topic.entries.length}</span></button>)}
+        </div>
+        <div class="sidebar-note">
+          <Icon name="book" size={20}/>
+          <p>不确定从哪里开始？</p>
+          <a href={sitePath('notes/agentic-infra-overview/')}>先读基础设施概览 →</a>
+        </div>
+      </aside>
+      <section class="resource-results" aria-label="资源列表">
+        <div class="type-filters" aria-label="按资料类型筛选">
+          {types.map(type => <button type="button" data-type={type.id} aria-pressed={type.id === 'all' ? 'true' : 'false'}>{type.label}</button>)}
+        </div>
+        <div class="results-meta">
+          <p id="resource-count" role="status">共 {resources.length} 条资源</p>
+          <button class="reset-filters" type="button" id="reset-filters" hidden>清除筛选</button>
+        </div>
+        <div class="resource-list">
+          {resources.map(resource => {
+            const source = getResourceSource(resource);
+            return (
+              <article class="resource-card" id={resource.id} data-id={resource.id} data-topic={resource.topicSlug} data-type={resource.type} data-search={`${resource.name} ${resource.description} ${resource.topicTitle} ${resource.topicZhTitle}`}>
+                <div class="resource-card-heading">
+                  <h2>{resource.name}</h2>
+                  <span class="resource-type">{typeLabel[resource.type]}</span>
+                </div>
+                <p>{resource.description}</p>
+                <div class="resource-links">
+                  <div class="resource-source">
+                    <a class="resource-source-link" href={resource.url} target="_blank" rel="noopener noreferrer">
+                      {source.label}<Icon name="external" size={13}/>
+                      <span class="sr-only">：{resource.name}（在新窗口打开）</span>
+                    </a>
+                    <span class="resource-host">{source.host}</span>
+                  </div>
+                  <a class="resource-topic-link" href={sitePath(`topics/${resource.topicSlug}/`)}>
+                    主题导读：{resource.topicZhTitle}<Icon name="arrow" size={13}/>
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <div id="no-results" class="empty-state" hidden>
+          <Icon name="search" size={34}/>
+          <h2>还没有找到匹配的资源</h2>
+          <p>试试更短的关键词，或放宽主题与类型筛选。</p>
+          <button class="button outline" type="button" data-reset-all>查看全部资源</button>
+        </div>
+      </section>
+    </div>
     <noscript><p class="noscript-note">所有资源已列在本页。启用 JavaScript 后可使用搜索与筛选；也可以使用浏览器的页面查找。</p></noscript>
   </main>
   <script>import '../../scripts/explorer';</script>
