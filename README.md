@@ -38,28 +38,6 @@ A curated collection of infrastructure resources and original notes on building 
 
 以上是阅读路径，各主题可以独立查阅。具体系统需要哪些组件，取决于任务、部署方式和约束。
 
-## Repository Layout
-
-```text
-awesome-agentic-infra/
-├── README.md                 # 项目介绍、主题导航与阅读路径
-├── CHANGELOG.md              # 按发布日期整理的内容与站点更新
-├── CONTRIBUTING.md           # 收录标准与维护方式
-├── LICENSE                   # CC BY 4.0
-├── assets/                   # README 与文档使用的图片
-├── resources/                # 八个主题的资源索引
-├── notes/                    # 原创概览、解读与比较
-│   ├── README.md
-│   ├── agentic-infra-overview.md
-│   └── task-recovery-and-side-effects.md
-├── site/                     # Astro 静态站点，直接读取上述 Markdown
-└── .github/workflows/        # 站点验证与 GitHub Pages 自动部署
-```
-
-资源的完整简介在所属主题维护，跨主题通过链接关联。[notes/](notes/README.md) 保存专题分析，`assets/` 保存独立图片。
-
-网页的主题页组织导读、相关学习笔记与参考资料；资源库提供跨主题搜索与筛选；笔记页展开完整分析。主题页与资源库共用 `resources/` 中的条目，笔记正文在 `notes/` 维护。
-
 ## Curation
 
 资源简介帮助判断项目解决什么问题，“关注”提供进一步阅读的切入点；需要理解机制、比较方案或复现实验时，可结合 [学习笔记](notes/README.md) 阅读。
