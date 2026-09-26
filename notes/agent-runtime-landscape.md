@@ -1,8 +1,8 @@
-# Agent Runtime 全景：开源框架与云厂商产品
+# Agent Runtime 全景：开源框架、运行平台与云厂商产品
 
-Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架，以及承载 Agent 应用的云端产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
+Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架、可自托管的运行平台，以及云厂商的托管产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
 
-开源框架主要提供 Agent 开发与编排能力；云厂商产品主要提供构建、部署、运行和管理服务。两者可以配合使用：一个开源框架可以接入多个云平台，同一厂商也可能同时提供开源工具包和托管产品。下面按这两种形态组织清单。
+下面按这三种形态组织清单：开源框架提供 Agent 开发与编排能力；开源运行平台供团队自行部署，管理 Agent 工作负载与运行环境；云厂商产品提供构建、部署、运行和管理服务。它们可以配合使用，一个框架可以接入不同运行平台，同一厂商也可能同时提供开发工具包、开源平台和托管产品。
 
 ## 开源框架与项目
 
@@ -19,6 +19,16 @@ Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架，�
 | [Cloudflare Agents](../resources/runtime-and-orchestration.md#resource-cloudflare-agents) | Cloudflare 团队与社区 | 在 Cloudflare 平台构建有状态 Agent 的开源 SDK | 状态管理、实时通信、任务调度、模型与 MCP 集成 | [文档](https://developers.cloudflare.com/agents/) · [仓库](https://github.com/cloudflare/agents) |
 
 旧 [AgentScope Runtime](https://github.com/agentscope-ai/agentscope-runtime) 的能力已整合进 AgentScope 2.0，因此这里作为一个项目介绍。
+
+## 开源运行平台
+
+这一组面向需要自行部署和管理 Agent 运行环境的团队，提供任务托管与生命周期管理能力。它们承载开发框架构建的 Agent 应用，由使用方维护运行基础设施。
+
+| 项目 | 维护方 | 一句话定位 | 主要特点 | 官方入口 |
+| --- | --- | --- | --- | --- |
+| [Google AX](../resources/deployment-and-scheduling.md#resource-google-ax) | Google 团队与社区 | 可自托管的声明式 Agent 工作负载编排平台 | 任务生命周期管理、工作空间准备与模型配置；通过 Kubernetes 上的 Agent Substrate 提供隔离执行 | [仓库](https://github.com/google/ax) · [概念说明](https://github.com/google/ax/blob/main/docs/concepts.md) |
+
+AX 当前接口为 `v1alpha1`，核心概念与规范仍在演进，见 [项目说明](https://github.com/google/ax#ax)。
 
 ## 云厂商产品
 
@@ -39,7 +49,7 @@ Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架，�
 
 - **阿里云 AgentCore 与 AWS AgentCore** 是两家厂商各自的产品；阿里云的 AgentCore 与 AgentRun 也按各自定位分别列出。
 - **VeADK 与 AgentKit Runtime** 分别对应开发工具包和云端运行服务；Cloudflare Agents 与 Workers 也分别出现在开发工具和运行平台的位置。
-- **Google Cloud Agent Runtime** 的旧名称是 Vertex AI Agent Engine，查阅旧资料时可能仍会遇到该名称，见 [官方更名记录](https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes)。
+- **Google ADK、AX 与 Google Cloud Agent Runtime** 分别对应开发工具包、可自托管的开源运行平台和云端托管服务。Google Cloud Agent Runtime 的旧名称是 Vertex AI Agent Engine，查阅旧资料时可能仍会遇到该名称，见 [官方更名记录](https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes)。
 
 ## 参考清单与延伸阅读
 
@@ -48,7 +58,7 @@ Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架，�
 - [Awesome Agent Infrastructure](https://github.com/backblaze-labs/awesome-agent-infrastructure)
 - [Awesome Agent Runtime](https://github.com/sandbaseai/awesome-agent-runtime)
 
-本篇归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
+本篇归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，开源运行平台与云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
 
 - **相关基础组件**：[Temporal](../resources/runtime-and-orchestration.md#resource-temporal) 是持久工作流平台，其官方 [AI 应用文档](https://docs.temporal.io/ai) 提供 Agent 集成入口。
 - **机制专题**：[任务失败后如何恢复](task-recovery-and-side-effects.md)，讨论检查点、重试与外部副作用。

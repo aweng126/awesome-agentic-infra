@@ -4,7 +4,7 @@
 
 ## 学习笔记
 
-- [Agent Runtime 全景：开源框架与云厂商产品](../notes/agent-runtime-landscape.md) — 汇总代表性开源框架与云厂商产品，介绍各方案的维护方、产品定位、主要特点和官方入口。
+- [Agent Runtime 全景：开源框架、运行平台与云厂商产品](../notes/agent-runtime-landscape.md) — 汇总代表性开源框架、可自托管的运行平台与云厂商产品，介绍各方案的维护方、产品定位、主要特点和官方入口。
 - [任务失败后如何恢复：检查点、重试与外部副作用](../notes/task-recovery-and-side-effects.md) — 从报告任务中断的例子理解检查点、重放、重试与幂等性，明确外部写入和人工审批的恢复边界。
 
 ## Projects & Platforms
