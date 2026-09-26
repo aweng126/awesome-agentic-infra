@@ -12,6 +12,7 @@
 
 ### 内容更新
 
+- 在 [GitHub README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md) 中加入三领域基础设施关系图，并更新项目介绍，说明资源索引、原创学习笔记与仓库的关注范围。
 - 在 [概览笔记](notes/agentic-infra-overview.md) 与 [仓库范围](README.md#scope) 中区分 Agentic Infra、LLM Serving Infra 和 LLM Training Infra，说明任务执行、模型服务与模型产物发布的关系；八个阅读主题同步标明核心能力、跨领域能力和关联基础设施。
 - 精简八个主题的资源索引，移除重复的相关主题列表与统一整理提示，保留资源简介、研究切入点和固定定位链接；可从 [主题导航](README.md#topics) 查阅。
 - 调整 [概览笔记](notes/agentic-infra-overview.md) 的开篇与研究记录建议，直接说明讨论问题及证据组织方法；简化 [笔记索引](notes/README.md)，在 [贡献指南](CONTRIBUTING.md#where-to-put-it) 中明确相关学习笔记的关联方式。

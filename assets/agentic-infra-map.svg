@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="736" viewBox="0 0 720 736" role="img" aria-labelledby="title description">
+  <title id="title">Agentic Infra 与模型基础设施的关系</title>
+  <desc id="description">Agentic Infra 包括运行时与编排、记忆与上下文、工具与协议、沙箱与执行。它向 LLM Serving Infra 发送模型请求并接收推理结果。LLM Training Infra 向 Serving 发布模型产物。部署与调度、观测与评估、安全与治理是跨领域能力，本仓库聚焦 Agent 场景。</desc>
+  <style>
+    svg {
+      --surface: #fffefa;
+      --surface-alt: #eef1e8;
+      --text: #222b26;
+      --muted: #69736b;
+      --line: #dce2d7;
+      --accent: #225c48;
+      --accent-soft: #e7efdc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --surface: #1b2720;
+        --surface-alt: #223026;
+        --text: #ecf0e4;
+        --muted: #a5b3a7;
+        --line: #334537;
+        --accent: #c1daa0;
+        --accent-soft: #2a3d2d;
+      }
+    }
+    text { fill: var(--text); }
+    .surface { fill: var(--surface); stroke: var(--line); }
+    .muted { fill: var(--muted); }
+    .domain { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-weight: 600; }
+    .small { font-size: 14px; }
+    .accent { fill: var(--accent); }
+    .wire { fill: none; stroke: var(--accent); stroke-width: 1.2; opacity: .5; }
+    .arrow { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .release { stroke: var(--muted); }
+  </style>
+  <defs>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r=".8" fill="var(--line)" />
+    </pattern>
+  </defs>
+
+  <rect class="surface" x="1" y="1" width="718" height="734" rx="18" />
+  <circle class="accent" cx="32" cy="33" r="4" />
+  <text x="49" y="40" font-size="19" font-weight="600">Agentic Infra 与模型基础设施的关系</text>
+  <path d="M1 64H719 M1 624H719" stroke="var(--line)" />
+  <rect x="2" y="65" width="716" height="558" fill="url(#dots)" />
+
+  <g aria-label="Agentic Infra，本站重点">
+    <rect x="30" y="84" width="660" height="224" rx="12" fill="var(--accent-soft)" stroke="var(--accent)" />
+    <text class="domain accent" x="54" y="118" font-size="23">Agentic Infra</text>
+    <rect x="584" y="99" width="82" height="27" rx="4" fill="none" stroke="var(--accent)" />
+    <text class="accent" x="625" y="118" font-size="13" text-anchor="middle">本站重点</text>
+    <text class="muted" x="54" y="147" font-size="15">让 Agent 持续、可靠地完成任务</text>
+
+    <rect x="54" y="163" width="612" height="48" rx="7" fill="#225c48" />
+    <text x="360" y="193" text-anchor="middle" font-size="17" font-weight="600" style="fill:#f0f5e5">运行时与编排</text>
+    <path class="wire" d="M360 211V224 M152 239V224H568V239 M360 224V239" />
+    <rect class="surface" x="54" y="239" width="196" height="44" rx="6" />
+    <rect class="surface" x="262" y="239" width="196" height="44" rx="6" />
+    <rect class="surface" x="470" y="239" width="196" height="44" rx="6" />
+    <text x="152" y="267" text-anchor="middle" font-size="15">记忆与上下文</text>
+    <text x="360" y="267" text-anchor="middle" font-size="15">工具与协议</text>
+    <text x="568" y="267" text-anchor="middle" font-size="15">沙箱与执行</text>
+  </g>
+
+  <g aria-label="Agentic 向 Serving 发送模型请求，Serving 返回推理结果">
+    <path class="arrow" d="M228 320V344 M220 336L228 344L236 336" />
+    <text class="small accent" x="247" y="339">模型请求</text>
+    <path class="arrow" d="M418 344V320 M410 328L418 320L426 328" />
+    <text class="small accent" x="437" y="339">推理结果</text>
+  </g>
+
+  <g aria-label="LLM Serving Infra">
+    <rect x="30" y="359" width="660" height="95" rx="12" fill="var(--surface)" stroke="var(--muted)" />
+    <text class="domain" x="54" y="393" font-size="21">LLM Serving Infra</text>
+    <text class="small muted" x="54" y="425">推理 · 批处理 · KV cache</text>
+    <text class="muted" x="666" y="425" text-anchor="end" font-size="13">自建服务 / 托管 API</text>
+  </g>
+
+  <g aria-label="Training 向 Serving 发布模型产物">
+    <path class="arrow release" d="M296 491V467 M288 475L296 467L304 475" />
+    <text class="small muted" x="315" y="485">模型产物发布</text>
+  </g>
+
+  <g aria-label="LLM Training Infra">
+    <rect x="66" y="507" width="588" height="91" rx="12" fill="var(--surface-alt)" stroke="var(--line)" />
+    <text class="domain" x="90" y="542" font-size="20">LLM Training Infra</text>
+    <text class="small muted" x="90" y="573">数据 · 分布式训练 · 微调</text>
+  </g>
+
+  <g aria-label="跨领域能力，本站聚焦 Agent 场景">
+    <text x="30" y="652" font-size="14" font-weight="600">跨领域能力</text>
+    <text class="muted" x="690" y="652" text-anchor="end" font-size="13">本站聚焦 Agent 场景</text>
+    <rect x="30" y="668" width="212" height="43" rx="6" fill="var(--surface-alt)" stroke="var(--line)" />
+    <rect x="254" y="668" width="212" height="43" rx="6" fill="var(--surface-alt)" stroke="var(--line)" />
+    <rect x="478" y="668" width="212" height="43" rx="6" fill="var(--surface-alt)" stroke="var(--line)" />
+    <text x="136" y="695" text-anchor="middle" font-size="15">部署与调度</text>
+    <text x="360" y="695" text-anchor="middle" font-size="15">观测与评估</text>
+    <text x="584" y="695" text-anchor="middle" font-size="15">安全与治理</text>
+  </g>
+</svg>

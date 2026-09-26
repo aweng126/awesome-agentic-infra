@@ -1,12 +1,16 @@
 # Awesome Agentic Infra
 
-面向 Agent 系统的基础设施资源索引与研究笔记，关注运行时、执行环境、状态管理、工具互联和可靠运行。
+Awesome Agentic Infra 是面向 **Agent 持续、可靠运行** 的基础设施知识库，提供精选资源索引与原创学习笔记，覆盖任务执行、状态管理、工具交互和失败恢复。
 
-A curated collection of infrastructure resources and research notes for agentic systems.
+资源索引帮助查找项目、论文、规范和官方文档，以一手来源为入口；学习笔记展开系统机制与设计取舍。内容以中文导读为主，保留英文项目名与技术术语。
+
+A curated collection of infrastructure resources and original notes on building reliable agentic systems.
 
 **在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/) · [更新日志](https://blog.kingwen.cn/awesome-agentic-infra/changelog/) · [站点开发与部署](site/README.md)
 
-以中文介绍为主，保留英文项目名与技术术语。资源按基础设施能力分类，各主题按实际内容收录项目、论文、规范与技术资料。
+[![Agentic Infra 与 LLM Serving、LLM Training 基础设施的关系](assets/agentic-infra-map.svg)](https://blog.kingwen.cn/awesome-agentic-infra/)
+
+以 **Agentic Infra** 为核心，**LLM Serving Infra** 为关联基础设施，**LLM Training Infra** 为上游背景；图中展示三者的职责与协作关系。
 
 ## Scope
 
@@ -60,6 +64,7 @@ awesome-agentic-infra/
 ├── CHANGELOG.md              # 按发布日期整理的内容与站点更新
 ├── CONTRIBUTING.md           # 收录标准与维护方式
 ├── LICENSE                   # CC BY 4.0
+├── assets/                   # README 与文档使用的图片
 ├── resources/                # 八个主题的资源索引
 ├── notes/                    # 原创概览、解读与比较
 │   ├── README.md
@@ -69,7 +74,7 @@ awesome-agentic-infra/
 └── .github/workflows/        # 站点验证与 GitHub Pages 自动部署
 ```
 
-资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)；出现独立图片文件时再建立 `assets/`。
+资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)，独立图片在 `assets/` 维护。
 
 网页的主题页组织导读、相关学习笔记与参考资料；资源库提供跨主题搜索与筛选；笔记页展开完整分析。主题页与资源库共用 `resources/` 中的条目，笔记正文在 `notes/` 维护。回访时可先查看 [更新日志](CHANGELOG.md)，直接前往新增或修改的内容。修改 Markdown 并同步补充日志后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
 
