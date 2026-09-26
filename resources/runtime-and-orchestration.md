@@ -4,7 +4,7 @@
 
 ## 学习笔记
 
-- [Agent Runtime 实现方案：开源框架与云托管平台](../notes/agent-runtime-landscape.md) — 按执行循环、持久执行与托管运行环境比较代表方案，区分会话状态、任务进度和工作文件的恢复方式，并说明框架与平台如何组合。
+- [Agent Runtime 全景：开源框架与云厂商产品](../notes/agent-runtime-landscape.md) — 汇总代表性开源框架与云厂商产品，介绍各方案的维护方、产品定位、主要特点和官方入口。
 - [任务失败后如何恢复：检查点、重试与外部副作用](../notes/task-recovery-and-side-effects.md) — 从报告任务中断的例子理解检查点、重放、重试与幂等性，明确外部写入和人工审批的恢复边界。
 
 ## Projects & Platforms

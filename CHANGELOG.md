@@ -6,7 +6,7 @@
 
 ### 新增内容
 
-- 新增 [Agent Runtime 实现方案：开源框架与云托管平台](notes/agent-runtime-landscape.md)，比较执行模型、状态与恢复边界、部署方式及组合选择，作为 [运行时与编排](resources/runtime-and-orchestration.md) 的学习笔记；同步补充该主题与 [部署与调度](resources/deployment-and-scheduling.md) 中的框架和托管平台资源。
+- 新增 [Agent Runtime 全景：开源框架与云厂商产品](notes/agent-runtime-landscape.md)，汇总代表性方案的维护方、产品定位、主要特点和官方入口，作为 [运行时与编排](resources/runtime-and-orchestration.md) 的学习笔记；同步补充该主题与 [部署与调度](resources/deployment-and-scheduling.md) 中的框架和托管平台资源。
 - 新增 [任务失败后如何恢复：检查点、重试与外部副作用](notes/task-recovery-and-side-effects.md)，通过报告任务的故障窗口，解释状态持久化、重放、幂等键与人工审批，并附官方来源和验证检查表。
 - 首次收录 40 项基础设施资源，覆盖 [运行时与编排](resources/runtime-and-orchestration.md)、[沙箱与执行](resources/sandbox-and-execution.md)、[记忆与上下文](resources/memory-and-context.md)、[工具与协议](resources/tools-and-protocols.md)、[推理与模型服务](resources/inference-and-model-serving.md)、[部署与调度](resources/deployment-and-scheduling.md)、[可观测性与评估](resources/observability-and-evaluation.md)、[安全与治理](resources/security-and-governance.md) 八个主题，每项提供简介、一手来源和研究切入点。
 - 发布概览笔记 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md)，介绍基础设施能力、执行链路与主题间的关系，作为首次阅读的起点。
