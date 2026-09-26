@@ -12,11 +12,13 @@
 
 ### 内容更新
 
+- 在 [概览笔记](notes/agentic-infra-overview.md) 与 [仓库范围](README.md#scope) 中区分 Agentic Infra、LLM Serving Infra 和 LLM Training Infra，说明任务执行、模型服务与模型产物发布的关系；八个阅读主题同步标明核心能力、跨领域能力和关联基础设施。
 - 精简八个主题的资源索引，移除重复的相关主题列表与统一整理提示，保留资源简介、研究切入点和固定定位链接；可从 [主题导航](README.md#topics) 查阅。
 - 调整 [概览笔记](notes/agentic-infra-overview.md) 的开篇与研究记录建议，直接说明讨论问题及证据组织方法；简化 [笔记索引](notes/README.md)，在 [贡献指南](CONTRIBUTING.md#where-to-put-it) 中明确相关学习笔记的关联方式。
 
 ### 站点改进
 
+- 重绘 [首页](README.md) 基础设施关系图：突出 Agentic Infra，独立展示 Serving 与 Training，标明模型请求、推理结果和模型产物发布方向；部署、观测与治理作为跨领域能力展示。
 - 将 [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/) 改为紧凑资料列表，明确区分外部来源与主题导读入口；保留搜索、筛选与同步计数。
 - 主题页按导读、学习笔记和参考资料组织内容，简化导航并保留既有资源定位链接。[运行时与编排](resources/runtime-and-orchestration.md) 已接入恢复机制笔记，首页可直接进入阅读。
 - 修正 [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/) 的筛选数量：主题旁的数字随搜索词和资料类型同步更新，选中主题的数量与右侧结果保持一致，清除筛选后恢复完整数量。

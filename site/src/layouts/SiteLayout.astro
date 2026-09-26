@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Icon from '../components/Icon.astro';
 import { getResources, getNotes, sitePath, resourcePath, repoUrl } from '../lib/content';
 interface Props { title: string; description?: string; active?: 'home' | 'topics' | 'resources' | 'notes' | 'changelog' | 'contributing'; }
-const { title, description = '探索 Agent 背后的基础设施：运行时、沙箱、记忆、工具、模型服务、部署、观测与治理。', active = 'home' } = Astro.props;
+const { title, description = '理解 Agent 任务执行所需的运行时、沙箱、记忆、工具与可靠运行机制，以及它们与模型服务、训练基础设施的关系。', active = 'home' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const resources = await getResources();
 const notes = await getNotes();

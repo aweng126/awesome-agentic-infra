@@ -65,6 +65,7 @@ export const topics = [
     slug: 'runtime-and-orchestration',
     title: 'Runtime & Orchestration',
     zhTitle: '运行时与编排',
+    scope: 'core',
     description: '让 Agent 任务持续推进，在协作、中断与失败之后恢复执行。',
     icon: 'workflow',
   },
@@ -72,6 +73,7 @@ export const topics = [
     slug: 'sandbox-and-execution',
     title: 'Sandbox & Execution',
     zhTitle: '沙箱与执行环境',
+    scope: 'core',
     description: '为代码、命令和浏览器操作提供可管理、可隔离的执行环境。',
     icon: 'sandbox',
   },
@@ -79,6 +81,7 @@ export const topics = [
     slug: 'memory-and-context',
     title: 'Memory & Context',
     zhTitle: '记忆与上下文',
+    scope: 'core',
     description: '保存任务所需的状态与记忆，为下一次模型调用组织上下文。',
     icon: 'memory',
   },
@@ -86,6 +89,7 @@ export const topics = [
     slug: 'tools-and-protocols',
     title: 'Tools & Protocols',
     zhTitle: '工具与协议',
+    scope: 'core',
     description: '连接外部工具与独立 Agent，统一能力发现、调用和通信接口。',
     icon: 'plug',
   },
@@ -93,20 +97,23 @@ export const topics = [
     slug: 'inference-and-model-serving',
     title: 'Inference & Model Serving',
     zhTitle: '推理与模型服务',
-    description: '承载多轮模型请求，组织路由、批处理与推理缓存。',
+    scope: 'serving',
+    description: '为 Agent 提供模型服务，处理多轮请求、批处理与推理缓存。',
     icon: 'model',
   },
   {
     slug: 'deployment-and-scheduling',
     title: 'Deployment & Scheduling',
     zhTitle: '部署与调度',
-    description: '让工作负载在合适的资源上运行，并按需求部署与伸缩。',
+    scope: 'crossCutting',
+    description: '围绕 Agent 工作负载，管理工作节点、执行环境与弹性伸缩。',
     icon: 'server',
   },
   {
     slug: 'observability-and-evaluation',
     title: 'Observability & Evaluation',
     zhTitle: '可观测性与评估',
+    scope: 'crossCutting',
     description: '追踪任务执行过程，衡量质量、可靠性、延迟与资源消耗。',
     icon: 'activity',
   },
@@ -114,10 +121,17 @@ export const topics = [
     slug: 'security-and-governance',
     title: 'Security & Governance',
     zhTitle: '安全与治理',
+    scope: 'crossCutting',
     description: '确认操作主体与权限，让身份、策略与审计贯穿执行过程。',
     icon: 'shield',
   },
 ] as const;
+
+export const topicScopeLabels = {
+  core: 'Agentic 核心能力',
+  crossCutting: '跨领域能力 · Agent 场景',
+  serving: '关联基础设施 · LLM Serving',
+} as const;
 
 type TopicMetadata = (typeof topics)[number];
 
@@ -125,6 +139,7 @@ export interface Topic {
   slug: string;
   title: string;
   zhTitle: string;
+  scope: TopicMetadata['scope'];
   description: string;
   icon: string;
   html: string;

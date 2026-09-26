@@ -1,8 +1,10 @@
 # Inference & Model Serving
 
-关注 Agent 的模型访问入口与推理执行：统一 API、请求路由、批处理、KV cache 管理和分布式服务。通用推理系统在此的收录理由，是它们为 Agent 的多轮调用、长上下文或并发任务提供模型服务基础。
+本主题属于 **LLM Serving Infra**，作为 Agentic Infra 的关联基础设施收录。它负责处理模型请求，涵盖统一 API、请求路由、推理执行、批处理、KV cache 管理和分布式服务。阅读重点是这些机制如何支持 Agent 的多轮调用、长上下文与并发任务。
 
-本主题关注模型请求如何被处理；Agent 的任务推进属于运行时与编排，工作节点和沙箱的部署生命周期属于部署与调度。推理系统内部的资源管理仍在本主题讨论。
+Agentic Infra 决定任务下一步做什么、向模型提供哪些上下文，并处理模型结果；Serving 接收请求并执行推理。模型的训练、微调与训练检查点属于 **LLM Training Infra**，通过模型产物发布与 Serving 衔接。三者的关系见 [概览笔记](../notes/agentic-infra-overview.md)。
+
+Agent 的任务推进与失败恢复在“运行时与编排”主题讨论，工作节点和沙箱的部署生命周期在“部署与调度”主题讨论。推理引擎内部的批处理、显存与 KV cache 调度仍在本主题讨论。
 
 ## Projects & Platforms
 

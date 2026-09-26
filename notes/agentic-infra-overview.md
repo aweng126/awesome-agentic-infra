@@ -1,31 +1,58 @@
 # Agentic Infra 的范围、组件与分类边界
 
-一个 Agent 从接收任务到完成执行，需要哪些基础设施能力？本文沿着一次任务的执行链路，介绍八个主题的职责，并区分任务状态、资源调度与执行隔离等容易混淆的概念，帮助读者选择后续的学习与研究方向。
+一个 Agent 从接收任务到完成执行，需要哪些基础设施能力？本文先区分 Agentic Infra、LLM Serving Infra 与 LLM Training Infra，再沿着一次任务的执行链路，介绍八个阅读主题的职责与联系。
+
+## 三个基础设施领域
+
+本仓库按主要职责组织内容：Agentic Infra 关心任务如何持续、可靠地完成，Serving 关心模型请求如何高效、稳定地执行，Training 关心模型如何训练与更新。
+
+| 领域 | 处理的主要对象 | 典型能力 | 在本仓库中的位置 |
+| --- | --- | --- | --- |
+| **Agentic Infra** | 任务、会话、执行状态与工具操作 | 运行时与编排、任务恢复、记忆与上下文、工具互联、沙箱执行 | 核心内容 |
+| **LLM Serving Infra** | 模型请求、推理批次与推理缓存 | 模型 API、路由、推理执行、批处理、KV cache 管理 | 关联基础设施，围绕 Agent 的模型调用需求展开 |
+| **LLM Training Infra** | 训练数据、模型参数与训练状态 | 数据流水线、训练与微调、分布式训练、优化器、训练检查点与模型产物 | 上游背景，暂不单独设置资源主题 |
+
+这些职责可以从具体系统中理解：[LangGraph](https://docs.langchain.com/oss/python/langgraph/overview) 聚焦长时间、有状态的 Agent 编排与持久执行；[vLLM](https://docs.vllm.ai/en/latest/) 提供模型推理与服务能力；[Megatron Core](https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/index.html) 提供大模型分布式训练组件。一个产品可能覆盖多个领域，阅读时需要进一步区分其中的机制。
 
 ## 从一次任务执行开始
 
 设想一个需要查询资料、运行代码并输出报告的 Agent。为了完成任务，系统需要决定下一步操作，准备模型上下文，调用模型和外部工具，记录过程，并在中断后处理尚未完成的工作。这个场景可以帮助我们识别基础设施职责。
 
-下面是逻辑关系示意。同一进程或平台可以承担多个职责，实际调用路径由具体实现决定。
+下面按三个领域展示协作关系。Agentic Infra 调用 Serving 并接收推理结果；Training 向 Serving 交付模型产物。图中的模型发布箭头表示模型生命周期中的交付过程，日常任务执行使用已经部署的模型服务。
 
 ```mermaid
-flowchart TD
-    Task[任务与会话] --> Runtime[运行时与编排]
-    Runtime <--> Memory[记忆与上下文]
-    Runtime <--> Models[推理与模型服务]
-    Runtime <--> Tools[工具与协议]
-    Tools <--> Sandbox[沙箱与执行环境]
-    Tools <--> External[外部 API 与其他 Agent]
-    Deployment[部署与资源调度] -.承载与伸缩.-> Runtime
-    Deployment -.供应执行环境.-> Sandbox
-    Deployment -.承载模型服务.-> Models
-    Observation[可观测性与评估] -.跨组件采集与验证.-> Runtime
-    Security[安全与治理] -.跨组件身份与策略.-> Tools
+flowchart TB
+    accTitle: Agentic Infra 与模型基础设施的关系
+    accDescr: Agentic Infra 内的运行时与记忆、工具和沙箱协作，向 LLM Serving Infra 发送模型请求并接收推理结果。LLM Training Infra 将训练或微调后的模型产物发布到 Serving。部署与调度、观测与评估、安全与治理是三个领域的跨领域能力。
+    subgraph Agentic["Agentic Infra · 本站重点"]
+        direction TB
+        Runtime[运行时与编排 / 任务恢复]
+        Runtime <--> Memory[记忆与上下文]
+        Runtime <--> Tools[工具与协议]
+        Tools <--> Sandbox[沙箱与执行环境]
+    end
+    subgraph Serving["LLM Serving Infra · 关联基础设施"]
+        Models[模型 API 与路由 / 推理执行<br/>批处理 / KV cache]
+    end
+    subgraph Training["LLM Training Infra · 上游背景"]
+        Train[数据 / 训练与微调<br/>分布式训练 / 训练检查点]
+    end
+    Runtime -->|模型请求| Models
+    Models -->|推理结果| Runtime
+    Train -->|模型产物发布| Models
+    Shared[跨领域能力<br/>部署与调度 · 观测与评估 · 安全与治理]
+    Shared -.-> Agentic
+    Shared -.-> Serving
+    Shared -.-> Training
 ```
 
-观测和治理通常涉及多个组件，图中只画出代表性连线；它们的具体作用范围需要在系统设计中明确。
+这里按职责划分边界，同一进程或平台可以承担多个职责，三个领域也可以独立部署。图中实线表示组件交互与模型交付，虚线表示跨领域能力的作用范围。
+
+部署与调度、观测与评估、安全与治理都服务于多个领域。本仓库侧重 Agent 工作负载中的问题，例如长任务与沙箱的资源供应、模型调用与工具操作的联合追踪、任务完成质量，以及操作授权与审计。通用的调度、遥测和策略机制可以复用，实际设计仍要明确管理对象与作用边界。
 
 ## 八个主题分别回答什么
+
+八个主题是阅读目录：前四项展开 Agentic Infra 的核心能力，第五项介绍关联的 Serving 服务，后三项讨论跨领域能力在 Agent 侧的应用。训练作为上游背景在本文说明。
 
 | 主题 | 在示例任务中的职责 | 阅读入口 |
 | --- | --- | --- |

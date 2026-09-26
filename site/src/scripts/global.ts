@@ -61,7 +61,9 @@ async function renderDiagrams() {
     for (const [index, block] of diagramBlocks.entries()) {
       const {svg} = await mermaid.render(`infra-diagram-${version}-${index}`,block.source);
       if(version!==diagramVersion)return;
-      const output=block.output||document.createElement('div');output.className='mermaid-diagram';output.setAttribute('role','img');output.setAttribute('aria-label','Agent 基础设施组件关系图');output.innerHTML=svg;
+      const output=block.output||document.createElement('div');output.className='mermaid-diagram';output.innerHTML=svg;
+      output.setAttribute('role','img');
+      output.setAttribute('aria-label',output.querySelector('svg > title')?.textContent || '文中示意图');
       if(!block.output){block.pre.after(output);block.output=output;}block.pre.hidden=true;
     }
   } catch { /* Keep the original diagram source readable if rendering fails. */ }

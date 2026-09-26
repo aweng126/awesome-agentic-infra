@@ -10,7 +10,15 @@ A curated collection of infrastructure resources and research notes for agentic 
 
 ## Scope
 
-本仓库将 **Agentic Infrastructure** 定义为：支撑 Agent 持续执行任务、与工具和其他 Agent 交互、维护状态，并进行部署、观测与治理的系统组件及机制。这是本仓库的工作分类，可随研究内容调整。
+本仓库关注 **Agentic Infrastructure**：支撑 Agent 持续执行任务、维护状态、调用工具，并在中断或失败后恢复的系统组件及机制。为说明它与模型基础设施的关系，按主要职责区分三个领域：
+
+| 领域 | 主要职责 | 本仓库的阅读范围 |
+| --- | --- | --- |
+| **Agentic Infra** | 运行时与编排、任务恢复、记忆与上下文、工具互联、沙箱执行 | 核心内容，重点研究任务如何持续、可靠地完成 |
+| **LLM Serving Infra** | 模型 API、请求路由、推理执行、批处理与 KV cache 管理 | 关联基础设施，关注它如何服务 Agent 的多轮、长上下文与并发请求 |
+| **LLM Training Infra** | 数据准备、训练与微调、分布式训练、训练检查点与模型产物 | 上游背景，用于理解模型如何产生和更新 |
+
+Agentic Infra 向 Serving 发起模型请求并接收结果；Training 将模型产物交付给 Serving。三者按职责划分，可以独立部署，也可以由同一平台承载。部署与调度、观测与评估、安全与治理是跨领域能力，本仓库重点讨论它们在 Agent 任务中的作用。
 
 重点收录：
 
@@ -18,9 +26,11 @@ A curated collection of infrastructure resources and research notes for agentic 
 - 与 Agent 工作负载直接相关的推理服务、资源调度、观测、评估和安全机制。
 - 解释上述系统设计的论文、官方文档、工程文章，以及本仓库的原创分析。
 
-通用数据库、云计算和模型服务组件需要说明与 Agent 的具体关系；面向终端用户的应用、单纯的提示词合集、模型训练资料暂不作为主要收录对象。
+通用数据库、云计算和模型服务组件需要说明与 Agent 的具体关系；面向终端用户的应用、单纯的提示词合集暂不作为主要收录对象。模型训练目前作为背景介绍，不单独设置资源主题。三领域的协作关系与分类示例见 [概览笔记](notes/agentic-infra-overview.md)。
 
 ## Topics
+
+以下八个主题是阅读目录：前四项覆盖 Agentic Infra 的核心能力，“推理与模型服务”属于关联的 Serving 领域，后三项讨论跨领域能力在 Agent 工作负载中的应用。
 
 | 主题 | 核心问题 |
 | --- | --- |

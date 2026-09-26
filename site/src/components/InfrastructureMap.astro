@@ -2,21 +2,83 @@
 import { sitePath } from '../lib/content';
 const to = (slug: string) => sitePath(`topics/${slug}/`);
 ---
-<div class="infra-map">
-  <div class="map-caption"><span><span class="live-dot"></span> AGENT SYSTEM / A LOGICAL VIEW</span><span>01—08</span></div>
-  <svg viewBox="0 0 520 410" role="img" aria-labelledby="infra-map-title infra-map-desc">
-    <title id="infra-map-title">Agent 基础设施关系图</title>
-    <desc id="infra-map-desc">运行时连接模型、记忆和工具，工具使用执行环境，部署、观测和安全支撑系统。点击组件可阅读对应主题。</desc>
-    <defs><pattern id="infra-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="currentColor" opacity=".17"/></pattern></defs>
-    <rect width="520" height="410" fill="url(#infra-dots)" />
-    <g class="map-lines" fill="none" stroke-width="1.5"><path d="M260 82v49 M147 166h39 M334 166h39 M433 198v34H260v26 M260 199v59"/><path d="M88 199v95h98 M260 322v34" stroke-dasharray="4 5"/></g>
-    <a href={to('inference-and-model-serving')}><rect class="map-node" x="178" y="25" width="164" height="58" rx="9"/><text class="map-label" x="260" y="49">MODEL SERVING</text><text class="map-sub" x="260" y="68">推理与模型服务</text></a>
-    <a href={to('memory-and-context')}><rect class="map-node" x="22" y="135" width="125" height="64" rx="9"/><text class="map-label" x="84" y="161">MEMORY</text><text class="map-sub" x="84" y="181">记忆与上下文</text></a>
-    <a href={to('runtime-and-orchestration')}><rect class="map-core" x="185" y="131" width="150" height="69" rx="9"/><text class="map-core-label" x="260" y="159">AGENT RUNTIME</text><text class="map-core-sub" x="260" y="180">运行时与编排</text></a>
-    <a href={to('tools-and-protocols')}><rect class="map-node" x="373" y="135" width="125" height="64" rx="9"/><text class="map-label" x="435" y="161">TOOLS</text><text class="map-sub" x="435" y="181">工具与协议</text></a>
-    <a href={to('sandbox-and-execution')}><rect class="map-node" x="185" y="260" width="150" height="64" rx="9"/><text class="map-label" x="260" y="285">EXECUTION</text><text class="map-sub" x="260" y="307">沙箱与执行环境</text></a>
-    <circle class="map-pulse" cx="260" cy="108" r="4"/>
-    <g class="map-base"><a href={to('deployment-and-scheduling')}><rect x="22" y="355" width="148" height="35" rx="6"/><text x="96" y="377">部署与调度</text></a><a href={to('observability-and-evaluation')}><rect x="185" y="355" width="150" height="35" rx="6"/><text x="260" y="377">观测与评估</text></a><a href={to('security-and-governance')}><rect x="350" y="355" width="148" height="35" rx="6"/><text x="424" y="377">安全与治理</text></a></g>
-  </svg>
-  <p class="map-footnote">从一次模型调用，到持续运行的 Agent 系统。</p>
-</div>
+<figure class="infra-map" aria-labelledby="infra-map-title" aria-describedby="infra-map-desc">
+  <figcaption id="infra-map-title"><span class="live-dot" aria-hidden="true"></span>Agentic Infra 与模型基础设施的关系</figcaption>
+  <p class="sr-only" id="infra-map-desc">Agentic Infra 调用 LLM Serving Infra 并接收推理结果。LLM Training Infra 向 Serving 发布模型产物，这条箭头表示模型交付关系。部署、观测与安全是跨领域能力。图中链接可进入对应主题导读。</p>
+  <div class="map-domains">
+    <section class="map-domain agentic-domain" aria-labelledby="agentic-domain-title">
+      <div class="domain-heading"><h2 id="agentic-domain-title">Agentic Infra</h2><span class="focus-label">本站重点</span></div>
+      <p class="domain-description">让 Agent 持续、可靠地完成任务</p>
+      <a class="runtime-node" href={to('runtime-and-orchestration')}>运行时与编排 <span aria-hidden="true">→</span></a>
+      <div class="agent-capabilities">
+        <a href={to('memory-and-context')}>记忆与上下文</a>
+        <a href={to('tools-and-protocols')}>工具与协议</a>
+        <a href={to('sandbox-and-execution')} aria-label="沙箱与执行环境主题导读">沙箱与执行</a>
+      </div>
+    </section>
+
+    <div class="model-exchange" aria-hidden="true">
+      <span><b>↓</b> 模型请求</span><span><b>↑</b> 推理结果</span>
+    </div>
+
+    <a class="map-domain serving-domain" href={to('inference-and-model-serving')}>
+      <div class="domain-heading"><h2>LLM Serving Infra</h2><span class="domain-link-arrow" aria-hidden="true">→</span></div>
+      <div class="serving-details"><p class="domain-description">推理 · 批处理 · KV cache</p><p class="domain-detail">自建服务 / 托管 API</p></div>
+    </a>
+
+    <p class="model-release" aria-hidden="true"><b>↑</b> 模型产物发布</p>
+
+    <section class="map-domain training-domain" aria-labelledby="training-domain-title">
+      <h2 id="training-domain-title">LLM Training Infra</h2>
+      <p class="domain-description">数据 · 分布式训练 · 微调</p>
+    </section>
+  </div>
+  <div class="shared-capabilities">
+    <p><strong>跨领域能力</strong><span>本站聚焦 Agent 场景</span></p>
+    <div>
+      <a href={to('deployment-and-scheduling')}>部署与调度</a>
+      <a href={to('observability-and-evaluation')}>观测与评估</a>
+      <a href={to('security-and-governance')}>安全与治理</a>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .infra-map{min-width:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+  figcaption{display:flex;align-items:center;gap:9px;padding:14px 20px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.6;font-weight:550}
+  .map-domains{padding:16px 22px;background-image:radial-gradient(var(--line) .7px,transparent .7px);background-size:18px 18px}
+  .map-domain{display:block;position:relative;padding:12px 16px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+  .domain-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .map-domain h2{font:550 15px/1.5 var(--font-mono);letter-spacing:-.35px}
+  .domain-description{font-size:12px;line-height:1.7;color:var(--muted);margin-top:3px}
+  .agentic-domain{border-color:var(--accent);background:var(--accent-soft);padding-bottom:14px}
+  .agentic-domain h2{color:var(--accent);font-size:17px}
+  .focus-label{font-size:10px;white-space:nowrap;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:1px 6px}
+  .runtime-node{display:flex;align-items:center;justify-content:center;gap:14px;background:#225c48;color:#f0f5e5;border-radius:5px;padding:8px 10px;font-size:13px;font-weight:550;margin-top:9px}
+  .runtime-node:hover{background:#194936}
+  .agent-capabilities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;position:relative;padding-top:15px}
+  .agent-capabilities::before{content:'';position:absolute;top:7px;left:calc((100% - 14px)/6);right:calc((100% - 14px)/6);border-top:1px solid var(--accent);opacity:.4}
+  .agent-capabilities::after{content:'';position:absolute;top:0;left:50%;height:7px;border-left:1px solid var(--accent);opacity:.4}
+  .agent-capabilities a{position:relative;display:grid;align-items:center;padding:7px 3px;border:1px solid var(--line);border-radius:5px;background:var(--surface);text-align:center;font-size:11px;line-height:1.6}
+  .agent-capabilities a::before{content:'';position:absolute;bottom:100%;left:50%;height:9px;border-left:1px solid var(--accent);opacity:.4}
+  .agent-capabilities a:hover,.shared-capabilities a:hover{border-color:var(--accent);color:var(--accent)}
+  .model-exchange{display:flex;justify-content:center;gap:36px;padding:3px 0;color:var(--accent)}
+  .model-exchange span,.model-release{display:flex;align-items:center;justify-content:center;gap:9px;font-size:11px;line-height:1.5}
+  .model-exchange b,.model-release b{font-size:25px;line-height:1.35;font-weight:400}
+  .serving-domain{border-color:var(--muted)}
+  .serving-domain:hover{border-color:var(--accent);background:var(--surface-alt)}
+  .domain-link-arrow{color:var(--muted);font-size:15px}
+  .serving-details{display:flex;align-items:baseline;justify-content:space-between;gap:0 12px;flex-wrap:wrap}
+  .domain-detail{font-size:11px;color:var(--muted);margin-top:2px}
+  .model-release{color:var(--muted);padding:2px 0}
+  .training-domain{width:88%;margin-inline:auto;background:var(--surface-alt)}
+  .training-domain h2{font-size:14px}
+  .training-domain .domain-description{font-size:11px}
+  .shared-capabilities{padding:10px 20px 13px;border-top:1px solid var(--line)}
+  .shared-capabilities>p{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;font-size:10px;color:var(--muted);margin-bottom:9px}
+  .shared-capabilities strong{font-weight:550;color:var(--text)}
+  .shared-capabilities>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .shared-capabilities a{display:block;padding:6px 3px;border:1px solid var(--line);border-radius:5px;font-size:11px;text-align:center;white-space:nowrap;background:var(--surface-alt)}
+  @media(max-width:760px){.infra-map{max-width:520px;width:100%;margin-inline:auto}}
+  @media(max-width:380px){figcaption{padding:14px 15px;font-size:13px}.map-domains{padding:15px 12px}.map-domain{padding:11px 10px}.agent-capabilities{gap:5px}.agent-capabilities::before{left:calc((100% - 10px)/6);right:calc((100% - 10px)/6)}.shared-capabilities{padding:12px}}
+</style>

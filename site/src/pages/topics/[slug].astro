@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, sitePath, repoUrl } from '../../lib/content';
+import { getTopics, sitePath, repoUrl, topicScopeLabels } from '../../lib/content';
 
 export async function getStaticPaths() {
   return (await getTopics()).map((topic) => ({
@@ -45,7 +45,7 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
         <span aria-current="page">{topic.zhTitle}</span>
       </nav>
       <header class="topic-header">
-        <p class="eyebrow">TOPIC GUIDE</p>
+        <p class="eyebrow">{topicScopeLabels[topic.scope]}</p>
         <h1>{topic.zhTitle}</h1>
         <p class="topic-subtitle">{topic.title}</p>
       </header>
