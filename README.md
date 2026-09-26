@@ -4,6 +4,8 @@
 
 A curated collection of infrastructure resources and research notes for agentic systems.
 
+**在线阅读**：[Agentic Infra](https://aweng126.github.io/awesome-agentic-infra/) · [站点开发与部署](site/README.md)
+
 以中文介绍为主，保留英文项目名与技术术语。资源按基础设施能力分类，各主题按实际内容收录项目、论文、规范与技术资料。
 
 ## Scope
@@ -48,12 +50,16 @@ awesome-agentic-infra/
 ├── CONTRIBUTING.md           # 收录标准与维护方式
 ├── LICENSE                   # CC BY 4.0
 ├── resources/                # 八个主题的资源索引
-└── notes/                    # 原创概览、解读与比较
-    ├── README.md
-    └── agentic-infra-overview.md
+├── notes/                    # 原创概览、解读与比较
+│   ├── README.md
+│   └── agentic-infra-overview.md
+├── site/                     # Astro 静态站点，直接读取上述 Markdown
+└── .github/workflows/        # 站点验证与 GitHub Pages 自动部署
 ```
 
 资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)；出现独立图片文件时再建立 `assets/`。
+
+网页提供主题导航、资源搜索与筛选、深浅色切换，以及带目录的笔记阅读页。修改 Markdown 后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
 
 ## Curation
 

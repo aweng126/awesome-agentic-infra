@@ -1,0 +1,35 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import DocumentView from '../../components/DocumentView.astro';
+import { getTopics, sitePath } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const topics = await getTopics();
+  return topics.map((topic, index) => ({
+    params: { slug: topic.slug },
+    props: {
+      topic,
+      previous: index > 0 ? topics[index - 1] : undefined,
+      next: index < topics.length - 1 ? topics[index + 1] : undefined,
+    },
+  }));
+}
+
+const { topic, previous, next } = Astro.props;
+---
+
+<SiteLayout title={`${topic.zhTitle} · ${topic.title}`} description={topic.description} active="resources">
+  <DocumentView
+    title={topic.zhTitle}
+    subtitle={topic.title}
+    kind="topic"
+    slug={topic.slug}
+    html={topic.html}
+    headings={topic.headings}
+    updated={topic.updated}
+    sourcePath={topic.sourcePath}
+    itemCount={topic.entries.length}
+    previous={previous ? { href: sitePath(`topics/${previous.slug}/`), title: previous.zhTitle, label: '上一个主题' } : { href: sitePath('resources/'), title: '全部资源', label: '返回索引' }}
+    next={next ? { href: sitePath(`topics/${next.slug}/`), title: next.zhTitle, label: '下一个主题' } : { href: sitePath('notes/'), title: '研究笔记', label: '继续探索' }}
+  />
+</SiteLayout>

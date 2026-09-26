@@ -1,0 +1,22 @@
+---
+import { sitePath } from '../lib/content';
+const to = (slug: string) => sitePath(`topics/${slug}/`);
+---
+<div class="infra-map">
+  <div class="map-caption"><span><span class="live-dot"></span> AGENT SYSTEM / A LOGICAL VIEW</span><span>01—08</span></div>
+  <svg viewBox="0 0 520 410" role="img" aria-labelledby="infra-map-title infra-map-desc">
+    <title id="infra-map-title">Agent 基础设施关系图</title>
+    <desc id="infra-map-desc">运行时连接模型、记忆和工具，工具使用执行环境，部署、观测和安全支撑系统。点击组件可阅读对应主题。</desc>
+    <defs><pattern id="infra-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="currentColor" opacity=".17"/></pattern></defs>
+    <rect width="520" height="410" fill="url(#infra-dots)" />
+    <g class="map-lines" fill="none" stroke-width="1.5"><path d="M260 82v49 M147 166h39 M334 166h39 M433 198v34H260v26 M260 199v59"/><path d="M88 199v95h98 M260 322v34" stroke-dasharray="4 5"/></g>
+    <a href={to('inference-and-model-serving')}><rect class="map-node" x="178" y="25" width="164" height="58" rx="9"/><text class="map-label" x="260" y="49">MODEL SERVING</text><text class="map-sub" x="260" y="68">推理与模型服务</text></a>
+    <a href={to('memory-and-context')}><rect class="map-node" x="22" y="135" width="125" height="64" rx="9"/><text class="map-label" x="84" y="161">MEMORY</text><text class="map-sub" x="84" y="181">记忆与上下文</text></a>
+    <a href={to('runtime-and-orchestration')}><rect class="map-core" x="185" y="131" width="150" height="69" rx="9"/><text class="map-core-label" x="260" y="159">AGENT RUNTIME</text><text class="map-core-sub" x="260" y="180">运行时与编排</text></a>
+    <a href={to('tools-and-protocols')}><rect class="map-node" x="373" y="135" width="125" height="64" rx="9"/><text class="map-label" x="435" y="161">TOOLS</text><text class="map-sub" x="435" y="181">工具与协议</text></a>
+    <a href={to('sandbox-and-execution')}><rect class="map-node" x="185" y="260" width="150" height="64" rx="9"/><text class="map-label" x="260" y="285">EXECUTION</text><text class="map-sub" x="260" y="307">沙箱与执行环境</text></a>
+    <circle class="map-pulse" cx="260" cy="108" r="4"/>
+    <g class="map-base"><a href={to('deployment-and-scheduling')}><rect x="22" y="355" width="148" height="35" rx="6"/><text x="96" y="377">部署与调度</text></a><a href={to('observability-and-evaluation')}><rect x="185" y="355" width="150" height="35" rx="6"/><text x="260" y="377">观测与评估</text></a><a href={to('security-and-governance')}><rect x="350" y="355" width="148" height="35" rx="6"/><text x="424" y="377">安全与治理</text></a></g>
+  </svg>
+  <p class="map-footnote">从一次模型调用，到持续运行的 Agent 系统。</p>
+</div>

@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { getResources, getNotes, sitePath, repoUrl } from '../lib/content';
+interface Props { title: string; description?: string; active?: 'home' | 'resources' | 'notes' | 'contributing'; }
+const { title, description = '探索 Agent 背后的基础设施：运行时、沙箱、记忆、工具、模型服务、部署、观测与治理。', active = 'home' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const resources = await getResources();
+const notes = await getNotes();
+const searchItems = [
+  ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:sitePath(`resources/?q=${encodeURIComponent(r.name)}`), keywords:`${r.topicTitle} ${r.type}`})),
+  ...notes.map(n => ({title:n.title, description:n.description, category:'研究笔记', url:sitePath(`notes/${n.slug}/`), keywords:'研究笔记 note'})),
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f7f8f2" />
+    <link rel="icon" type="image/svg+xml" href={sitePath('favicon.svg')} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} · Agentic Infra`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <title>{title} · Agentic Infra</title>
+    <script is:inline>
+      try { const saved = localStorage.getItem('agentic-infra-theme'); document.documentElement.dataset.theme = saved === 'dark' || saved === 'light' ? saved : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = 'light'; }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href={sitePath()} aria-label="Agentic Infra 首页"><span class="brand-mark"><Icon name="stack" size={25} /></span><span>Agentic<span class="brand-light"> Infra</span><small>AN OPEN FIELD GUIDE</small></span></a>
+        <nav class="desktop-nav" aria-label="主导航">
+          <a href={sitePath()} aria-current={active === 'home' ? 'page' : undefined}>概览</a>
+          <a href={sitePath('resources/')} aria-current={active === 'resources' ? 'page' : undefined}>资源库</a>
+          <a href={sitePath('notes/')} aria-current={active === 'notes' ? 'page' : undefined}>研究笔记</a>
+        </nav>
+        <div class="header-actions">
+          <button class="search-trigger" type="button" data-search-open aria-label="搜索资源与笔记"><Icon name="search" size={17}/><span>搜索</span><kbd>⌘ K</kbd></button>
+          <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><span class="sun-icon"><Icon name="sun" size={19}/></span><span class="moon-icon"><Icon name="moon" size={19}/></span></button>
+          <a class="github-link" href={repoUrl} target="_blank" rel="noopener noreferrer" aria-label="访问 GitHub 仓库（新窗口）"><Icon name="github" size={20}/></a>
+        </div>
+      </div>
+      <nav class="mobile-nav" aria-label="移动端主导航"><a href={sitePath()} aria-current={active === 'home' ? 'page' : undefined}>概览</a><a href={sitePath('resources/')} aria-current={active === 'resources' ? 'page' : undefined}>资源库</a><a href={sitePath('notes/')} aria-current={active === 'notes' ? 'page' : undefined}>研究笔记</a></nav>
+    </header>
+    <slot />
+    <footer class="site-footer"><div class="footer-inner"><div><a class="footer-brand" href={sitePath()}>Agentic Infra<span> / </span>开放的知识，持续的探索。</a><p>精选资源与研究笔记，共同理解 Agent 系统。</p></div><div class="footer-links"><a href={sitePath('contributing/')}>参与贡献</a><a href={`${repoUrl}/blob/main/LICENSE`}>CC BY 4.0</a><a href={repoUrl}>GitHub ↗</a></div></div></footer>
+    <dialog id="search-dialog" aria-labelledby="search-title">
+      <div class="search-dialog-head"><Icon name="search" size={21}/><label id="search-title" class="sr-only" for="global-search">搜索资源与笔记</label><input id="global-search" type="search" placeholder="搜索资源、主题或笔记…" autocomplete="off"/><button class="icon-button" type="button" data-search-close aria-label="关闭搜索"><Icon name="close" size={19}/></button></div>
+      <div class="search-dialog-meta"><span id="search-status" role="status">输入关键词，探索整个知识库</span><kbd>ESC 关闭</kbd></div>
+      <div id="search-results" class="search-results"></div>
+    </dialog>
+    <script id="search-data" type="application/json" set:html={JSON.stringify(searchItems).replace(/</g, '\\u003c')} />
+    <script>
+      import '../scripts/global';
+    </script>
+  </body>
+</html>

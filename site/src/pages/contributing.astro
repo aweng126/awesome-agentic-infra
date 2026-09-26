@@ -1,0 +1,22 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import DocumentView from '../components/DocumentView.astro';
+import { getGuide, sitePath } from '../lib/content';
+
+const guide = await getGuide();
+---
+
+<SiteLayout title="贡献指南" description="如何为 Awesome Agentic Infra 补充资源、纠正事实与提交原创笔记。" active="contributing">
+  <DocumentView
+    title={guide.title}
+    subtitle="Build the collection, together."
+    kind="guide"
+    html={guide.html}
+    headings={guide.headings}
+    updated={guide.updated}
+    sourcePath={guide.sourcePath}
+    readingMinutes={guide.readingMinutes}
+    previous={{ href: sitePath(), title: 'Awesome Agentic Infra', label: '返回首页' }}
+    next={{ href: sitePath('resources/'), title: '浏览已有资源', label: '从这里开始' }}
+  />
+</SiteLayout>

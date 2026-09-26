@@ -1,0 +1,5 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { sitePath } from '../lib/content';
+---
+<SiteLayout title="页面未找到"><main id="main-content" class="container not-found"><p class="eyebrow">404 / PATH NOT FOUND</p><h1>这条路径还没有内容。</h1><p>回到资源库，继续探索 Agent 的基础设施。</p><a class="button primary" href={sitePath('resources/')}>浏览资源库 →</a></main></SiteLayout>

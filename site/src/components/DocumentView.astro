@@ -1,0 +1,209 @@
+---
+import { topics, getNotes, sitePath, repoUrl } from '../lib/content';
+
+interface ReadingLink {
+  href: string;
+  title: string;
+  label?: string;
+}
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  kind: 'topic' | 'note' | 'guide';
+  slug?: string;
+  html: string;
+  headings: { depth: number; id: string; text: string }[];
+  updated?: string;
+  sourcePath: string;
+  readingMinutes?: number;
+  itemCount?: number;
+  previous?: ReadingLink;
+  next?: ReadingLink;
+}
+
+const {
+  title, subtitle, kind, slug, html, headings, updated,
+  sourcePath, readingMinutes, itemCount, previous, next,
+} = Astro.props;
+const notes = await getNotes();
+const toc = headings.filter((heading) => heading.depth <= 3);
+const section = kind === 'topic' ? '主题资源' : kind === 'note' ? '研究笔记' : '参与共建';
+const sectionPath = kind === 'topic' ? 'resources/' : kind === 'note' ? 'notes/' : 'contributing/';
+const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
+---
+
+<main id="main-content" class="reader-shell">
+  <aside class="reader-sidebar" aria-label="文档导航">
+    <details class="chapter-menu" open>
+      <summary>浏览主题与笔记 <span aria-hidden="true">⌄</span></summary>
+      <nav class="chapter-nav" aria-label="主题与笔记">
+        <p class="sidebar-label">THE COLLECTION</p>
+        <a class="all-resources" href={sitePath('resources/')}>
+          <span>全部资源</span><span aria-hidden="true">↗</span>
+        </a>
+        <p class="sidebar-label category-label">主题索引</p>
+        <ol class="chapter-list">
+          {topics.map((topic, index) => (
+            <li>
+              <a
+                href={sitePath(`topics/${topic.slug}/`)}
+                class:list={['chapter-link', { selected: kind === 'topic' && topic.slug === slug }]}
+                aria-current={kind === 'topic' && topic.slug === slug ? 'page' : undefined}
+              >
+                <span class="chapter-number">{String(index + 1).padStart(2, '0')}</span>
+                <span>{topic.zhTitle}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <p class="sidebar-label category-label">理解与共建</p>
+        {notes.map((note) => (
+          <a
+            href={sitePath(`notes/${note.slug}/`)}
+            class:list={['chapter-link', 'note-link', { selected: kind === 'note' && note.slug === slug }]}
+            aria-current={kind === 'note' && note.slug === slug ? 'page' : undefined}
+          >
+            <span class="note-mark" aria-hidden="true">↳</span>
+            <span>{note.title}</span>
+          </a>
+        ))}
+        <a
+          href={sitePath('contributing/')}
+          class:list={['chapter-link', { selected: kind === 'guide' }]}
+          aria-current={kind === 'guide' ? 'page' : undefined}
+        >
+          <span class="note-mark" aria-hidden="true">+</span>
+          <span>贡献指南</span>
+        </a>
+        <a class="sidebar-source" href={repoUrl} target="_blank" rel="noopener noreferrer">
+          在 GitHub 查看源文件 <span aria-hidden="true">↗</span>
+        </a>
+      </nav>
+    </details>
+  </aside>
+
+  <div class="document-column">
+    <nav class="breadcrumbs" aria-label="面包屑">
+      <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
+      {kind === 'guide' ? <span aria-current="page">{section}</span> : <>
+        <a href={sitePath(sectionPath)}>{section}</a>
+        <span aria-hidden="true">/</span><span aria-current="page">{title}</span>
+      </>}
+    </nav>
+    <article>
+      <header class="document-header">
+        <p class="document-kicker">{kind === 'topic' ? 'INFRASTRUCTURE / COLLECTION' : kind === 'note' ? 'FIELD NOTES / PERSPECTIVES' : 'OPEN KNOWLEDGE / CONTRIBUTING'}</p>
+        <h1>{title}</h1>
+        {subtitle && <p class="document-subtitle">{subtitle}</p>}
+        <div class="document-meta">
+          {updated && <span>最近整理 <time datetime={updated}>{updated}</time></span>}
+          {typeof itemCount === 'number' && <span>{itemCount} 条资源</span>}
+          {readingMinutes && <span>约 {readingMinutes} 分钟阅读</span>}
+          <a href={editUrl} target="_blank" rel="noopener noreferrer">编辑此页 <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+      {toc.length > 1 && <details class="mobile-toc">
+        <summary>本页目录 <span aria-hidden="true">+</span></summary>
+        <nav aria-label="本页目录">
+          <ul>
+            {toc.map((heading) => <li class:list={{ 'toc-child': heading.depth > 2 }}><a href={`#${heading.id}`}>{heading.text}</a></li>)}
+          </ul>
+        </nav>
+      </details>}
+      <div class="prose document-body" set:html={html} />
+    </article>
+
+    {(previous || next) && <nav class="reading-navigation" aria-label="继续阅读">
+      {previous ? <a href={previous.href} class="reading-link previous-link">
+        <span class="reading-direction"><span aria-hidden="true">←</span> {previous.label || '上一篇'}</span>
+        <strong>{previous.title}</strong>
+      </a> : <div class="reading-placeholder" />}
+      {next && <a href={next.href} class="reading-link next-link">
+        <span class="reading-direction">{next.label || '下一篇'} <span aria-hidden="true">→</span></span>
+        <strong>{next.title}</strong>
+      </a>}
+    </nav>}
+    <p class="document-endnote">共同维护一份有来源、可追溯的知识索引。<a href={editUrl} target="_blank" rel="noopener noreferrer">发现问题？欢迎改进此页 ↗</a></p>
+  </div>
+
+  <aside class="reader-toc" aria-label="本页目录">
+    <div class="toc-sticky">
+      <p class="sidebar-label">ON THIS PAGE</p>
+      {toc.length > 0 && <nav>
+        <ul>
+          {toc.map((heading) => <li class:list={{ 'toc-child': heading.depth > 2 }}><a href={`#${heading.id}`}>{heading.text}</a></li>)}
+        </ul>
+      </nav>}
+      <a class="toc-edit" href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 编辑 <span aria-hidden="true">↗</span></a>
+      <a class="back-to-top" href="#main-content">回到顶部 ↑</a>
+    </div>
+  </aside>
+</main>
+
+<script>
+  // Keep the navigation expanded on desktop and compact on small screens.
+  const menu = document.querySelector<HTMLDetailsElement>('.chapter-menu');
+  const desktop = window.matchMedia('(min-width: 960px)');
+  const syncMenu = () => { if (menu) menu.open = desktop.matches; };
+  syncMenu();
+  desktop.addEventListener('change', syncMenu);
+</script>
+
+<style>
+  .reader-shell { display: grid; grid-template-columns: 218px minmax(0, 740px) 180px; gap: 48px; max-width: 1420px; margin: 0 auto; padding: 42px 36px 80px; align-items: start; }
+  .reader-sidebar { min-width: 0; position: sticky; top: 104px; }
+  .chapter-menu summary { display: none; }
+  .sidebar-label { font: 10px/1.5 var(--font-mono); color: var(--muted); letter-spacing: .12em; margin: 0 0 16px; }
+  .all-resources { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; margin: 0 0 28px; border: 1px solid var(--line); border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none; }
+  .all-resources:hover { color: var(--accent); border-color: var(--accent); }
+  .category-label { margin: 25px 12px 10px; font-family: inherit; font-size: 10px; }
+  .chapter-list { list-style: none; padding: 0; margin: 0; }
+  .chapter-link { display: flex; align-items: baseline; gap: 11px; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: var(--muted); text-decoration: none; border-radius: 6px; margin: 2px 0; }
+  .chapter-link:hover { color: var(--accent); background: var(--surface-alt); }
+  .chapter-link.selected { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .chapter-number { font: 10px/1.6 var(--font-mono); opacity: .6; }
+  .note-mark { width: 13px; flex-shrink: 0; text-align: center; }
+  .note-link { font-size: 11px; }
+  .sidebar-source { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding: 20px 12px 0; margin-top: 30px; font-size: 11px; text-decoration: none; color: var(--muted); }
+  .sidebar-source:hover { color: var(--accent); }
+  .document-column { min-width: 0; }
+  .breadcrumbs { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 11px; line-height: 1.7; color: var(--muted); margin: 0 0 42px; }
+  .breadcrumbs a { text-decoration: none; color: var(--muted); }
+  .breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumbs [aria-current] { color: var(--text); }
+  .document-header { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .document-kicker { font: 10px/1.7 var(--font-mono); letter-spacing: .12em; color: var(--accent); margin: 0 0 16px; }
+  h1 { font-size: clamp(27px, 3vw, 38px); line-height: 1.4; font-weight: 650; letter-spacing: -.055em; margin: 0; color: var(--text); text-wrap: balance; }
+  .document-subtitle { margin: 10px 0 0; font-size: 17px; color: var(--muted); line-height: 1.6; letter-spacing: -.015em; }
+  .document-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 23px; }
+  .document-meta time { font-family: var(--font-mono); margin-left: 4px; }
+  .document-meta a { margin-left: auto; color: var(--muted); text-decoration: none; }
+  .document-meta a:hover { color: var(--accent); }
+  .mobile-toc { display: none; }
+  .reader-toc { min-width: 0; align-self: stretch; padding-top: 74px; }
+  .toc-sticky { position: sticky; top: 112px; }
+  .reader-toc ul, .mobile-toc ul { margin: 0; padding: 0; list-style: none; }
+  .reader-toc li { margin: 12px 0; font-size: 11px; line-height: 1.7; }
+  .reader-toc li a { display: block; color: var(--muted); text-decoration: none; border-left: 1px solid var(--line); padding-left: 14px; }
+  .reader-toc li a:hover { color: var(--accent); border-left-color: var(--accent); }
+  .toc-child { padding-left: 12px; }
+  .toc-edit, .back-to-top { display: block; font-size: 10px; line-height: 1.7; color: var(--muted); text-decoration: none; }
+  .toc-edit { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .back-to-top { margin-top: 12px; }
+  .toc-edit:hover, .back-to-top:hover { color: var(--accent); }
+  .reading-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 54px; }
+  .reading-link { border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; color: var(--text); text-decoration: none; transition: border-color .2s, background .2s; }
+  .reading-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .reading-direction { display: flex; gap: 8px; font-size: 10px; color: var(--muted); margin-bottom: 9px; }
+  .reading-link strong { font-size: 13px; line-height: 1.7; font-weight: 550; }
+  .next-link { text-align: right; }
+  .next-link .reading-direction { justify-content: flex-end; }
+  .document-endnote { margin: 32px 0 0; font-size: 10px; line-height: 1.9; color: var(--muted); }
+  .document-endnote a { color: var(--muted); text-underline-offset: 3px; }
+  @media (max-width: 1250px) { .reader-shell { grid-template-columns: 205px minmax(0, 1fr) 160px; gap: 30px; padding-inline: 28px; } }
+  @media (max-width: 1100px) { .reader-shell { grid-template-columns: 205px minmax(0, 740px); gap: 36px; } .reader-toc { display: none; } .mobile-toc { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 30px; color: var(--muted); font-size: 12px; } .mobile-toc summary { display: flex; justify-content: space-between; cursor: pointer; } .mobile-toc ul { margin-top: 14px; } .mobile-toc li { padding: 6px 0; } .mobile-toc li a { color: var(--muted); text-decoration: none; } }
+  @media (min-width: 960px) { .chapter-menu:not([open]) > .chapter-nav { display: block; } }
+  @media (max-width: 959px) { .reader-shell { display: block; max-width: 820px; padding: 24px 26px 56px; } .reader-sidebar { position: static; margin-bottom: 30px; } .chapter-menu { border: 1px solid var(--line); border-radius: 8px; } .chapter-menu summary { display: flex; justify-content: space-between; padding: 14px 18px; font-size: 12px; color: var(--muted); cursor: pointer; } .chapter-menu[open] summary { border-bottom: 1px solid var(--line); } .chapter-nav { padding: 20px 14px; } .chapter-nav > .sidebar-label:first-child { display: none; } .all-resources { margin-bottom: 18px; } .category-label { margin-top: 18px; } .chapter-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; } .sidebar-source { margin-top: 18px; } .breadcrumbs { margin-bottom: 30px; } }
+  @media (max-width: 560px) { .reader-shell { padding-inline: 20px; } .chapter-list { display: block; } h1 { font-size: 28px; } .document-subtitle { font-size: 15px; } .document-meta { gap: 9px 14px; } .document-meta a { margin-left: 0; } .reading-navigation { gap: 10px; } .reading-link { padding: 16px 13px; } .reading-link strong { font-size: 12px; } .breadcrumbs { font-size: 10px; gap: 7px; } }
+</style>
