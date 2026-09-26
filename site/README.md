@@ -6,7 +6,7 @@
 
 项目站点继承账号个人站点的自定义域名 `blog.kingwen.cn`，原地址 `https://aweng126.github.io/awesome-agentic-infra/` 会跳转到上述地址。这是 [GitHub Pages 的域名继承规则](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages#using-a-custom-domain-across-multiple-repositories)。本仓库的 **Custom domain** 保持为空即可，路径前缀仍为 `/awesome-agentic-infra/`。
 
-站点在构建时读取根目录的 `resources/`、`notes/` 和 `CONTRIBUTING.md`。日常整理资源或修改笔记时，直接编辑这些 Markdown 文件即可，GitHub 文档和网页共用一份内容。
+站点在构建时读取根目录的 `resources/`、`notes/`、`CHANGELOG.md` 和 `CONTRIBUTING.md`。日常整理资源或修改笔记时，直接编辑这些 Markdown 文件即可，GitHub 文档和网页共用一份内容。
 
 ## 本地开发
 
@@ -39,6 +39,7 @@ npm run preview
 | --- | --- |
 | 主题资源、论文与文章 | 根目录 `resources/*.md` |
 | 专题分析与笔记 | 根目录 `notes/*.md` |
+| 内容与站点更新记录 | 根目录 `CHANGELOG.md` |
 | 收录规则与贡献方式 | 根目录 `CONTRIBUTING.md` |
 | 首页、布局与交互 | 本目录 `src/` |
 | 站点域名与路径前缀 | 本目录 `astro.config.mjs` |
@@ -46,6 +47,14 @@ npm run preview
 部署到其他仓库或路径时，同时更新 `src/lib/content.ts` 中的 `basePath` 与 `repoUrl`，以及构建检查脚本 `scripts/verify-build.mjs` 中的 `base`。它们共同保证 Markdown 链接、资源路径与 GitHub 编辑入口一致。
 
 Markdown 内继续使用仓库相对链接，站点构建负责转换对应的网页链接。资源条目格式与收录规则见 [贡献指南](../CONTRIBUTING.md)。
+
+### 维护更新日志
+
+导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容，无需另行编辑网页。
+
+每批发布内容时，同时更新日志：以 `## YYYY-MM-DD` 记录本站实际发布日，日期倒序、同一天一组；在日期下按需要使用 `### 新增内容`、`### 内容更新` 和 `### 站点改进`，用列表说明具体变化并提供直达链接。省略空类别，资源移除时说明原因并提供仍可访问的相关说明。
+
+资源条目通过主题 Markdown 中的固定锚点定位，格式为 `- <a id="resource-langgraph"></a> [LangGraph](https://...) — 简介`，锚点与名称链接放在同一列表项中。标识以 `resource-` 开头，仅使用小写 ASCII 字母、数字与连字符，在本主题内唯一，更名时保留。根目录日志可写 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)`；从本说明链接同一条目则使用 [LangGraph](../resources/runtime-and-orchestration.md#resource-langgraph)。笔记更新可直接链接到对应章节。构建验证会检查生成页面中的内部链接与锚点。
 
 依赖由 `package-lock.json` 固定。Mermaid 的 `lodash-es` 传递依赖通过 `overrides` 固定到 4.18.1，以避开旧版本的已知安全问题；升级 Mermaid 时应同时检查上游依赖并重新运行验证。
 

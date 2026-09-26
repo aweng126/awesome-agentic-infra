@@ -1,0 +1,73 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getChangelog } from '../../lib/content';
+
+const updates = await getChangelog();
+const formatDate = (date: string) => {
+  const [year, month, day] = date.split('-');
+  return `${year} 年 ${Number(month)} 月 ${Number(day)} 日`;
+};
+---
+
+<SiteLayout title="更新日志" description="按日期查看 Agentic Infra 新收录的资源、研究笔记的补充与站点改进，直接阅读感兴趣的更新。" active="changelog">
+  <main id="main-content" class="changelog-page">
+    <header class="changelog-heading">
+      <p class="eyebrow"><span class="live-dot" /> CHANGELOG</p>
+      <h1>最近更新<span class="accent-dot">。</span></h1>
+      <p>新发现、新思考，以及让阅读更顺畅的小改进。</p>
+      <div class="changelog-meta"><span>按发布时间倒序</span><span aria-hidden="true">/</span><span>点击条目，阅读相关内容</span></div>
+    </header>
+
+    <div class="changelog-timeline" aria-label="网站更新记录">
+      {updates.map((update, index) => (
+        <article id={`update-${update.date}`} class="changelog-entry" aria-labelledby={update.date}>
+          <div class="changelog-date">
+            <h2 id={update.date}><a href={`#update-${update.date}`} aria-label={`链接到 ${formatDate(update.date)} 的更新`}><time datetime={update.date}>{update.date}</time></a></h2>
+            <div class="changelog-date-meta">{index === 0 && <span class="changelog-latest">最近一次</span>}<span>{update.changeCount} 项更新</span></div>
+          </div>
+          <div class="changelog-body prose" set:html={update.html} />
+        </article>
+      ))}
+    </div>
+  </main>
+</SiteLayout>
+
+<style>
+  .changelog-page { max-width: 1080px; margin: 0 auto; padding: 56px 36px 76px; }
+  .changelog-heading { padding-bottom: 34px; }
+  .changelog-heading h1 { font-size: clamp(32px, 4vw, 42px); margin: 15px 0 15px; }
+  .changelog-heading > p:not(.eyebrow) { font-size: 14px; line-height: 1.9; color: var(--muted); }
+  .changelog-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 21px; color: var(--muted); font-size: 11px; }
+  .changelog-meta > span[aria-hidden] { color: var(--line); }
+  .changelog-timeline { border-top: 1px solid var(--line); }
+  .changelog-entry { display: grid; grid-template-columns: 164px minmax(0, 1fr); gap: 30px; padding-top: 34px; scroll-margin-top: 122px; }
+  .changelog-date { padding-top: 2px; }
+  .changelog-date h2 { font: 14px/1.6 var(--font-mono); letter-spacing: -.02em; }
+  .changelog-date h2 a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
+  .changelog-date-meta { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin-top: 11px; font-size: 10px; color: var(--muted); }
+  .changelog-latest { padding: 2px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+  .changelog-body { position: relative; min-width: 0; padding: 0 0 38px 29px; border-left: 1px solid var(--line); }
+  .changelog-body::before { content: ''; position: absolute; left: -4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+  .changelog-entry:first-child .changelog-body::before { background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
+  .changelog-body :global(h3) { font-size: 13px; line-height: 1.6; letter-spacing: 0; color: var(--accent); margin: 26px 0 10px; }
+  .changelog-body > :global(:first-child) { margin-top: 0; }
+  .changelog-body :global(ul) { margin-top: 10px; }
+  .changelog-body :global(li) { font-size: 13px; line-height: 1.95; }
+  .changelog-body :global(li + li) { margin-top: 12px; }
+  .changelog-entry:last-child .changelog-body { padding-bottom: 8px; }
+  .changelog-entry:target .changelog-date h2 { color: var(--accent); }
+  @media (max-width: 760px) {
+    .changelog-page { padding: 37px 22px 56px; }
+    .changelog-heading { padding-bottom: 27px; }
+    .changelog-heading > p:not(.eyebrow) { font-size: 13px; }
+    .changelog-entry { grid-template-columns: 1fr; gap: 20px; padding-top: 26px; }
+    .changelog-date { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+    .changelog-date-meta { margin-top: 0; }
+    .changelog-body { margin-left: 3px; padding-left: 20px; padding-bottom: 28px; }
+  }
+  @media (max-width: 440px) {
+    .changelog-meta { column-gap: 8px; font-size: 10px; }
+    .changelog-date { column-gap: 12px; }
+    .changelog-date h2 { font-size: 13px; }
+  }
+</style>

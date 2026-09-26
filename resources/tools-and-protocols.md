@@ -6,13 +6,13 @@
 
 ## Projects & Platforms
 
-- [Composio](https://github.com/ComposioHQ/composio) — 为 Agent 提供应用工具集、认证与按用户组织的会话，包含托管工具服务及配套 SDK 和框架适配器；关注：工具搜索、认证接入、工具执行与事件触发。
-- [Playwright MCP](https://github.com/microsoft/playwright-mcp) — 将 Playwright 浏览器自动化能力封装为 MCP 服务，让 Agent 通过结构化无障碍快照理解页面并执行操作；关注：浏览器能力到工具接口的映射，以及页面状态的结构化表示。
+- <a id="resource-composio"></a> [Composio](https://github.com/ComposioHQ/composio) — 为 Agent 提供应用工具集、认证与按用户组织的会话，包含托管工具服务及配套 SDK 和框架适配器；关注：工具搜索、认证接入、工具执行与事件触发。
+- <a id="resource-playwright-mcp"></a> [Playwright MCP](https://github.com/microsoft/playwright-mcp) — 将 Playwright 浏览器自动化能力封装为 MCP 服务，让 Agent 通过结构化无障碍快照理解页面并执行操作；关注：浏览器能力到工具接口的映射，以及页面状态的结构化表示。
 
 ## Specifications
 
-- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/latest) — 规定 AI 应用与上下文、工具服务之间的通信方式，使宿主能够接入不同服务提供的能力；关注：宿主、客户端与服务端的角色划分，JSON-RPC 消息，以及 tools、resources 和 prompts 接口。
-- [Agent2Agent Protocol (A2A)](https://a2a-protocol.org/latest/specification/) — 规定独立 Agent 系统间的能力发现、消息交换与任务协作方式；关注：Agent Card、任务生命周期、产物表示，以及流式和异步更新。
+- <a id="resource-mcp"></a> [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/latest) — 规定 AI 应用与上下文、工具服务之间的通信方式，使宿主能够接入不同服务提供的能力；关注：宿主、客户端与服务端的角色划分，JSON-RPC 消息，以及 tools、resources 和 prompts 接口。
+- <a id="resource-a2a"></a> [Agent2Agent Protocol (A2A)](https://a2a-protocol.org/latest/specification/) — 规定独立 Agent 系统间的能力发现、消息交换与任务协作方式；关注：Agent Card、任务生命周期、产物表示，以及流式和异步更新。
 
 ## Related Topics
 

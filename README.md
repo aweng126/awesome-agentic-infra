@@ -4,7 +4,7 @@
 
 A curated collection of infrastructure resources and research notes for agentic systems.
 
-**在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/) · [站点开发与部署](site/README.md)
+**在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/) · [更新日志](https://blog.kingwen.cn/awesome-agentic-infra/changelog/) · [站点开发与部署](site/README.md)
 
 以中文介绍为主，保留英文项目名与技术术语。资源按基础设施能力分类，各主题按实际内容收录项目、论文、规范与技术资料。
 
@@ -47,6 +47,7 @@ A curated collection of infrastructure resources and research notes for agentic 
 ```text
 awesome-agentic-infra/
 ├── README.md                 # 项目范围、主题导航与阅读路径
+├── CHANGELOG.md              # 按发布日期整理的内容与站点更新
 ├── CONTRIBUTING.md           # 收录标准与维护方式
 ├── LICENSE                   # CC BY 4.0
 ├── resources/                # 八个主题的资源索引
@@ -59,7 +60,7 @@ awesome-agentic-infra/
 
 资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)；出现独立图片文件时再建立 `assets/`。
 
-网页提供主题导航、资源搜索与筛选、深浅色切换，以及带目录的笔记阅读页。修改 Markdown 后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
+网页提供主题导航、资源搜索与筛选、深浅色切换，以及带目录的笔记阅读页。回访时可先查看 [更新日志](CHANGELOG.md)，直接前往新增或修改的内容。修改 Markdown 并同步补充日志后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
 
 ## Curation
 

@@ -40,6 +40,7 @@ export interface Heading {
 
 export interface Resource {
   id: string;
+  anchor: string;
   name: string;
   url: string;
   description: string;
@@ -47,6 +48,16 @@ export interface Resource {
   topicSlug: string;
   topicTitle: string;
   topicZhTitle: string;
+}
+
+export function resourcePath(resource: Pick<Resource, 'topicSlug' | 'anchor'>): string {
+  return sitePath(`topics/${resource.topicSlug}/#${resource.anchor}`);
+}
+
+export interface ChangelogEntry {
+  date: string;
+  html: string;
+  changeCount: number;
 }
 
 export const topics = [
@@ -188,6 +199,7 @@ export function rewriteMarkdownUrl(url: string, sourcePath: string): string | nu
   if (localPath === '..' || localPath.startsWith('../')) return null;
   if (/^README\.md$/iu.test(localPath)) return `${sitePath()}${suffix}`;
   if (/^CONTRIBUTING\.md$/iu.test(localPath)) return `${sitePath('contributing/')}${suffix}`;
+  if (/^CHANGELOG\.md$/iu.test(localPath)) return `${sitePath('changelog/')}${suffix}`;
   if (/^notes\/README\.md$/iu.test(localPath)) return `${sitePath('notes/')}${suffix}`;
 
   const topic = localPath.match(/^resources\/([^/]+)\.md$/u);
@@ -219,6 +231,7 @@ function isReturnNavigation(node: MarkdownRoot['children'][number]): boolean {
 export async function renderMarkdown(
   markdown: string,
   sourcePath: string,
+  headingPrefix = '',
 ): Promise<{ html: string; headings: Heading[] }> {
   const headings: Heading[] = [];
   const result = await unified()
@@ -228,6 +241,13 @@ export async function renderMarkdown(
       tree.children = tree.children.filter(
         (node) => !(node.type === 'heading' && node.depth === 1) && !isReturnNavigation(node),
       );
+      if (/^resources\/[^/]+\.md$/u.test(sourcePath)) {
+        for (const { item, anchor } of resourceItems(tree)) {
+          // Only the fixed, empty anchor is promoted to an HTML property.
+          // All source HTML, including the original anchor tags, is discarded.
+          item.data = { ...item.data, hProperties: { id: anchor } };
+        }
+      }
       visit(tree, (node) => {
         if (node.type === 'link' || node.type === 'image' || node.type === 'definition') {
           const rewritten = rewriteMarkdownUrl(node.url, sourcePath);
@@ -236,7 +256,7 @@ export async function renderMarkdown(
       });
     })
     .use(remarkRehype) // Raw HTML is deliberately not passed through.
-    .use(rehypeSlug)
+    .use(rehypeSlug, { prefix: headingPrefix })
     .use(() => (tree: HtmlRoot) => {
       visit(tree, 'element', (node) => {
         if (/^h[2-6]$/u.test(node.tagName)) {
@@ -282,33 +302,70 @@ function firstResourceLink(item: ListItem): Link | undefined {
   return first;
 }
 
-export function extractResources(markdown: string, topic: TopicMetadata): Resource[] {
-  const resources: Resource[] = [];
+function resourceItems(tree: MarkdownRoot) {
+  const items: { item: ListItem; link: Link; type: Resource['type']; anchor: string }[] = [];
+  const seen = new Set<string>();
   let type: Resource['type'] | undefined;
-  for (const node of parse(markdown).children) {
+  for (const node of tree.children) {
     if (node.type === 'heading' && node.depth <= 2) {
       type = sectionTypes[readableText(node)];
     }
     if (node.type !== 'list' || !type) continue;
-    const sectionType = type;
-    visit(node, 'listItem', (item) => {
+    for (const item of node.children) {
       const link = firstResourceLink(item);
-      if (!link || !/^https?:\/\//iu.test(link.url) || !isSafeUrl(link.url)) return;
-      const name = readableText(link);
-      const nameSlug = name.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/gu, '');
-      resources.push({
-        id: `${topic.slug}-${nameSlug}`,
-        name,
-        url: link.url,
-        description: readableText(item, link).replace(/^[\s—–:：-]+/u, ''),
-        type: sectionType,
-        topicSlug: topic.slug,
-        topicTitle: topic.title,
-        topicZhTitle: topic.zhTitle,
-      });
-    });
+      if (!link || !/^https?:\/\//iu.test(link.url) || !isSafeUrl(link.url)) continue;
+      const paragraph = item.children.find(child => child.type === 'paragraph');
+      const [open, close] = paragraph?.children ?? [];
+      const anchor = open?.type === 'html' && close?.type === 'html' && close.value === '</a>'
+        ? /^<a id="(resource-[a-z0-9]+(?:-[a-z0-9]+)*)">$/u.exec(open.value)?.[1]
+        : undefined;
+      if (!anchor) throw new Error(`Resource "${readableText(link)}" needs a fixed <a id="resource-name"></a> anchor.`);
+      if (seen.has(anchor)) throw new Error(`Duplicate resource anchor: ${anchor}`);
+      seen.add(anchor);
+      items.push({ item, link, type, anchor });
+    }
   }
-  return resources;
+  return items;
+}
+
+export function extractResources(markdown: string, topic: TopicMetadata): Resource[] {
+  return resourceItems(parse(markdown)).map(({ item, link, type, anchor }) => ({
+    id: `${topic.slug}-${anchor}`,
+    anchor,
+    name: readableText(link),
+    url: link.url,
+    description: readableText(item, link).replace(/^[\s—–:：-]+/u, ''),
+    type,
+    topicSlug: topic.slug,
+    topicTitle: topic.title,
+    topicZhTitle: topic.zhTitle,
+  }));
+}
+
+export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]> {
+  const sections = parse(markdown).children.filter(node => node.type === 'heading' && node.depth === 2);
+  const seen = new Set<string>();
+  const entries = await Promise.all(sections.map(async (heading, index) => {
+    const date = readableText(heading);
+    if (!/^\d{4}-\d{2}-\d{2}$/u.test(date)
+      || !Number.isFinite(Date.parse(`${date}T00:00:00Z`))
+      || new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) !== date) {
+      throw new Error(`Invalid changelog date: ${date}. Use a real YYYY-MM-DD publication date.`);
+    }
+    if (seen.has(date)) throw new Error(`Duplicate changelog date: ${date}. Combine same-day changes.`);
+    seen.add(date);
+    const body = markdown.slice(heading.position!.end.offset!, sections[index + 1]?.position?.start.offset ?? markdown.length);
+    const changeCount = parse(body).children.reduce((count, node) => count + (node.type === 'list' ? node.children.length : 0), 0);
+    if (!changeCount) throw new Error(`Changelog ${date} needs at least one change.`);
+    const { html } = await renderMarkdown(body, 'CHANGELOG.md', `update-${date}-`);
+    return { date, html, changeCount };
+  }));
+  if (!entries.length) throw new Error('CHANGELOG.md needs at least one dated update.');
+  return entries.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export async function getChangelog(): Promise<ChangelogEntry[]> {
+  return parseChangelog(await readFile(`${repositoryRoot}/CHANGELOG.md`, 'utf8'));
 }
 
 function updatedDate(markdown: string): string {

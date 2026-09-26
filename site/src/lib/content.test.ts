@@ -9,6 +9,7 @@ import {
   getResources,
   getTopics,
   renderMarkdown,
+  resourcePath,
   repoUrl,
   rewriteMarkdownUrl,
   sitePath,
@@ -43,6 +44,8 @@ test('topic sources produce nonempty, unique resources in metadata order', async
       assert.equal(resource.topicSlug, topic.slug);
       assert.equal(resource.topicTitle, topic.title);
       assert.equal(resource.topicZhTitle, topic.zhTitle);
+      assert.ok(topic.html.includes(`id="${resource.anchor}"`), 'every resource has a direct target in its topic');
+      assert.equal(resourcePath(resource), sitePath(`topics/${topic.slug}/#${resource.anchor}`));
     }
     assert.doesNotMatch(topic.html, /<h1(?:\s|>)/u);
     assert.doesNotMatch(topic.html, /返回首页/u);
@@ -53,13 +56,13 @@ test('resource sections classify all four types without counting implementation 
   const resources = extractResources(`
 # Test
 ## Projects & Platforms
-- [Project](https://example.org/project) — A project.
+- <a id="resource-project"></a> [Project](https://example.org/project) — A project.
 ## Papers
-- [Paper](https://example.org/paper)（2026，SOSP）— A **useful** result. 附 [实现](https://example.org/code)。
+- <a id="resource-paper"></a> [Paper](https://example.org/paper)（2026，SOSP）— A **useful** result. 附 [实现](https://example.org/code)。
 ## Specifications
-- [Specification](https://example.org/specification) — A specification.
+- <a id="resource-specification"></a> [Specification](https://example.org/specification) — A specification.
 ## Articles & Documentation
-- [Article](https://example.org/article) — An article.
+- <a id="resource-article"></a> [Article](https://example.org/article) — An article.
 ## Related Topics
 - [Other topic](https://example.org/other) — not a resource.
 `, topics[0]);
@@ -79,11 +82,28 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
   assert.equal(rewriteMarkdownUrl('README.md', 'notes/overview.md'), sitePath('notes/'));
   assert.equal(rewriteMarkdownUrl('notes/agentic-infra-overview.md', 'CONTRIBUTING.md'), sitePath('notes/agentic-infra-overview/'));
   assert.equal(rewriteMarkdownUrl('../CONTRIBUTING.md#notes', 'notes/overview.md'), sitePath('contributing/#notes'));
+  assert.equal(rewriteMarkdownUrl('../CHANGELOG.md', 'notes/overview.md'), sitePath('changelog/'));
+  assert.equal(rewriteMarkdownUrl('resources/runtime-and-orchestration.md#resource-langgraph', 'CHANGELOG.md'), sitePath('topics/runtime-and-orchestration/#resource-langgraph'));
   assert.equal(rewriteMarkdownUrl('LICENSE', 'CONTRIBUTING.md'), `${repoUrl}/blob/main/LICENSE`);
   assert.equal(rewriteMarkdownUrl('../../outside.md', 'notes/overview.md'), null);
   for (const url of ['https://example.com/README.md#scope', '//example.com/a.md', 'mailto:hello@example.com', '#本地标题']) {
     assert.equal(rewriteMarkdownUrl(url, 'notes/overview.md'), url);
   }
+});
+
+test('fixed resource anchors survive renamed entries and only promote safe empty markers', async () => {
+  const source = '# Topic\n## Projects & Platforms\n- <a id="resource-stable"></a> [Original](https://example.org) — Useful.\n';
+  const renamed = source.replace('Original', 'Renamed');
+  const before = extractResources(source, topics[0])[0];
+  const after = extractResources(renamed, topics[0])[0];
+  assert.equal(after.id, before.id);
+  assert.equal(resourcePath(after), resourcePath(before));
+  const rendered = await renderMarkdown(renamed, 'resources/runtime-and-orchestration.md');
+  assert.match(rendered.html, /<li id="resource-stable">/u);
+  assert.doesNotMatch(rendered.html, /<a id=/u);
+  assert.throws(() => extractResources(source.replace('id="resource-stable"', 'id="resource-stable" onclick="alert(1)"'), topics[0]), /fixed/);
+  assert.throws(() => extractResources(source + '- <a id="resource-stable"></a> [Duplicate](https://example.org/second)\n', topics[0]), /Duplicate resource anchor/);
+  assert.throws(() => extractResources(source.replace('<a id="resource-stable"></a> ', ''), topics[0]), /fixed/);
 });
 
 test('GFM tables, Chinese heading IDs, duplicate headings, and Mermaid survive rendering', async () => {
