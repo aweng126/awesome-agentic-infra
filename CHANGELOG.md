@@ -16,6 +16,7 @@
 
 ### 站点改进
 
+- 修正 [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/) 的筛选数量：主题旁的数字随搜索词和资料类型同步更新，选中主题的数量与右侧结果保持一致，清除筛选后恢复完整数量。
 - [在线站点](README.md) 上线，提供主题导航、资源搜索与筛选、深浅色切换及带目录的笔记阅读页。
 - 增加导航中的 [更新日志](CHANGELOG.md) 入口，集中展示每批内容变化，并链接到相关资源和笔记。
 - 为资源条目增加固定定位链接，从日志或其他页面可直接跳到具体条目，例如 [LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)。后续条目更名时保留原有定位链接。

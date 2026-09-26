@@ -13,12 +13,26 @@ if (explorer) {
   input.value = params.get('q') || '';
   function update() {
     let count = 0;
+    let allTopicCount = 0;
+    const topicCounts = new Map<string, number>();
     for (const card of cards) {
-      const match = matchesResource({search:card.dataset.search || '',topic:card.dataset.topic || '',type:card.dataset.type || ''},{query:input.value,topic,type});
+      const resource = {search:card.dataset.search || '',topic:card.dataset.topic || '',type:card.dataset.type || ''};
+      // Topic counts show what each choice would return under the current
+      // query and type, including choices outside the selected topic.
+      const matchesQueryAndType = matchesResource(resource,{query:input.value,topic:'all',type});
+      if (matchesQueryAndType) {
+        allTopicCount++;
+        topicCounts.set(resource.topic, (topicCounts.get(resource.topic) || 0) + 1);
+      }
+      const match = matchesQueryAndType && (topic === 'all' || resource.topic === topic);
       card.hidden = !match;
       if (match) count++;
     }
-    topicButtons.forEach(button => button.setAttribute('aria-pressed',String(button.dataset.topic === topic)));
+    topicButtons.forEach(button => {
+      button.setAttribute('aria-pressed',String(button.dataset.topic === topic));
+      const matches = button.dataset.topic === 'all' ? allTopicCount : topicCounts.get(button.dataset.topic!) || 0;
+      button.querySelector<HTMLElement>('[data-topic-count]')!.textContent = String(matches);
+    });
     typeButtons.forEach(button => button.setAttribute('aria-pressed',String(button.dataset.type === type)));
     document.querySelector('#resource-count')!.textContent = `共 ${count} 条资源`;
     document.querySelector<HTMLElement>('#no-results')!.hidden = count !== 0;

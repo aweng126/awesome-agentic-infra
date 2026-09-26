@@ -135,6 +135,7 @@
   .topic-filters{display:flex;flex-direction:column;gap:5px}.topic-filters button{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 11px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:12px;text-align:left}
   .topic-filters button>span{font:10px var(--font-mono);opacity:.8}.topic-filters button:hover{background:var(--surface-alt)}
   .topic-filters button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .filter-count-hint{font-size:10px;line-height:1.7;color:var(--muted);margin-bottom:12px}
   .sidebar-note{margin-top:27px;padding:22px 11px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.sidebar-note p{margin:10px 0 6px}.sidebar-note a{color:var(--accent)}
   .resource-results{min-width:0}.type-filters{display:flex;gap:7px;flex-wrap:wrap}.type-filters button{font-size:11px;border:1px solid var(--line);border-radius:6px;padding:7px 11px;background:transparent;color:var(--muted)}
   .type-filters button[aria-pressed=true]{background:var(--text);border-color:var(--text);color:var(--bg)}
