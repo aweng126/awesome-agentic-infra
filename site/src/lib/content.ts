@@ -130,7 +130,6 @@ export interface Topic {
   html: string;
   headings: Heading[];
   entries: Resource[];
-  updated: string;
   sourcePath: string;
 }
 
@@ -140,7 +139,6 @@ export interface Note {
   description: string;
   html: string;
   headings: Heading[];
-  updated: string;
   sourcePath: string;
   readingMinutes: number;
 }
@@ -368,15 +366,11 @@ export async function getChangelog(): Promise<ChangelogEntry[]> {
   return parseChangelog(await readFile(`${repositoryRoot}/CHANGELOG.md`, 'utf8'));
 }
 
-function updatedDate(markdown: string): string {
-  return markdown.match(/(?:最近整理|整理日期)\s*[：:]\s*(\d{4}-\d{2}-\d{2})/u)?.[1] ?? '';
-}
-
 function noteDescription(tree: MarkdownRoot): string {
   for (const node of tree.children) {
     if (node.type !== 'paragraph' || isReturnNavigation(node)) continue;
     const text = readableText(node);
-    if (!text || /^(?:整理日期|最近整理)\s*[：:]/u.test(text)) continue;
+    if (!text) continue;
     return text.length > 128 ? `${text.slice(0, 128)}…` : text;
   }
   return '';
@@ -394,7 +388,6 @@ async function loadNote(sourcePath: string, slug: string, titleOverride?: string
     title: titleOverride ?? (h1 ? readableText(h1) : slug),
     description: noteDescription(tree),
     ...(await renderMarkdown(markdown, sourcePath)),
-    updated: updatedDate(markdown),
     sourcePath,
     readingMinutes: Math.max(1, Math.ceil(cjkCharacters / 350 + otherWords / 220)),
   };
@@ -408,7 +401,6 @@ export async function getTopics(): Promise<Topic[]> {
       ...topic,
       ...(await renderMarkdown(markdown, sourcePath)),
       entries: extractResources(markdown, topic),
-      updated: updatedDate(markdown),
       sourcePath,
     };
   }));

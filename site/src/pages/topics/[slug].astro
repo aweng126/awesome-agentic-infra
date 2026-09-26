@@ -26,7 +26,6 @@ const { topic, previous, next } = Astro.props;
     slug={topic.slug}
     html={topic.html}
     headings={topic.headings}
-    updated={topic.updated}
     sourcePath={topic.sourcePath}
     itemCount={topic.entries.length}
     previous={previous ? { href: sitePath(`topics/${previous.slug}/`), title: previous.zhTitle, label: '上一个主题' } : { href: sitePath('resources/'), title: '全部资源', label: '返回索引' }}

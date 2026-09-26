@@ -2,8 +2,6 @@
 
 关注 Agent 的模型访问入口与推理执行：统一 API、请求路由、批处理、KV cache 管理和分布式服务。通用推理系统在此的收录理由，是它们为 Agent 的多轮调用、长上下文或并发任务提供模型服务基础。
 
-> 最近整理：2026-09-26。条目依据所链接的一手来源整理，不代表实测。
-
 本主题关注模型请求如何被处理；Agent 的任务推进属于运行时与编排，工作节点和沙箱的部署生命周期属于部署与调度。推理系统内部的资源管理仍在本主题讨论。
 
 ## Projects & Platforms
@@ -16,12 +14,5 @@
 ## Papers
 
 - <a id="resource-pagedattention"></a> [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180)（2023，SOSP）— 研究 LLM 服务中的 KV cache 内存管理，并提出 PagedAttention；关注：理解长上下文和并发生成的服务端内存开销，是分析 Agent 推理负载的基础材料。
-
-## Related Topics
-
-- [Runtime & Orchestration](runtime-and-orchestration.md)：模型调用在 Agent 任务执行链路中的位置。
-- [Memory & Context](memory-and-context.md)：上下文如何构造与保留；与推理引擎内部的 KV cache 区分。
-- [Deployment & Scheduling](deployment-and-scheduling.md)：服务副本、集群与弹性伸缩。
-- [Observability & Evaluation](observability-and-evaluation.md)：端到端任务质量、延迟与用量的观测。
 
 [返回首页](../README.md)

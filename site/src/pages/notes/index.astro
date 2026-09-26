@@ -25,7 +25,7 @@ const entryNote = notes[0];
               <p class="note-category">RESEARCH NOTE <span>研究笔记</span></p>
               <h3><a href={sitePath(`notes/${note.slug}/`)}>{note.title}</a></h3>
               <p class="note-description">{note.description}</p>
-              <div class="note-metadata"><time datetime={note.updated}>{note.updated}</time><span>约 {note.readingMinutes} 分钟阅读</span></div>
+              <div class="note-metadata"><span>约 {note.readingMinutes} 分钟阅读</span></div>
             </div>
             <a class="note-open" href={sitePath(`notes/${note.slug}/`)} aria-label={`阅读：${note.title}`}><span aria-hidden="true">↗</span></a>
           </article>
@@ -67,7 +67,6 @@ const entryNote = notes[0];
   .note-content h3 a:hover { color: var(--accent); }
   .note-description { max-width: 690px; font-size: 13px; line-height: 1.9; color: var(--muted); margin: 0; }
   .note-metadata { display: flex; flex-wrap: wrap; gap: 20px; font-size: 10px; color: var(--muted); margin-top: 23px; }
-  .note-metadata time { font-family: var(--font-mono); }
   .note-open { display: flex; align-items: center; justify-content: center; align-self: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; color: var(--accent); text-decoration: none; transition: background .2s, border-color .2s; }
   .note-open:hover { background: var(--accent-soft); border-color: var(--accent); }
   .reading-path { display: grid; grid-template-columns: .85fr 1.15fr; gap: 70px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 36px; margin-top: 64px; }

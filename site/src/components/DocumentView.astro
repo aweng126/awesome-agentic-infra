@@ -14,7 +14,6 @@ interface Props {
   slug?: string;
   html: string;
   headings: { depth: number; id: string; text: string }[];
-  updated?: string;
   sourcePath: string;
   readingMinutes?: number;
   itemCount?: number;
@@ -23,7 +22,7 @@ interface Props {
 }
 
 const {
-  title, subtitle, kind, slug, html, headings, updated,
+  title, subtitle, kind, slug, html, headings,
   sourcePath, readingMinutes, itemCount, previous, next,
 } = Astro.props;
 const notes = await getNotes();
@@ -97,7 +96,6 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
         <h1>{title}</h1>
         {subtitle && <p class="document-subtitle">{subtitle}</p>}
         <div class="document-meta">
-          {updated && <span>最近整理 <time datetime={updated}>{updated}</time></span>}
           {typeof itemCount === 'number' && <span>{itemCount} 条资源</span>}
           {readingMinutes && <span>约 {readingMinutes} 分钟阅读</span>}
           <a href={editUrl} target="_blank" rel="noopener noreferrer">编辑此页 <span aria-hidden="true">↗</span></a>
@@ -177,7 +175,6 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
   h1 { font-size: clamp(27px, 3vw, 38px); line-height: 1.4; font-weight: 650; letter-spacing: -.055em; margin: 0; color: var(--text); text-wrap: balance; }
   .document-subtitle { margin: 10px 0 0; font-size: 17px; color: var(--muted); line-height: 1.6; letter-spacing: -.015em; }
   .document-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 23px; }
-  .document-meta time { font-family: var(--font-mono); margin-left: 4px; }
   .document-meta a { margin-left: auto; color: var(--muted); text-decoration: none; }
   .document-meta a:hover { color: var(--accent); }
   .mobile-toc { display: none; }

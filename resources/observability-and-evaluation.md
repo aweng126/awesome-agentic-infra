@@ -2,8 +2,6 @@
 
 关注 Agent 执行过程的追踪与调试、模型和工具调用的度量，以及任务质量和重复运行可靠性的评估。既收录观测与实验平台，也收录可研究其环境和指标设计的基准。
 
-> 最近整理：2026-09-26。条目依据所链接的一手来源整理，不代表实测。
-
 可观测性解释执行过程中发生了什么，评估判断结果是否达到目标。基准任务的得分不能直接代表基础设施性能；比较运行时或沙箱时，还需控制模型、提示词、任务和资源配置。本主题关注测量，访问控制与策略执行归安全与治理。
 
 ## Projects & Platforms
@@ -20,11 +18,5 @@
 ## Specifications
 
 - <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定；关注：模型、Agent 和工具调用的观测数据如何统一表达。采用具体字段前需查看对应规范的稳定性状态。
-
-## Related Topics
-
-- [Runtime & Orchestration](runtime-and-orchestration.md)：执行步骤、重试与恢复形成的事件。
-- [Inference & Model Serving](inference-and-model-serving.md)：模型调用的服务端行为。
-- [Security & Governance](security-and-governance.md)：审计、敏感数据和策略执行。
 
 [返回首页](../README.md)

@@ -18,12 +18,6 @@ import {
 
 const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url));
 
-function assertRecordedDate(date: string, source: string): void {
-  assert.match(date, /^\d{4}-\d{2}-\d{2}$/u);
-  assert.equal(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10), date);
-  assert.ok(source.includes(date), 'the update date must come from the source document');
-}
-
 test('topic sources produce nonempty, unique resources in metadata order', async () => {
   const loaded = await getTopics();
   const resources = await getResources();
@@ -36,7 +30,6 @@ test('topic sources produce nonempty, unique resources in metadata order', async
     assert.ok(topic.entries.length > 0);
     assert.equal(topic.sourcePath, `resources/${topic.slug}.md`);
     const source = await readFile(`${repositoryRoot}/${topic.sourcePath}`, 'utf8');
-    assertRecordedDate(topic.updated, source);
     for (const resource of topic.entries) {
       assert.ok(resource.name.length > 0);
       assert.ok(resource.description.length > 0);
@@ -52,7 +45,7 @@ test('topic sources produce nonempty, unique resources in metadata order', async
   }
 });
 
-test('resource sections classify all four types without counting implementation or related links', () => {
+test('resource sections classify all four types without counting implementation or learning-note links', () => {
   const resources = extractResources(`
 # Test
 ## Projects & Platforms
@@ -63,8 +56,8 @@ test('resource sections classify all four types without counting implementation 
 - <a id="resource-specification"></a> [Specification](https://example.org/specification) — A specification.
 ## Articles & Documentation
 - <a id="resource-article"></a> [Article](https://example.org/article) — An article.
-## Related Topics
-- [Other topic](https://example.org/other) — not a resource.
+## 学习笔记
+- [相关分析](https://example.org/note) — not a resource.
 `, topics[0]);
   assert.equal(resources.length, 4);
   assert.deepEqual(resources.map((resource) => resource.type), ['project', 'paper', 'spec', 'article']);
@@ -176,13 +169,10 @@ test('notes and guide load repository sources with readable summaries and source
     .sort();
   assert.deepEqual(notes.map((note) => note.sourcePath).sort(), sourceFiles);
   for (const note of notes) {
-    const source = await readFile(`${repositoryRoot}/${note.sourcePath}`, 'utf8');
     assert.equal(note.sourcePath, `notes/${note.slug}.md`);
     assert.ok(note.title.length > 0);
     assert.ok(note.description.length > 0);
-    assert.doesNotMatch(note.description, /^(?:整理日期|最近整理)\s*[：:]/u);
     assert.ok(Number.isInteger(note.readingMinutes) && note.readingMinutes > 0);
-    if (note.updated) assertRecordedDate(note.updated, source);
     assert.doesNotMatch(note.html, /<h1(?:\s|>)/u);
     assert.doesNotMatch(note.html, /返回首页|返回笔记索引/u);
     for (const heading of note.headings) {

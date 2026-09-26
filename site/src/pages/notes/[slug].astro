@@ -25,7 +25,6 @@ const { note, previous, next } = Astro.props;
     slug={note.slug}
     html={note.html}
     headings={note.headings}
-    updated={note.updated}
     sourcePath={note.sourcePath}
     readingMinutes={note.readingMinutes}
     previous={previous ? { href: sitePath(`notes/${previous.slug}/`), title: previous.title } : { href: sitePath('notes/'), title: '全部研究笔记', label: '返回索引' }}

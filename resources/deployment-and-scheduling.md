@@ -2,8 +2,6 @@
 
 收录 Agent 服务、工具服务和执行环境的托管、资源分配、生命周期管理与弹性伸缩方案。重点是任务在何处运行以及资源如何供给；任务步骤和恢复语义见 [Runtime & Orchestration](runtime-and-orchestration.md)，底层隔离机制见 [Sandbox & Execution](sandbox-and-execution.md)。通用基础设施的条目会说明其与 Agent 工作负载的具体联系。
 
-> 最近整理：2026-09-26。条目依据所链接的一手来源整理，不代表实测。
-
 ## Projects & Platforms
 
 - <a id="resource-agent-sandbox"></a> [Agent Sandbox](https://github.com/kubernetes-sigs/agent-sandbox) — 通过 Kubernetes 自定义资源和控制器管理有状态的单实例执行环境，可用于 Agent 运行环境及代码执行工作负载；关注：稳定身份、持久存储、生命周期管理与预热池。底层隔离由 RuntimeClass 对接的沙箱运行时提供。
@@ -14,12 +12,5 @@
 ## Articles & Documentation
 
 - <a id="resource-build-a-tool-using-agent"></a> [Build a tool-using agent](https://docs.ray.io/en/latest/_collections/ray-overview/examples/langchain_agent_ray_serve/content/README.html) — Ray 官方教程，展示如何在 Anyscale 上将 Agent、模型和 MCP 工具分别部署为 Ray Serve 服务；关注：CPU 与 GPU 组件的拆分、独立伸缩和服务间调用。
-
-## Related Topics
-
-- [Runtime & Orchestration](runtime-and-orchestration.md) — 工作流推进、持久执行与故障恢复。
-- [Sandbox & Execution](sandbox-and-execution.md) — 执行环境及其底层隔离机制。
-- [Inference & Model Serving](inference-and-model-serving.md) — 模型推理、网关与服务优化。
-- [Observability & Evaluation](observability-and-evaluation.md) — 部署后的执行追踪与运行指标。
 
 [返回首页](../README.md)
