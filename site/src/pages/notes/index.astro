@@ -3,7 +3,7 @@ import SiteLayout from '../../layouts/SiteLayout.astro';
 import { getNotes, sitePath } from '../../lib/content';
 
 const notes = await getNotes();
-const entryNote = notes[0];
+const entryNote = notes.find((note) => note.slug === 'agentic-infra-overview');
 ---
 
 <SiteLayout title="研究笔记" description="围绕 Agent 基础设施的组件关系、系统设计与工程取舍，记录有来源的分析与思考。" active="notes">
