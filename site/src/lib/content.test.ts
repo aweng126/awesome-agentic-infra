@@ -109,7 +109,7 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
   assert.equal(rewriteMarkdownUrl('../README.md#scope', 'notes/overview.md'), sitePath('#scope'));
   assert.equal(rewriteMarkdownUrl('README.md', 'notes/overview.md'), sitePath('notes/'));
   assert.equal(rewriteMarkdownUrl('notes/agentic-infra-overview.md', 'CONTRIBUTING.md'), sitePath('notes/agentic-infra-overview/'));
-  assert.equal(rewriteMarkdownUrl('../CONTRIBUTING.md#notes', 'notes/overview.md'), sitePath('contributing/#notes'));
+  assert.equal(rewriteMarkdownUrl('../CONTRIBUTING.md#what-to-include', 'notes/overview.md'), sitePath('contributing/#what-to-include'));
   assert.equal(rewriteMarkdownUrl('../CHANGELOG.md', 'notes/overview.md'), sitePath('changelog/'));
   assert.equal(rewriteMarkdownUrl('resources/runtime-and-orchestration.md#resource-langgraph', 'CHANGELOG.md'), sitePath('topics/runtime-and-orchestration/#resource-langgraph'));
   assert.equal(rewriteMarkdownUrl('LICENSE', 'CONTRIBUTING.md'), `${repoUrl}/blob/main/LICENSE`);

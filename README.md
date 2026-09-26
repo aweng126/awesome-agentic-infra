@@ -6,7 +6,7 @@ Awesome Agentic Infra 是面向 **Agent 持续、可靠运行** 的基础设施�
 
 A curated collection of infrastructure resources and original notes on building reliable agentic systems.
 
-**在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/) · [更新日志](https://blog.kingwen.cn/awesome-agentic-infra/changelog/) · [站点开发与部署](site/README.md)
+**在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/)
 
 [![Agentic Infra 与 LLM Serving、LLM Training 基础设施的关系](assets/agentic-infra-map.svg)](https://blog.kingwen.cn/awesome-agentic-infra/)
 
@@ -56,15 +56,15 @@ awesome-agentic-infra/
 └── .github/workflows/        # 站点验证与 GitHub Pages 自动部署
 ```
 
-资源的完整简介在所属主题维护，跨主题通过链接关联。较长的分析进入 [notes/](notes/README.md)，独立图片在 `assets/` 维护。
+资源的完整简介在所属主题维护，跨主题通过链接关联。[notes/](notes/README.md) 保存专题分析，`assets/` 保存独立图片。
 
-网页的主题页组织导读、相关学习笔记与参考资料；资源库提供跨主题搜索与筛选；笔记页展开完整分析。主题页与资源库共用 `resources/` 中的条目，笔记正文在 `notes/` 维护。回访时可先查看 [更新日志](CHANGELOG.md)，直接前往新增或修改的内容。修改 Markdown 并同步补充日志后，推送到 `main` 会触发验证与发布；首次启用和本地预览方法见 [站点说明](site/README.md)。
+网页的主题页组织导读、相关学习笔记与参考资料；资源库提供跨主题搜索与筛选；笔记页展开完整分析。主题页与资源库共用 `resources/` 中的条目，笔记正文在 `notes/` 维护。
 
 ## Curation
 
-资源简介帮助判断项目解决什么问题，“关注”提供进一步阅读的切入点；需要理解机制、比较方案或复现实验时，可结合 [学习笔记](notes/README.md) 阅读。内容的新增与修订统一记录在 [更新日志](CHANGELOG.md)。
+资源简介帮助判断项目解决什么问题，“关注”提供进一步阅读的切入点；需要理解机制、比较方案或复现实验时，可结合 [学习笔记](notes/README.md) 阅读。
 
-欢迎补充资源、修正介绍和提交研究笔记，详见 [贡献指南](CONTRIBUTING.md)。
+欢迎补充资源、修正介绍和完善链接，详见 [贡献指南](CONTRIBUTING.md)。
 
 相关资源库：[Awesome Agent Infrastructure](https://github.com/backblaze-labs/awesome-agent-infrastructure)、[Awesome Agent Runtime](https://github.com/sandbaseai/awesome-agent-runtime)。它们可作为扩展阅读与查漏的入口。
 

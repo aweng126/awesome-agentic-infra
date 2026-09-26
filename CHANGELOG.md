@@ -12,6 +12,7 @@
 
 ### 内容更新
 
+- 精简 [GitHub README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md) 的在线入口与维护说明，将贡献介绍统一为资源补充、事实与链接修正；[贡献指南](CONTRIBUTING.md) 同步移除笔记投稿相关说明。
 - 精简 [GitHub README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md)，移除重复的 Scope 章节，通过图下入口阅读 [范围与分类边界](notes/agentic-infra-overview.md#三个基础设施领域)；资源收录标准集中在 [贡献指南](CONTRIBUTING.md#what-to-include)。
 - 在 [GitHub README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md) 中加入三领域基础设施关系图，并更新项目介绍，说明资源索引、原创学习笔记与仓库的关注范围。
 - 在 [概览笔记](notes/agentic-infra-overview.md) 与 [仓库范围](README.md#scope) 中区分 Agentic Infra、LLM Serving Infra 和 LLM Training Infra，说明任务执行、模型服务与模型产物发布的关系；八个阅读主题同步标明核心能力、跨领域能力和关联基础设施。
