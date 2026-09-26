@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, sitePath, repoUrl, topicScopeLabels } from '../../lib/content';
+import { getTopics, groupTopics, sitePath, repoUrl, topicScopeLabels } from '../../lib/content';
 
 export async function getStaticPaths() {
   return (await getTopics()).map((topic) => ({
@@ -12,25 +12,30 @@ export async function getStaticPaths() {
 
 const { topic } = Astro.props;
 const topics = await getTopics();
+const topicGroups = groupTopics(topics);
+const isRelated = topic.scope === 'serving';
+const sectionLabel = isRelated ? '关联基础设施' : '主题导读';
 const filterPath = `${sitePath('resources/')}?topic=${topic.slug}`;
 const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 ---
 
-<SiteLayout title={`${topic.zhTitle} · 主题导读`} description={topic.description} active="topics">
+<SiteLayout title={`${topic.zhTitle} · ${sectionLabel}`} description={topic.description} active="topics">
   <main id="main-content" class="topic-shell">
     <aside class="topic-sidebar" aria-label="主题导航">
       <details class="topic-menu" open>
         <summary>主题导航 <span aria-hidden="true">⌄</span></summary>
         <nav aria-label="主题导航">
-          <p class="sidebar-label">主题导航</p>
+          {topicGroups.map((group) => <div class="topic-nav-group" data-topic-group={group.id}>
+          <p class="sidebar-label">{group.title}</p>
           <ol class="topic-navigation">
-            {topics.map((entry, index) => <li>
+            {group.topics.map((entry, index) => <li>
               <a href={sitePath(`topics/${entry.slug}/`)} aria-current={entry.slug === topic.slug ? 'page' : undefined}>
-                <span class="topic-order">{String(index + 1).padStart(2, '0')}</span>
+                <span class="topic-order" aria-hidden="true">{group.id === 'primary' ? String(index + 1).padStart(2, '0') : '↳'}</span>
                 <span>{entry.zhTitle}</span>
               </a>
             </li>)}
           </ol>
+          </div>)}
           <a class="sidebar-resource-link" href={sitePath('resources/')}>
             搜索与筛选全部资源 <Icon name="arrow" size={16} />
           </a>
@@ -41,7 +46,7 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
     <div class="topic-content">
       <nav class="breadcrumbs" aria-label="面包屑">
         <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
-        <a href={`${sitePath()}#topics`}>主题导读</a><span aria-hidden="true">/</span>
+        <a href={`${sitePath()}#${isRelated ? 'related-infrastructure' : 'topics'}`}>{sectionLabel}</a><span aria-hidden="true">/</span>
         <span aria-current="page">{topic.zhTitle}</span>
       </nav>
       <header class="topic-header">
@@ -51,7 +56,7 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
       </header>
 
       <section class="topic-section topic-intro" aria-labelledby="topic-guide">
-        <h2 id="topic-guide">主题导读</h2>
+        <h2 id="topic-guide">{isRelated ? '关联导读' : '主题导读'}</h2>
         <div class="prose" set:html={topic.introHtml} />
       </section>
 
@@ -71,10 +76,10 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 
       <section class="topic-section reference-section" aria-labelledby="reference-materials">
         <div class="section-top"><h2 id="reference-materials">参考资料</h2><span>{topic.entries.length} 条资料</span></div>
-        <p class="reference-intro">相关项目、论文与一手文档。<a href={filterPath}>在资源库筛选本主题 <Icon name="arrow" size={14} /></a></p>
+        <p class="reference-intro">相关项目、论文与一手文档。<a href={filterPath}>在资源库筛选这些资料 <Icon name="arrow" size={14} /></a></p>
         <div class="prose reference-list" set:html={topic.resourceHtml} />
       </section>
-      <footer class="topic-footer"><a href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 改进本主题 <Icon name="external" size={14} /></a></footer>
+      <footer class="topic-footer"><a href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 改进本页 <Icon name="external" size={14} /></a></footer>
     </div>
   </main>
 </SiteLayout>
@@ -92,6 +97,7 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   .topic-sidebar { min-width: 0; position: sticky; top: 110px; }
   .topic-menu summary { display: none; }
   .sidebar-label { font-size: 11px; color: var(--muted); letter-spacing: .06em; margin: 0 12px 16px; }
+  .topic-nav-group + .topic-nav-group { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
   .topic-navigation { list-style: none; padding: 0; margin: 0; }
   .topic-navigation a { display: flex; align-items: baseline; gap: 12px; padding: 12px; font-size: 12px; line-height: 1.6; color: var(--muted); border-radius: 6px; margin: 3px 0; }
   .topic-navigation a:hover { color: var(--accent); background: var(--surface-alt); }
@@ -136,5 +142,6 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   @media (min-width: 960px) { .topic-menu:not([open]) > nav { display: block; } }
   @media (max-width: 1100px) { .topic-shell { gap: 38px; grid-template-columns: 205px minmax(0, 1fr); padding-inline: 28px; } }
   @media (max-width: 959px) { .topic-shell { display: block; max-width: 820px; padding: 24px 26px 60px; } .topic-sidebar { position: static; margin-bottom: 30px; } .topic-menu { border: 1px solid var(--line); border-radius: 8px; } .topic-menu summary { display: flex; justify-content: space-between; padding: 14px 18px; font-size: 12px; color: var(--muted); cursor: pointer; } .topic-menu[open] summary { border-bottom: 1px solid var(--line); } .topic-menu nav { padding: 14px 10px 20px; } .topic-menu .sidebar-label { display: none; } .topic-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; } .sidebar-resource-link { margin-top: 14px; padding-top: 16px; } .breadcrumbs { margin-bottom: 29px; } }
+  @media (max-width: 959px) { .topic-menu .topic-nav-group .sidebar-label { display: block; margin-bottom: 8px; } }
   @media (max-width: 560px) { .topic-shell { padding-inline: 20px; } .topic-navigation { display: block; } .topic-header { padding-bottom: 25px; } h1 { font-size: 29px; } .topic-subtitle { font-size: 13px; } .section-top { align-items: baseline; gap: 12px; } .section-top > span { font-size: 10px; } .learning-notes > li { grid-template-columns: 20px minmax(0, 1fr); gap: 11px; } .learning-notes h3 { font-size: 20px; } .learning-notes p { font-size: 12px; } .breadcrumbs { gap: 7px; font-size: 10px; } }
 </style>

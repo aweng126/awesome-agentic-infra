@@ -1,6 +1,6 @@
 # Agentic Infra 的范围、组件与分类边界
 
-一个 Agent 从接收任务到完成执行，需要哪些基础设施能力？本文先区分 Agentic Infra、LLM Serving Infra 与 LLM Training Infra，再沿着一次任务的执行链路，介绍八个阅读主题的职责与联系。
+一个 Agent 从接收任务到完成执行，需要哪些基础设施能力？本文先区分 Agentic Infra、LLM Serving Infra 与 LLM Training Infra，再沿着一次任务的执行链路，介绍七个主要主题与关联基础设施的职责和联系。
 
 ## 三个基础设施领域
 
@@ -50,9 +50,9 @@ flowchart TB
 
 部署与调度、观测与评估、安全与治理都服务于多个领域。本仓库侧重 Agent 工作负载中的问题，例如长任务与沙箱的资源供应、模型调用与工具操作的联合追踪、任务完成质量，以及操作授权与审计。通用的调度、遥测和策略机制可以复用，实际设计仍要明确管理对象与作用边界。
 
-## 八个主题分别回答什么
+## 主题导航与关联基础设施
 
-八个主题是阅读目录：前四项展开 Agentic Infra 的核心能力，第五项介绍关联的 Serving 服务，后三项讨论跨领域能力在 Agent 侧的应用。训练作为上游背景在本文说明。
+七个主要主题构成阅读目录：前四项展开 Agentic Infra 的核心能力，后三项讨论跨领域能力在 Agent 侧的应用。模型服务作为关联基础设施单独提供阅读入口，训练作为上游背景在本文说明。
 
 | 主题 | 在示例任务中的职责 | 阅读入口 |
 | --- | --- | --- |
@@ -60,10 +60,11 @@ flowchart TB
 | Sandbox & Execution | 为生成的代码或浏览器操作提供执行环境与隔离边界 | [资源](../resources/sandbox-and-execution.md) |
 | Memory & Context | 保存会话与长期信息，为下一次模型调用选择上下文 | [资源](../resources/memory-and-context.md) |
 | Tools & Protocols | 描述工具接口，传递请求和结果，与其他 Agent 互联 | [资源](../resources/tools-and-protocols.md) |
-| Inference & Model Serving | 将模型请求路由到后端，处理批执行与推理缓存 | [资源](../resources/inference-and-model-serving.md) |
 | Deployment & Scheduling | 分配工作节点、执行环境和服务副本，处理伸缩 | [资源](../resources/deployment-and-scheduling.md) |
 | Observability & Evaluation | 解释失败步骤，衡量任务成功率、耗时与资源消耗 | [资源](../resources/observability-and-evaluation.md) |
 | Security & Governance | 确认调用主体、检查操作权限并记录审计信息 | [资源](../resources/security-and-governance.md) |
+
+**关联基础设施：[Inference & Model Serving](../resources/inference-and-model-serving.md)。** 在示例任务中，模型服务接收 Agent 发出的请求，处理路由、批执行与推理缓存。这里围绕 Agent 的多轮调用、长上下文与并发需求阅读相关资料。
 
 ## 容易混淆的边界
 

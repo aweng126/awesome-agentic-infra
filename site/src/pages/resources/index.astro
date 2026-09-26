@@ -1,10 +1,12 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, getResources, sitePath } from '../../lib/content';
+import { getTopics, getResources, groupTopics, sitePath } from '../../lib/content';
 import { getResourceSource } from '../../lib/resource-source';
 const topics = await getTopics();
 const resources = await getResources();
+const topicGroups = groupTopics(topics);
+const relatedSlugs = new Set(topicGroups[1].topics.map((topic) => topic.slug));
 const types = [{id:'all',label:'全部类型'},{id:'project',label:'项目与平台'},{id:'paper',label:'论文'},{id:'spec',label:'协议规范'},{id:'article',label:'文章与文档'}];
 const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
 ---
@@ -14,12 +16,17 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
     <div class="explorer-search"><Icon name="search" size={22}/><label class="sr-only" for="resource-search">搜索资源</label><input id="resource-search" type="search" autocomplete="off" placeholder="搜索名称、技术机制或关键词，如 sandbox、记忆、MCP…"/><span>已收录 {resources.length} 条</span></div>
     <div class="explorer-layout">
       <aside class="filter-sidebar" aria-label="按主题筛选">
-        <h2>按主题筛选</h2>
+        <h2>筛选范围</h2>
         <p class="filter-count-hint" id="topic-count-hint">数量随搜索词和资料类型更新</p>
         <div class="topic-filters" aria-describedby="topic-count-hint">
-          <button type="button" data-topic="all" aria-pressed="true">全部主题<span data-topic-count>{resources.length}</span></button>
-          {topics.map(topic => <button type="button" data-topic={topic.slug} aria-pressed="false">{topic.zhTitle}<span data-topic-count>{topic.entries.length}</span></button>)}
+          <button type="button" data-topic="all" aria-pressed="true">全部资源<span data-topic-count>{resources.length}</span></button>
         </div>
+        {topicGroups.map((group) => <div class="topic-filter-group" data-topic-group={group.id} role="group" aria-labelledby={`filters-${group.id}`}>
+          <h3 id={`filters-${group.id}`}>{group.title}</h3>
+          <div class="topic-filters" aria-describedby="topic-count-hint">
+            {group.topics.map(topic => <button type="button" data-topic={topic.slug} aria-pressed="false">{topic.zhTitle}<span data-topic-count>{topic.entries.length}</span></button>)}
+          </div>
+        </div>)}
         <div class="sidebar-note">
           <Icon name="book" size={20}/>
           <p>不确定从哪里开始？</p>
@@ -53,7 +60,7 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
                     <span class="resource-host">{source.host}</span>
                   </div>
                   <a class="resource-topic-link" href={sitePath(`topics/${resource.topicSlug}/`)}>
-                    主题导读：{resource.topicZhTitle}<Icon name="arrow" size={13}/>
+                    {relatedSlugs.has(resource.topicSlug) ? '关联资料' : '主题导读'}：{resource.topicZhTitle}<Icon name="arrow" size={13}/>
                   </a>
                 </div>
               </article>
@@ -72,3 +79,17 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
   </main>
   <script>import '../../scripts/explorer';</script>
 </SiteLayout>
+
+<style>
+  .topic-filter-group { margin-top: 22px; }
+  .topic-filter-group + .topic-filter-group { padding-top: 18px; border-top: 1px solid var(--line); }
+  .topic-filter-group h3 { margin: 0 11px 9px; font-size: 11px; font-weight: 500; letter-spacing: .05em; color: var(--muted); }
+  @media (max-width: 760px) {
+    .filter-sidebar > .topic-filters { margin-bottom: 0; padding-bottom: 4px; }
+    .topic-filter-group { margin-top: 12px; }
+    .topic-filter-group + .topic-filter-group { padding-top: 0; border-top: 0; }
+    .topic-filter-group h3 { margin: 0 0 7px; font-size: 10px; }
+    .topic-filter-group .topic-filters { margin-bottom: 0; padding-bottom: 8px; }
+    .filter-sidebar { margin-bottom: 18px; }
+  }
+</style>

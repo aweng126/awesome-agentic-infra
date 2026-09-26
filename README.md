@@ -16,7 +16,7 @@ A curated collection of infrastructure resources and original notes on building 
 
 ## Topics
 
-以下八个主题是阅读目录：前四项覆盖 Agentic Infra 的核心能力，“推理与模型服务”属于关联的 Serving 领域，后三项讨论跨领域能力在 Agent 工作负载中的应用。
+以下七个主要主题构成阅读目录：前四项覆盖 Agentic Infra 的核心能力，后三项讨论跨领域能力在 Agent 工作负载中的应用。
 
 | 主题 | 核心问题 |
 | --- | --- |
@@ -24,10 +24,11 @@ A curated collection of infrastructure resources and original notes on building 
 | [Sandbox & Execution](resources/sandbox-and-execution.md) | 代码、命令和浏览器操作在哪里执行，如何隔离？ |
 | [Memory & Context](resources/memory-and-context.md) | 状态如何保存，哪些信息进入下一轮上下文？ |
 | [Tools & Protocols](resources/tools-and-protocols.md) | Agent 如何发现和调用工具，如何与其他 Agent 通信？ |
-| [Inference & Model Serving](resources/inference-and-model-serving.md) | 模型请求如何接入、路由、批处理与复用缓存？ |
 | [Deployment & Scheduling](resources/deployment-and-scheduling.md) | 工作负载如何部署、分配资源与弹性伸缩？ |
 | [Observability & Evaluation](resources/observability-and-evaluation.md) | 如何解释执行过程并衡量任务质量、延迟与成本？ |
 | [Security & Governance](resources/security-and-governance.md) | 谁能执行什么操作，如何实施策略与审计？ |
+
+**关联基础设施**：[Inference & Model Serving](resources/inference-and-model-serving.md) — 围绕 Agent 的模型调用，了解模型接入、请求路由与推理服务。
 
 ## Where to Start
 

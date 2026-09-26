@@ -1,5 +1,5 @@
 ---
-import { topics, getNotes, sitePath, repoUrl } from '../lib/content';
+import { topics, getNotes, groupTopics, sitePath, repoUrl } from '../lib/content';
 
 interface ReadingLink {
   href: string;
@@ -26,6 +26,7 @@ const {
   sourcePath, readingMinutes, itemCount, previous, next,
 } = Astro.props;
 const notes = await getNotes();
+const topicGroups = groupTopics(topics);
 const toc = headings.filter((heading) => heading.depth <= 3);
 const section = kind === 'topic' ? '主题导读' : kind === 'note' ? '研究笔记' : '参与共建';
 const sectionPath = kind === 'topic' ? '#topics' : kind === 'note' ? 'notes/' : 'contributing/';
@@ -41,21 +42,23 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
         <a class="all-resources" href={sitePath('resources/')}>
           <span>搜索与筛选全部资源</span><span aria-hidden="true">→</span>
         </a>
-        <p class="sidebar-label category-label">主题导航</p>
+        {topicGroups.map((group) => <div class="topic-nav-group" data-topic-group={group.id}>
+        <p class="sidebar-label category-label">{group.title}</p>
         <ol class="chapter-list">
-          {topics.map((topic, index) => (
+          {group.topics.map((topic, index) => (
             <li>
               <a
                 href={sitePath(`topics/${topic.slug}/`)}
                 class:list={['chapter-link', { selected: kind === 'topic' && topic.slug === slug }]}
                 aria-current={kind === 'topic' && topic.slug === slug ? 'page' : undefined}
               >
-                <span class="chapter-number">{String(index + 1).padStart(2, '0')}</span>
+                <span class="chapter-number" aria-hidden="true">{group.id === 'primary' ? String(index + 1).padStart(2, '0') : '↳'}</span>
                 <span>{topic.zhTitle}</span>
               </a>
             </li>
           ))}
         </ol>
+        </div>)}
         <p class="sidebar-label category-label">理解与共建</p>
         {notes.map((note) => (
           <a

@@ -22,6 +22,7 @@
 
 ### 站点改进
 
+- 将 [主题导航](README.md#topics) 调整为七个主要主题与独立的“关联基础设施”入口，突出 Agent 核心能力和跨领域支撑；[推理与模型服务](resources/inference-and-model-serving.md) 保留原有资料与链接，作为关联资料查阅。[概览笔记](notes/agentic-infra-overview.md#主题导航与关联基础设施) 和 [贡献指南](CONTRIBUTING.md#where-to-put-it) 同步说明分类边界。
 - 重绘 [首页](README.md) 基础设施关系图：突出 Agentic Infra，独立展示 Serving 与 Training，标明模型请求、推理结果和模型产物发布方向；部署、观测与治理作为跨领域能力展示。
 - 将 [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/) 改为紧凑资料列表，明确区分外部来源与主题导读入口；保留搜索、筛选与同步计数。
 - 主题页按导读、学习笔记和参考资料组织内容，简化导航并保留既有资源定位链接。[运行时与编排](resources/runtime-and-orchestration.md) 已接入恢复机制笔记，首页可直接进入阅读。

@@ -63,11 +63,55 @@ const resourceSections = new Set([
 ]);
 const resourceFiles=(await readdir('../resources')).filter((file) => file.endsWith('.md'));
 assert.equal(pages.filter(p=>path.relative(root,p).startsWith(`topics${path.sep}`)).length,resourceFiles.length,'Each source topic needs a page');
+const servingSlug = 'inference-and-model-serving';
+const servingPath = `${base}topics/${servingSlug}/`;
+const primarySlugs = resourceFiles.map((filename) => filename.slice(0, -3)).filter((slug) => slug !== servingSlug);
+assert.equal(primarySlugs.length, 7, 'The collection has seven primary Agent infrastructure topics');
+assert.ok(resourceFiles.includes(`${servingSlug}.md`), 'Serving remains a source topic with its existing address');
+const primaryTopicPaths = new Set(primarySlugs.map((slug) => `${base}topics/${slug}/`));
+const home = documents.get(path.join(root, 'index.html'));
+assert.ok(home, 'Homepage must be generated');
+const homeTopicCards = [...home.querySelectorAll('.topic-card')];
+assert.equal(homeTopicCards.length, 7, 'Homepage highlights seven primary topic cards');
+assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))), primaryTopicPaths, 'Homepage primary cards include all Agent topics and exclude Serving');
+const primaryTopicStat = [...home.querySelectorAll('.stats-strip > div')]
+  .find((stat) => [...stat.querySelectorAll('span')].some((label) => label.textContent.trim() === '主要主题'));
+assert.equal(primaryTopicStat?.querySelector('strong')?.textContent.trim(), '07', 'Homepage reports 07 primary topics');
+assert.ok(home.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Homepage retains a Serving entry under related infrastructure');
+
+for (const [groupName, expectedSlugs] of [['primary', primarySlugs], ['related', [servingSlug]]]) {
+  const group = explorer.querySelector(`.topic-filter-group[data-topic-group="${groupName}"]`);
+  assert.ok(group, `Explorer exposes a ${groupName} filter group`);
+  const buttons = [...group.querySelectorAll('button[data-topic]')];
+  assert.equal(buttons.length, expectedSlugs.length, `Explorer ${groupName} filter group contains each topic once`);
+  assert.deepEqual(new Set(buttons.map((button) => button.getAttribute('data-topic'))), new Set(expectedSlugs), `Explorer ${groupName} filters retain their original topic identifiers`);
+}
+assert.equal(explorer.querySelectorAll('.topic-filters button[data-topic]').length, resourceFiles.length + 1, 'Explorer keeps every topic and the combined all-topics filter');
+
+function assertTopicNavigation(sidebar, label) {
+  assert.ok(sidebar, `${label}: topic sidebar must exist`);
+  assert.equal(sidebar.querySelectorAll('.topic-nav-group').length, 2, `${label}: navigation separates primary and related infrastructure`);
+  for (const [groupName, expectedPaths] of [['primary', primaryTopicPaths], ['related', new Set([servingPath])]]) {
+    const group = sidebar.querySelector(`.topic-nav-group[data-topic-group="${groupName}"]`);
+    assert.equal(group?.localName, 'div', `${label}: ${groupName} navigation uses a grouped container`);
+    const links = [...group.querySelectorAll(`a[href^="${base}topics/"]`)];
+    assert.equal(links.length, expectedPaths.size, `${label}: ${groupName} navigation includes each topic once`);
+    assert.deepEqual(new Set(links.map((link) => link.getAttribute('href'))), expectedPaths, `${label}: ${groupName} navigation reaches the original topic pages`);
+  }
+}
+for (const [file, document] of documents) {
+  const sidebar = document.querySelector('.reader-sidebar');
+  if (sidebar) assertTopicNavigation(sidebar, path.relative(root, file));
+}
 let sourceCount = 0;
 for (const filename of resourceFiles) {
   const topicSlug = filename.slice(0, -3);
   const topic = documents.get(path.join(root, 'topics', topicSlug, 'index.html'));
   assert.ok(topic, `${filename}: topic page must be generated`);
+  assertTopicNavigation(topic.querySelector('.topic-sidebar'), filename);
+  const currentTopicLinks = [...topic.querySelectorAll('.topic-sidebar a[aria-current="page"]')];
+  assert.equal(currentTopicLinks.length, 1, `${filename}: navigation marks only the current topic`);
+  assert.equal(currentTopicLinks[0]?.getAttribute('href'), `${base}topics/${topicSlug}/`, `${filename}: the current topic remains active in its group`);
   const tree = parser.parse(await readFile(`../resources/${filename}`, 'utf8'));
   const anchors = new Set();
   const learningLinks = new Set();

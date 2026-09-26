@@ -135,6 +135,13 @@ export const topicScopeLabels = {
 
 type TopicMetadata = (typeof topics)[number];
 
+export function groupTopics<T extends Pick<TopicMetadata, 'scope'>>(items: readonly T[]) {
+  return [
+    { id: 'primary', title: '主要主题', topics: items.filter((topic) => topic.scope !== 'serving') },
+    { id: 'related', title: '关联基础设施', topics: items.filter((topic) => topic.scope === 'serving') },
+  ] as const;
+}
+
 export interface Topic {
   slug: string;
   title: string;
