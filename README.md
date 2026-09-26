@@ -38,14 +38,6 @@ A curated collection of infrastructure resources and original notes on building 
 
 以上是阅读路径，各主题可以独立查阅。具体系统需要哪些组件，取决于任务、部署方式和约束。
 
-## Curation
-
-资源简介帮助判断项目解决什么问题，“关注”提供进一步阅读的切入点；需要理解机制、比较方案或复现实验时，可结合 [学习笔记](notes/README.md) 阅读。
-
-欢迎补充资源、修正介绍和完善链接，详见 [贡献指南](CONTRIBUTING.md)。
-
-相关资源库：[Awesome Agent Infrastructure](https://github.com/backblaze-labs/awesome-agent-infrastructure)、[Awesome Agent Runtime](https://github.com/sandbaseai/awesome-agent-runtime)。它们可作为扩展阅读与查漏的入口。
-
 ## License
 
 本仓库原创文字与图示采用 [CC BY 4.0](LICENSE)，许可说明见 [Creative Commons 官方页面](https://creativecommons.org/licenses/by/4.0/)。所链接的项目、论文和其他第三方内容遵循各自的许可证或使用条款。
