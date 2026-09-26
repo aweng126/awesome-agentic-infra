@@ -2,7 +2,7 @@
 
 Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架、可自托管的运行平台，以及云厂商的托管产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
 
-下面按这三种形态组织清单：开源框架提供 Agent 开发与编排能力；开源运行平台供团队自行部署，管理 Agent 工作负载与运行环境；云厂商产品提供构建、部署、运行和管理服务。它们可以配合使用，一个框架可以接入不同运行平台，同一厂商也可能同时提供开发工具包、开源平台和托管产品。
+下面先按这三种形态组织清单：开源框架提供 Agent 开发与编排能力；开源运行平台供团队自行部署，管理 Agent 工作负载与运行环境；云厂商产品提供构建、部署、运行和管理服务。它们可以配合使用，一个框架可以接入不同运行平台，同一厂商也可能同时提供开发工具包、开源平台和托管产品。随后补充围绕目标、分工与交付协调多个 Agent 的上层协作平台。
 
 ## 开源框架与项目
 
@@ -51,6 +51,16 @@ AX 当前接口为 `v1alpha1`，核心概念与规范仍在演进，见 [项目�
 - **VeADK 与 AgentKit Runtime** 分别对应开发工具包和云端运行服务；Cloudflare Agents 与 Workers 也分别出现在开发工具和运行平台的位置。
 - **Google ADK、AX 与 Google Cloud Agent Runtime** 分别对应开发工具包、可自托管的开源运行平台和云端托管服务。Google Cloud Agent Runtime 的旧名称是 Vertex AI Agent Engine，查阅旧资料时可能仍会遇到该名称，见 [官方更名记录](https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes)。
 
+## 上层协作平台
+
+这一组以组织、目标和任务为管理对象，通过已有 Agent Runtime 执行具体工作，提供团队分工、任务委派与交付管理能力。按主要职责，这里将其归入 [运行时与编排](../resources/runtime-and-orchestration.md) 中的组织级多 Agent 协作。
+
+| 项目 | 维护方 | 一句话定位 | 主要特点 | 官方入口 |
+| --- | --- | --- | --- | --- |
+| [Paperclip](../resources/runtime-and-orchestration.md#resource-paperclip) | Paperclip 团队与社区 | 开源、可自托管的组织级多 Agent 协作平台 | 目标与任务分工、事件唤醒、审批与预算；通过适配器接入已有 Agent Runtime 并衔接会话状态 | [仓库](https://github.com/paperclipai/paperclip) · [适配器文档](https://docs.paperclip.ing/reference/adapters/overview/) · [执行策略](https://docs.paperclip.ing/guides/power/execution-policy/) |
+
+Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/reference/adapters/sandbox-providers/) 接入和管理外部执行环境。阅读时可区分两类编排：Paperclip 主要协调 Agent 团队的任务与组织规则，AX 主要管理任务执行单元及其工作环境。
+
 ## 参考清单与延伸阅读
 
 以下两个社区清单可用于继续发现 Agent 基础设施与 Runtime 相关项目：
@@ -58,7 +68,7 @@ AX 当前接口为 `v1alpha1`，核心概念与规范仍在演进，见 [项目�
 - [Awesome Agent Infrastructure](https://github.com/backblaze-labs/awesome-agent-infrastructure)
 - [Awesome Agent Runtime](https://github.com/sandbaseai/awesome-agent-runtime)
 
-本篇归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，开源运行平台与云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
+本篇及上层协作平台的主条目归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，AX 与云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
 
 - **相关基础组件**：[Temporal](../resources/runtime-and-orchestration.md#resource-temporal) 是持久工作流平台，其官方 [AI 应用文档](https://docs.temporal.io/ai) 提供 Agent 集成入口。
 - **机制专题**：[任务失败后如何恢复](task-recovery-and-side-effects.md)，讨论检查点、重试与外部副作用。

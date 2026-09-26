@@ -6,6 +6,7 @@
 
 ### 新增内容
 
+- 在 [运行时与编排](resources/runtime-and-orchestration.md#resource-paperclip) 中收录 Paperclip，并在 [Runtime 全景](notes/agent-runtime-landscape.md#上层协作平台) 中补充上层协作平台，介绍组织级多 Agent 协作及其与任务执行平台的分工。
 - 在 [部署与调度](resources/deployment-and-scheduling.md#resource-google-ax) 中收录 Google AX，并在 [Runtime 全景](notes/agent-runtime-landscape.md#开源运行平台) 中增加开源运行平台分类，区分开发框架、自托管平台与云厂商产品。
 - 新增 [Agent Runtime 全景：开源框架、运行平台与云厂商产品](notes/agent-runtime-landscape.md)，汇总代表性方案的维护方、产品定位、主要特点和官方入口，作为 [运行时与编排](resources/runtime-and-orchestration.md) 的学习笔记；同步补充该主题与 [部署与调度](resources/deployment-and-scheduling.md) 中的框架和托管平台资源。
 - 新增 [任务失败后如何恢复：检查点、重试与外部副作用](notes/task-recovery-and-side-effects.md)，通过报告任务的故障窗口，解释状态持久化、重放、幂等键与人工审批，并附官方来源和验证检查表。
