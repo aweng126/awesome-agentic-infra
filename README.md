@@ -8,7 +8,7 @@ A curated collection of infrastructure resources and original notes on building 
 
 **在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/)
 
-[![Agentic Infra 与 LLM Serving、LLM Training 基础设施的关系](assets/agentic-infra-map.svg)](https://blog.kingwen.cn/awesome-agentic-infra/)
+[![Agentic Infra 首页概览与三领域基础设施关系图](assets/awesome-agentic-infra-page.jpg)](https://blog.kingwen.cn/awesome-agentic-infra/)
 
 <a id="scope"></a>
 
