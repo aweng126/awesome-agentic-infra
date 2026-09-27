@@ -1,6 +1,6 @@
 # Sandbox & Execution
 
-收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱平台、云浏览器和隔离运行时。身份与授权组件见 [Security & Governance](security-and-governance.md)，集群资源管理见 [Deployment & Scheduling](deployment-and-scheduling.md)。
+收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱平台、云浏览器和隔离运行时，以及执行环境的状态检查点、回滚与分支机制。身份与授权组件见 [Security & Governance](security-and-governance.md)，集群资源管理见 [Deployment & Scheduling](deployment-and-scheduling.md)。
 
 <!-- resources:start -->
 
@@ -11,6 +11,11 @@
 - <a id="resource-e2b"></a> [E2B](https://docs.e2b.dev/) — 面向 Agent 的云沙箱，通过 SDK 和环境模板创建 Linux 执行环境，用于运行代码、处理数据和调用工具，支持保存文件系统与内存的暂停和恢复。 [项目介绍](items/e2b.md)
 - <a id="resource-firecracker"></a> [Firecracker](https://github.com/firecracker-microvm/firecracker) — 基于 Linux KVM 的微虚拟机监控器，提供精简设备模型、独立客户机内核及 Jailer 权限限制，可作为自建 Agent 代码执行平台的隔离底座。 [项目介绍](items/firecracker.md)
 - <a id="resource-gvisor"></a> [gVisor](https://gvisor.dev/docs/) — 通过用户态应用内核处理工作负载系统调用的隔离运行时，可隔离 Agent 生成的代码及其依赖，通过 OCI 运行时 `runsc` 接入容器工具链。 [项目介绍](items/gvisor.md)
+- <a id="resource-cube-sandbox"></a> [Cube Sandbox](https://github.com/TencentCloud/CubeSandbox) — 腾讯云开源的 Agent 沙箱服务，基于 RustVMM 与 KVM 提供 MicroVM 执行环境，支持自部署、E2B 兼容接口，以及环境模板、暂停恢复、快照克隆与回滚。 [项目介绍](items/cube-sandbox.md)
+
+## Papers
+
+- <a id="resource-deltabox"></a> [DeltaBox: Scaling Stateful AI Agents with Millisecond-Level Sandbox Checkpoint/Rollback](https://arxiv.org/abs/2605.22781)（2026，ACM SIGOPS ATC 已接收）— 面向 Agent 树搜索与强化学习采样中的高频状态探索，通过 DeltaFS 与 DeltaCR 增量保存文件系统和进程状态，降低沙箱检查点与回滚开销。系统概览见 [作者项目页](https://dongyunpeng-sjtu.github.io/deltabox/)，ATC26 接收信息见 [IPADS 公告](https://ipads.sjtu.edu.cn/zh/news/)。
 
 <!-- resources:end -->
 

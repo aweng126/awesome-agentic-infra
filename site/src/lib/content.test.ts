@@ -129,7 +129,7 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
 test('profile routes contain full introductions while metadata-only resources keep their topic fallback', async () => {
   const resources = await getResources();
   const profiles = await getResourceProfiles();
-  assert.equal(resources.length, 52);
+  assert.equal(resources.length, 54);
   assert.deepEqual(profiles.map(profile => profile.slug).sort(), resources.filter(resource => resource.type === 'project').map(resource => resource.slug).sort(), 'every project and platform has a complete introduction');
   assert.equal(resources.filter(resource => resource.hasProfile).length, profiles.length);
   for (const profile of profiles) {

@@ -6,6 +6,7 @@
 
 ### 新增内容
 
+- 在 [沙箱与执行环境](resources/sandbox-and-execution.md) 中新增腾讯云 [Cube Sandbox 项目介绍](resources/items/cube-sandbox.md)，了解自托管 MicroVM 沙箱与状态管理能力；收录 [DeltaBox](resources/sandbox-and-execution.md#resource-deltabox) 论文，介绍面向 Agent 状态探索的增量检查点与回滚，并补充 ATC26 接收来源。
 - 补齐其余 39 个项目与平台的介绍页，现有 43 项均可在站内阅读背景、能力、核心概念和接入方式。覆盖 [记忆与上下文](resources/memory-and-context.md)、[工具与协议](resources/tools-and-protocols.md)、[可观测性与评估](resources/observability-and-evaluation.md) 和 [安全与治理](resources/security-and-governance.md) 中的全部项目，并保留官方资料入口。
 - 完成 [运行时框架](resources/runtime-and-orchestration.md) 与 [云端部署方案](resources/deployment-and-scheduling.md) 介绍，包括 [Paperclip](resources/items/paperclip.md)、[阿里云 AgentCore](resources/items/alibaba-cloud-agentcore.md)、[Google Cloud Agent Runtime](resources/items/google-cloud-agent-runtime.md)、[Microsoft Foundry Hosted Agents](resources/items/microsoft-foundry-hosted-agents.md) 和 [火山引擎 AgentKit Runtime](resources/items/volcengine-agentkit-runtime.md)，区分应用框架、组织协作与托管运行服务。
 - 补齐 [沙箱与执行环境](resources/sandbox-and-execution.md) 及关联的 [推理与模型服务](resources/inference-and-model-serving.md) 项目介绍，说明托管平台、隔离组件与模型服务各自的用途。
