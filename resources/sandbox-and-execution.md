@@ -1,6 +1,6 @@
 # Sandbox & Execution
 
-收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱平台、云浏览器和隔离运行时，以及执行环境的状态检查点、回滚与分支机制。身份与授权组件见 [Security & Governance](security-and-governance.md)，集群资源管理见 [Deployment & Scheduling](deployment-and-scheduling.md)。
+收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱环境与服务、云浏览器，以及容器执行和隔离底座；也关注执行环境的状态检查点、回滚与分支机制。身份与授权组件见 [Security & Governance](security-and-governance.md)，集群资源管理见 [Deployment & Scheduling](deployment-and-scheduling.md)。
 
 <!-- resources:start -->
 
@@ -12,6 +12,8 @@
 - <a id="resource-firecracker"></a> [Firecracker](https://github.com/firecracker-microvm/firecracker) — 基于 Linux KVM 的微虚拟机监控器，提供精简设备模型、独立客户机内核及 Jailer 权限限制，可作为自建 Agent 代码执行平台的隔离底座。 [项目介绍](items/firecracker.md)
 - <a id="resource-gvisor"></a> [gVisor](https://gvisor.dev/docs/) — 通过用户态应用内核处理工作负载系统调用的隔离运行时，可隔离 Agent 生成的代码及其依赖，通过 OCI 运行时 `runsc` 接入容器工具链。 [项目介绍](items/gvisor.md)
 - <a id="resource-cube-sandbox"></a> [Cube Sandbox](https://github.com/TencentCloud/CubeSandbox) — 腾讯云开源的 Agent 沙箱服务，基于 RustVMM 与 KVM 提供 MicroVM 执行环境，支持自部署、E2B 兼容接口，以及环境模板、暂停恢复、快照克隆与回滚。 [项目介绍](items/cube-sandbox.md)
+- <a id="resource-docker-engine"></a> [Docker Engine](https://docs.docker.com/engine/) — 通用容器引擎，通过镜像、容器、网络和卷组织执行环境，可作为 Agent 代码与工具执行的基础组件；普通 Linux 容器共享其宿主内核，权限和挂载由环境配置控制。 [项目介绍](items/docker-engine.md)
+- <a id="resource-docker-sandboxes"></a> [Docker Sandboxes](https://docs.docker.com/ai/sandboxes/) — 面向 AI 编码 Agent 的沙箱产品，通过 sbx CLI 管理本地或 Docker 托管云端环境；本地采用 microVM 与独立 Docker daemon，支持工作目录接入、网络策略和环境留存，云端另提供 API 与 SDK。 [项目介绍](items/docker-sandboxes.md)
 
 ## Papers
 

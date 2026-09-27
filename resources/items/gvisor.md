@@ -33,7 +33,7 @@ gVisor 在应用与宿主操作系统之间提供额外隔离层，面向需要�
 ## 核心能力
 
 - **系统接口隔离**：应用的系统调用由 gVisor 内核处理，宿主访问限制在实现这些功能所需的受控操作中。[安全架构](https://gvisor.dev/docs/architecture_guide/intro/)
-- **容器工具兼容**：通过 `runsc` 运行 OCI 容器，可以接入 Docker、containerd 与 Kubernetes。[文档入口](https://gvisor.dev/docs/)
+- **容器工具兼容**：通过 `runsc` 运行 OCI 容器，可以接入 [Docker Engine](docker-engine.md)、containerd 与 Kubernetes。[文档入口](https://gvisor.dev/docs/)
 - **环境访问控制**：在容器配置指定的文件系统、网络和资源范围内运行工作负载，结合宿主的命名空间与权限限制形成执行边界。[运行方式](https://gvisor.dev/docs/architecture_guide/intro/)
 
 ## 核心概念与工作方式

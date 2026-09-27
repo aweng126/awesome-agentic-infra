@@ -4,6 +4,18 @@
 
 ## 2026-09-27
 
+### 21:40 · 补充 Docker 执行环境
+
+新增 [Docker Engine](resources/items/docker-engine.md) 与 [Docker Sandboxes](resources/items/docker-sandboxes.md) 介绍，分别了解容器执行底座和面向 Agent 的本地、云端沙箱产品。
+
+#### 新增内容
+
+- 在[沙箱与执行环境](resources/sandbox-and-execution.md)中收录 Docker Engine 与 Docker Sandboxes，补充定位、主要能力、工作方式及官方接入资料，并关联两者与 gVisor 的阅读入口。
+
+#### 内容更新
+
+- 主题内分组使用“沙箱环境与服务”和“执行与隔离底座”，覆盖本地工具、托管沙箱与容器基础组件；资源库、搜索和首页资源数量同步更新。
+
 ### 21:10 · 资源发现与阅读体验更新
 
 在[资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/)按组件角色与交付方式查找方案，通过中文别名和能力关键词搜索资源；新增 [MCP](resources/items/mcp.md)、[A2A](resources/items/a2a.md) 与 [OpenTelemetry GenAI](resources/items/opentelemetry-genai-semantic-conventions.md) 规范导读，并可通过 RSS 订阅后续更新。
