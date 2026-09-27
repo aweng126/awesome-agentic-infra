@@ -72,4 +72,4 @@ Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/refe
 
 - **相关基础组件**：[Temporal](../resources/runtime-and-orchestration.md#resource-temporal) 是持久工作流平台，其官方 [AI 应用文档](https://docs.temporal.io/ai) 提供 Agent 集成入口。
 
-[返回笔记索引](README.md) · [返回首页](../README.md)
+[返回资源导览](README.md) · [返回首页](../README.md)

@@ -51,16 +51,16 @@ test('topic sources produce nonempty, unique resources in metadata order', async
   }
 });
 
-test('topic introductions, linked notes and reference sections share one Markdown source', async () => {
+test('topic introductions, linked solution overviews and resource sections share one Markdown source', async () => {
   const note: Note = {
-    slug: 'recovery', title: '任务恢复', description: '理解任务恢复', html: '<p>机制解释</p>',
-    headings: [], sourcePath: 'notes/recovery.md', readingMinutes: 3,
+    slug: 'runtime-options', title: 'Runtime 方案', description: '了解项目定位', html: '<p>开源框架与云平台</p>',
+    headings: [], sourcePath: 'notes/runtime-options.md', readingMinutes: 3,
   };
   const markdown = `# 运行时
 理解 **持久执行**。
 
-## 学习笔记
-- [任务恢复](../notes/recovery.md) — 检查点与副作用。
+## 方案总览
+- [Runtime 方案](../notes/runtime-options.md) — 开源框架与云平台。
 
 ## Projects & Platforms
 - <a id="resource-example"></a> [Example](https://example.org) — 执行系统。
@@ -69,18 +69,20 @@ test('topic introductions, linked notes and reference sections share one Markdow
 `;
   const sections = await getTopicSections(markdown, 'resources/runtime-and-orchestration.md', [note]);
   assert.match(sections.introHtml, /<strong>持久执行<\/strong>/u);
-  assert.doesNotMatch(sections.introHtml, /任务恢复|Example/u);
+  assert.doesNotMatch(sections.introHtml, /Runtime 方案|Example/u);
   assert.deepEqual(sections.learningNotes, [note]);
   assert.match(sections.resourceHtml, /<h3 id="projects--platforms">/u);
   assert.match(sections.resourceHtml, /<li id="resource-example">/u);
-  assert.doesNotMatch(sections.resourceHtml, /学习笔记|任务恢复|返回首页/u);
+  assert.doesNotMatch(sections.resourceHtml, /方案总览|Runtime 方案|返回首页/u);
   assert.equal(extractResources(markdown, topics[0]).length, 1);
-  const withoutNotes = await getTopicSections(markdown.replace(/## 学习笔记[\s\S]*?(?=## Projects)/u, ''), 'resources/runtime-and-orchestration.md', [note]);
+  const overviewLast = await getTopicSections(`# 运行时\n## Projects & Platforms\n- <a id="resource-example"></a> [Example](https://example.org)\n## 方案总览\n- [Runtime 方案](../notes/runtime-options.md)\n\n[返回首页](../README.md)`, 'resources/runtime-and-orchestration.md', [note]);
+  assert.deepEqual(overviewLast.learningNotes, [note], 'return navigation after a final overview section is not a guide link');
+  const withoutNotes = await getTopicSections(markdown.replace(/## 方案总览[\s\S]*?(?=## Projects)/u, ''), 'resources/runtime-and-orchestration.md', [note]);
   assert.deepEqual(withoutNotes.learningNotes, []);
-  await assert.rejects(getTopicSections(markdown, 'resources/runtime-and-orchestration.md', []), /existing notes\/\*\.md article/);
+  await assert.rejects(getTopicSections(markdown, 'resources/runtime-and-orchestration.md', []), /existing notes\/\*\.md guide/);
 });
 
-test('resource sections classify all four types without counting implementation or learning-note links', () => {
+test('resource sections classify all four types without counting implementation or solution-overview links', () => {
   const resources = extractResources(`
 # Test
 ## Projects & Platforms
@@ -91,8 +93,8 @@ test('resource sections classify all four types without counting implementation 
 - <a id="resource-specification"></a> [Specification](https://example.org/specification) — A specification.
 ## Articles & Documentation
 - <a id="resource-article"></a> [Article](https://example.org/article) — An article.
-## 学习笔记
-- [相关分析](https://example.org/note) — not a resource.
+## 方案总览
+- [相关方案](https://example.org/note) — not a resource.
 `, topics[0]);
   assert.equal(resources.length, 4);
   assert.deepEqual(resources.map((resource) => resource.type), ['project', 'paper', 'spec', 'article']);
@@ -151,7 +153,9 @@ flowchart TD
   A[任务] --> B[运行时]
 \`\`\`
 
-[返回笔记索引](README.md) · [返回首页](../README.md)
+[返回资源导览](README.md) · [返回首页](../README.md)
+
+[返回笔记索引](README.md)
 `, 'notes/example.md');
   assert.deepEqual(rendered.headings, [
     { depth: 2, id: '中文标题', text: '中文标题' },
@@ -162,7 +166,7 @@ flowchart TD
   assert.match(rendered.html, /<code class="language-mermaid">/u);
   assert.match(rendered.html, /flowchart TD/u);
   for (const heading of rendered.headings) assert.ok(rendered.html.includes(`id="${heading.id}"`));
-  assert.doesNotMatch(rendered.html, /<h1|返回首页|返回笔记索引/u);
+  assert.doesNotMatch(rendered.html, /<h1|返回首页|返回资源导览|返回笔记索引/u);
 });
 
 test('raw HTML cannot execute and dangerous URL schemes are removed', async () => {
@@ -209,7 +213,7 @@ test('notes and guide load repository sources with readable summaries and source
     assert.ok(note.description.length > 0);
     assert.ok(Number.isInteger(note.readingMinutes) && note.readingMinutes > 0);
     assert.doesNotMatch(note.html, /<h1(?:\s|>)/u);
-    assert.doesNotMatch(note.html, /返回首页|返回笔记索引/u);
+    assert.doesNotMatch(note.html, /返回首页|返回资源导览|返回笔记索引/u);
     for (const heading of note.headings) {
       assert.ok(heading.depth >= 2 && heading.depth <= 6);
       assert.ok(note.html.includes(`id="${heading.id}"`));

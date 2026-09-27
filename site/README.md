@@ -6,7 +6,7 @@
 
 项目站点继承账号个人站点的自定义域名 `blog.kingwen.cn`，原地址 `https://aweng126.github.io/awesome-agentic-infra/` 会跳转到上述地址。这是 [GitHub Pages 的域名继承规则](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages#using-a-custom-domain-across-multiple-repositories)。本仓库的 **Custom domain** 保持为空即可，路径前缀仍为 `/awesome-agentic-infra/`。
 
-站点在构建时读取根目录的 `resources/`、`notes/`、`CHANGELOG.md` 和 `CONTRIBUTING.md`。日常整理资源或修改笔记时，直接编辑这些 Markdown 文件即可，GitHub 文档和网页共用一份内容。
+站点在构建时读取根目录的 `resources/`、`notes/`、`CHANGELOG.md` 和 `CONTRIBUTING.md`。日常整理资源或修改导览时，直接编辑这些 Markdown 文件即可，GitHub 文档和网页共用一份内容。
 
 ## 本地开发
 
@@ -38,7 +38,7 @@ npm run preview
 | 修改目标 | 编辑位置 |
 | --- | --- |
 | 主题资源、论文与文章 | 根目录 `resources/*.md` |
-| 专题分析与笔记 | 根目录 `notes/*.md` |
+| 领域导览与方案总览 | 根目录 `notes/*.md` |
 | 内容与站点更新记录 | 根目录 `CHANGELOG.md` |
 | 收录规则与贡献方式 | 根目录 `CONTRIBUTING.md` |
 | 首页、布局与交互 | 本目录 `src/` |
@@ -48,21 +48,21 @@ npm run preview
 
 Markdown 内继续使用仓库相对链接，站点构建负责转换对应的网页链接。资源条目格式与收录规则见 [贡献指南](../CONTRIBUTING.md)。
 
-### 主题导读、资源库与笔记
+### 主题资源、资源库与导览
 
-- `/topics/<slug>/` 从对应的 `resources/<slug>.md` 生成导读、已关联的学习笔记与参考资料。`## 学习笔记` 中的本站 Markdown 链接决定笔记关联与顺序，其他资源分类继续生成固定锚点。
-- `/resources/` 从同一批主题文件抽取资源，展示紧凑资料列表并提供搜索、主题与类型筛选。来源链接打开原始资料，“主题导读”链接进入对应主题页。
-- `/notes/<slug>/` 展示笔记全文，正文来自根目录的 `notes/<slug>.md`。
+- `/topics/<slug>/` 从对应的 `resources/<slug>.md` 依次生成主题简介、资源清单和已关联的方案总览。`## 方案总览` 中的本站 Markdown 链接决定总览关联与顺序，资源分类继续生成固定锚点。
+- `/resources/` 从同一批主题文件抽取资源，展示紧凑资料列表并提供搜索、主题与类型筛选。来源链接打开原始资料，“所属主题”链接进入对应主题页。
+- `/notes/<slug>/` 展示领域导览或方案总览全文，正文来自根目录的 `notes/<slug>.md`。
 
-主题页不复制笔记正文。现有 `/topics/<slug>/#resource-*` 定位链接继续有效，供日志、笔记引用和全站搜索使用；主题页的“在资源库筛选本主题”链接使用 `/resources/?topic=<slug>`。
+主导航为首页、主题导航、资源库和更新日志。`/notes/` 保留为辅助的资源导览索引，现有文档地址不变。主题页不复制导览正文。现有 `/topics/<slug>/#resource-*` 定位链接继续有效，供日志、导览引用和全站搜索使用；主题页的“在资源库筛选本主题”链接使用 `/resources/?topic=<slug>`。
 
 ### 维护更新日志
 
-导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容，无需另行编辑网页。
+导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容；首页自动展示其中最近三个顶层列表条目，按日期倒序、同日按文件顺序排列，无需重复维护。
 
 每批发布内容时，同时更新日志：以 `## YYYY-MM-DD` 记录本站实际发布日，日期倒序、同一天一组；在日期下按需要使用 `### 新增内容`、`### 内容更新` 和 `### 站点改进`，用列表说明具体变化并提供直达链接。省略空类别，资源移除时说明原因并提供仍可访问的相关说明。
 
-资源条目通过主题 Markdown 中的固定锚点定位，格式为 `- <a id="resource-langgraph"></a> [LangGraph](https://...) — 简介`，锚点与名称链接放在同一列表项中。标识以 `resource-` 开头，仅使用小写 ASCII 字母、数字与连字符，在本主题内唯一，更名时保留。根目录日志可写 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)`；从本说明链接同一条目则使用 [LangGraph](../resources/runtime-and-orchestration.md#resource-langgraph)。笔记更新可直接链接到对应章节。构建验证会检查生成页面中的内部链接与锚点。
+资源条目通过主题 Markdown 中的固定锚点定位，格式为 `- <a id="resource-langgraph"></a> [LangGraph](https://...) — 简介`，锚点与名称链接放在同一列表项中。标识以 `resource-` 开头，仅使用小写 ASCII 字母、数字与连字符，在本主题内唯一，更名时保留。根目录日志可写 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)`；从本说明链接同一条目则使用 [LangGraph](../resources/runtime-and-orchestration.md#resource-langgraph)。导览更新可直接链接到对应章节。构建验证会检查生成页面中的内部链接与锚点。
 
 依赖由 `package-lock.json` 固定。Mermaid 的 `lodash-es` 传递依赖通过 `overrides` 固定到 4.18.1，以避开旧版本的已知安全问题；升级 Mermaid 时应同时检查上游依赖并重新运行验证。
 

@@ -2,10 +2,12 @@
 import SiteLayout from '../layouts/SiteLayout.astro';
 import Icon from '../components/Icon.astro';
 import InfrastructureMap from '../components/InfrastructureMap.astro';
-import { getTopics, getResources, getNotes, groupTopics, sitePath, topicScopeLabels } from '../lib/content';
+import { getTopics, getResources, getChangelog, groupTopics, sitePath, topicScopeLabels } from '../lib/content';
 const topics = await getTopics();
 const resources = await getResources();
-const notes = await getNotes();
+const updates = await getChangelog();
+const recentChanges = updates.flatMap((update) => update.changes.map((html) => ({ date: update.date, html }))).slice(0, 3);
+const resourceTypeCount = new Set(resources.map((resource) => resource.type)).size;
 const topicGroups = groupTopics(topics);
 const primaryTopics = topicGroups.find((group) => group.id === 'primary')?.topics ?? [];
 const relatedTopics = topicGroups.find((group) => group.id === 'related')?.topics ?? [];
@@ -23,10 +25,9 @@ const topicIcons: Record<string, string> = {
 <SiteLayout title="理解 Agent 背后的基础设施" active="home">
   <main id="main-content">
     <section class="hero container" aria-labelledby="hero-title">
-      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p><h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1><p class="hero-description">从运行时到执行环境，从记忆到协作。<br/>梳理值得关注的项目、论文与工程实践，<br class="desktop-break"/>探索智能体如何可靠地运行。</p><div class="hero-buttons"><a class="button primary" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a><a class="button text-button" href={sitePath('notes/agentic-infra-overview/')}>从概览开始 <Icon name="book" size={18}/></a></div><p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p></div>
+      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p><h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1><p class="hero-description">从运行时到执行环境，从记忆到协作。<br/>汇集开源项目、云产品、论文与文档，<br class="desktop-break"/>了解各类方案的定位与主要能力。</p><div class="hero-buttons"><a class="button primary" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a><a class="button text-button" href={sitePath('notes/agentic-infra-overview/')}>阅读领域导览 <Icon name="book" size={18}/></a></div><p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p></div>
       <InfrastructureMap />
     </section>
-    <section class="stats-strip container" aria-label="知识库概况"><div><strong>{String(primaryTopics.length).padStart(2,'0')}</strong><span>主要主题</span></div><div><strong>{resources.length}</strong><span>精选资源</span></div><div><strong>{String(notes.length).padStart(2,'0')}</strong><span>研究笔记</span></div><div class="stat-statement"><span class="live-dot"></span><span>让散落的资料<br/><b>成为相连的知识。</b></span></div></section>
     <section class="topics-section container" id="topics" aria-labelledby="topics-title">
       <div class="section-heading">
         <div><p class="eyebrow">EXPLORE THE LANDSCAPE</p><h2 id="topics-title">探索 Agent 基础设施<span class="accent-dot">。</span></h2><p class="topics-description">从核心执行能力，到围绕 Agent 任务展开的部署、观测与治理。</p></div>
@@ -38,7 +39,7 @@ const topicIcons: Record<string, string> = {
             <div class="topic-card-top"><span class="topic-icon"><Icon name={topicIcons[topic.slug]} size={23}/></span><span class="topic-number">{String(i+1).padStart(2,'0')}</span></div>
             <p class="topic-scope">{topicScopeLabels[topic.scope]}</p>
             <h3>{topic.zhTitle}</h3><p class="topic-english">{topic.title}</p><p class="topic-description">{topic.description}</p>
-            <div class="topic-card-bottom"><span>进入主题导读 · {topic.entries.length} 条资料</span><Icon name="arrow" size={18}/></div>
+            <div class="topic-card-bottom"><span>浏览主题资源 · {topic.entries.length} 条资料</span><Icon name="arrow" size={18}/></div>
           </a>
         ))}
       </div>
@@ -53,13 +54,40 @@ const topicIcons: Record<string, string> = {
         ))}
       </aside>
     </section>
-    <section class="reading-section container" aria-labelledby="reading-title"><div class="reading-intro"><p class="eyebrow">A GOOD PLACE TO START</p><h2 id="reading-title">从一个问题，<br/>开始深入。</h2><p>沿着问题阅读笔记，<br/>再到参考资料中继续探索。</p><a class="inline-link" href={sitePath('notes/')}>阅读研究笔记 <Icon name="arrow" size={17}/></a></div><div class="reading-paths"><a href={sitePath('notes/agentic-infra-overview/')}><span class="path-number">01</span><div><h3>Agentic Infra 到底包含什么？</h3><p>区分任务执行、模型服务与模型训练，理解职责和协作关系。</p><span>研究笔记 · 概念与架构</span></div><Icon name="arrow" size={20}/></a><a href={sitePath('notes/agent-runtime-landscape/')}><span class="path-number">02</span><div><h3>有哪些 Agent Runtime 方案？</h3><p>浏览开源框架、运行平台与云厂商产品，了解各自定位和主要能力。</p><span>方案全景 · 运行时与编排</span></div><Icon name="arrow" size={20}/></a><a href={sitePath('topics/observability-and-evaluation/')}><span class="path-number">03</span><div><h3>浏览观测与评估资料</h3><p>查阅执行追踪、任务评估的项目、论文与官方规范。</p><span>主题导读与参考资料</span></div><Icon name="arrow" size={20}/></a></div></section>
-    <section class="scope-section container" id="scope"><p class="eyebrow">WHAT BELONGS HERE</p><h2>围绕 Agent 运行，保持清晰的边界。</h2><p>本站重点是支撑 Agent 任务执行、状态管理、工具交互与恢复的基础设施。LLM Serving 作为关联领域，解释模型请求如何被服务；LLM Training 作为上游背景，说明模型产物从何而来。部署、观测与治理贯穿这些领域，本站围绕 Agent 工作负载展开讨论。</p></section>
-    <section class="contribute-banner container"><span class="topic-icon"><Icon name="stack" size={26}/></span><div><h2>这个领域在生长，知识库也是。</h2><p>分享值得关注的资源，纠正事实，或修复失效链接。</p></div><a class="button outline" href={sitePath('contributing/')}>一起完善 <Icon name="arrow" size={17}/></a></section>
+    <section class="stats-strip container" aria-label="资源收录概况"><div><strong>{String(primaryTopics.length).padStart(2,'0')}</strong><span>主要主题</span></div><div><strong>{resources.length}</strong><span>精选资源</span></div><div><strong>{String(resourceTypeCount).padStart(2,'0')}</strong><span>资源类型</span></div><div class="stat-statement"><span class="live-dot"></span><span>发现相关方案，<br/><b>找到官方入口。</b></span></div></section>
+    {recentChanges.length > 0 && (
+      <section class="recent-updates container" aria-labelledby="recent-updates-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">RECENT UPDATES</p><h2 id="recent-updates-title">最近更新<span class="accent-dot">。</span></h2></div>
+          <a class="inline-link" href={sitePath('changelog/')}>查看全部更新 <Icon name="arrow" size={17}/></a>
+        </div>
+        <div class="recent-update-list">
+          {recentChanges.map((change) => (
+            <article class="recent-update">
+              <a class="recent-update-date" href={sitePath(`changelog/#update-${change.date}`)} aria-label={`查看 ${change.date} 的更新`}><time datetime={change.date}>{change.date}</time></a>
+              <div class="recent-update-body" set:html={change.html} />
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+    <section class="scope-section container" id="scope"><p class="eyebrow">WHAT BELONGS HERE</p><h2>围绕 Agent 运行，保持清晰的边界。</h2><p>收录支撑 Agent 运行的项目、产品、论文与文档，按七个主题组织；模型服务单列为关联基础设施。<a href={sitePath('notes/agentic-infra-overview/')}>领域导览 <Icon name="arrow" size={14}/></a>介绍分类与领域之间的关系。</p></section>
+    <section class="contribute-banner container"><span class="topic-icon"><Icon name="stack" size={26}/></span><div><h2>让资源库持续丰富。</h2><p>分享值得关注的资源，纠正事实，或修复失效链接。</p></div><a class="button outline" href={sitePath('contributing/')}>一起完善 <Icon name="arrow" size={17}/></a></section>
   </main>
 </SiteLayout>
 
 <style>
+  .recent-updates { padding-top: 60px; padding-bottom: 54px; }
+  .recent-update-list { border-top: 1px solid var(--line); }
+  .recent-update { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .recent-update-date { padding-top: 3px; color: var(--muted); font: 11px/1.9 var(--font-mono); }
+  .recent-update-date:hover { color: var(--accent); }
+  .recent-update-body { min-width: 0; font-size: 13px; line-height: 1.9; color: var(--muted); overflow-wrap: anywhere; }
+  .recent-update-body > :global(ul), .recent-update-body > :global(ol) { padding: 0; list-style: none; }
+  .recent-update-body :global(li > ul), .recent-update-body :global(li > ol) { margin-top: 8px; padding-left: 20px; }
+  .recent-update-body :global(a), .scope-section a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+  .recent-update-body :global(a:hover), .scope-section a:hover { text-decoration-color: var(--accent); }
+
   .topics-description { margin-top: 14px; max-width: 520px; color: var(--muted); font-size: 13px; line-height: 1.8; }
   .topic-scope { color: var(--muted); font-size: 10px; line-height: 1.6; margin-bottom: 9px; }
   .topic-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
@@ -84,6 +112,9 @@ const topicIcons: Record<string, string> = {
     .related-topic { width: 100%; }
   }
   @media (max-width: 600px) {
+    .recent-updates { padding-top: 38px; padding-bottom: 36px; }
+    .recent-update { grid-template-columns: 1fr; gap: 7px; padding: 18px 0; }
+
     .topic-grid { grid-template-columns: minmax(0, 1fr); }
     .topic-card { min-height: 0; }
     .topic-english { min-height: 0; }

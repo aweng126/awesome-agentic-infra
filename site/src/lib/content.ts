@@ -57,6 +57,7 @@ export function resourcePath(resource: Pick<Resource, 'topicSlug' | 'anchor'>): 
 export interface ChangelogEntry {
   date: string;
   html: string;
+  changes: string[];
   changeCount: number;
 }
 
@@ -168,6 +169,10 @@ export interface Note {
   readingMinutes: number;
 }
 
+export function resourceGuideLabel(slug: string): '领域导览' | '方案总览' {
+  return slug === 'agentic-infra-overview' ? '领域导览' : '方案总览';
+}
+
 type TextNode = {
   type: string;
   value?: string;
@@ -247,7 +252,7 @@ function isReturnNavigation(node: MarkdownRoot['children'][number]): boolean {
   if (node.type !== 'paragraph') return false;
   return node.children.every((child) => {
     if (child.type === 'text') return /^[\s·|]*$/u.test(child.value);
-    return child.type === 'link' && /^返回(?:首页|笔记索引|索引)$/u.test(readableText(child));
+    return child.type === 'link' && /^返回(?:首页|资源导览|笔记索引|索引)$/u.test(readableText(child));
   });
 }
 
@@ -382,10 +387,16 @@ export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]
     if (seen.has(date)) throw new Error(`Duplicate changelog date: ${date}. Combine same-day changes.`);
     seen.add(date);
     const body = markdown.slice(heading.position!.end.offset!, sections[index + 1]?.position?.start.offset ?? markdown.length);
-    const changeCount = parse(body).children.reduce((count, node) => count + (node.type === 'list' ? node.children.length : 0), 0);
-    if (!changeCount) throw new Error(`Changelog ${date} needs at least one change.`);
-    const { html } = await renderMarkdown(body, 'CHANGELOG.md', `update-${date}-`);
-    return { date, html, changeCount };
+    const items = parse(body).children.flatMap((node) => node.type === 'list' ? node.children : []);
+    if (!items.length) throw new Error(`Changelog ${date} needs at least one change.`);
+    const [rendered, changes] = await Promise.all([
+      renderMarkdown(body, 'CHANGELOG.md', `update-${date}-`),
+      Promise.all(items.map(async (item, itemIndex) => {
+        const markdown = body.slice(item.position!.start.offset!, item.position!.end.offset!);
+        return (await renderMarkdown(markdown, 'CHANGELOG.md', `update-${date}-change-${itemIndex}-`)).html;
+      })),
+    ]);
+    return { date, html: rendered.html, changes, changeCount: changes.length };
   }));
   if (!entries.length) throw new Error('CHANGELOG.md needs at least one dated update.');
   return entries.sort((a, b) => b.date.localeCompare(a.date));
@@ -437,7 +448,7 @@ export async function getTopics(): Promise<Topic[]> {
   }));
 }
 
-/** Derive a topic's reading path and references from its single Markdown source. */
+/** Derive a topic's introduction, resource list and solution overviews from one Markdown source. */
 export async function getTopicSections(markdown: string, sourcePath: string, notes: Note[]) {
   const tree = parse(markdown);
   const sections = tree.children.filter(node => node.type === 'heading' && node.depth === 2);
@@ -449,11 +460,13 @@ export async function getTopicSections(markdown: string, sourcePath: string, not
     const sectionMarkdown = markdown.slice(section.position!.start.offset!, sections[index + 1]?.position?.start.offset ?? markdown.length);
     const name = readableText(section);
     if (sectionTypes[name]) resourceSections.push(sectionMarkdown);
-    if (name !== '学习笔记') continue;
-    visit(parse(sectionMarkdown), 'link', link => {
+    if (name !== '方案总览') continue;
+    const overviewTree = parse(sectionMarkdown);
+    overviewTree.children = overviewTree.children.filter((node) => !isReturnNavigation(node));
+    visit(overviewTree, 'link', link => {
       const localPath = posix.normalize(posix.join(posix.dirname(sourcePath), decodeURIComponent(link.url.split(/[?#]/u)[0])));
       const note = notes.find(note => note.sourcePath === localPath);
-      if (!note) throw new Error(`${sourcePath}: learning note must link to an existing notes/*.md article: ${link.url}`);
+      if (!note) throw new Error(`${sourcePath}: solution overview must link to an existing notes/*.md guide: ${link.url}`);
       if (!learningNotes.some(existing => existing.slug === note.slug)) learningNotes.push(note);
     });
   }

@@ -1,10 +1,10 @@
 # Awesome Agentic Infra
 
-Awesome Agentic Infra 是面向 **Agent 持续、可靠运行** 的基础设施知识库，提供精选资源索引与原创学习笔记，覆盖任务执行、状态管理、工具交互和失败恢复。
+Awesome Agentic Infra 是面向 **Agent 持续、可靠运行** 的基础设施资源导航，按主题整理开源项目、云厂商平台、论文、规范与官方文档。
 
-资源索引帮助查找项目、论文、规范和官方文档，以一手来源为入口；学习笔记展开系统机制与设计取舍。内容以中文导读为主，保留英文项目名与技术术语。
+通过中文项目简介、领域导览与方案全景，了解各类基础设施的职责、主要能力和官方入口。
 
-A curated collection of infrastructure resources and original notes on building reliable agentic systems.
+A curated guide to agentic infrastructure projects, platforms, papers, and documentation.
 
 **在线阅读**：[Agentic Infra](https://blog.kingwen.cn/awesome-agentic-infra/)
 
@@ -12,7 +12,7 @@ A curated collection of infrastructure resources and original notes on building 
 
 <a id="scope"></a>
 
-以 **Agentic Infra** 为核心，**LLM Serving Infra** 为关联基础设施，**LLM Training Infra** 为上游背景。职责划分与协作关系见 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md#三个基础设施领域)，资源收录标准见 [贡献指南](CONTRIBUTING.md#what-to-include)。
+以 **Agentic Infra** 为核心，**LLM Serving Infra** 为关联基础设施，**LLM Training Infra** 为上游背景。职责划分与协作关系见 [Agentic Infra 领域导览](notes/agentic-infra-overview.md#三个基础设施领域)，资源收录标准见 [贡献指南](CONTRIBUTING.md#what-to-include)。
 
 ## Topics
 
@@ -32,12 +32,8 @@ A curated collection of infrastructure resources and original notes on building 
 
 ## Where to Start
 
-1. 先读 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md)，建立整体认识。
-2. 了解现有实现方案时，阅读 [Agent Runtime 全景](notes/agent-runtime-landscape.md)，查看开源框架、运行平台与云厂商产品的定位和主要能力。
-3. 研究长任务与规模化运行时，结合 [记忆与上下文](resources/memory-and-context.md)、[部署与调度](resources/deployment-and-scheduling.md) 和 [模型服务](resources/inference-and-model-serving.md)。
-4. 设计验证与运行管理时，结合 [可观测性与评估](resources/observability-and-evaluation.md) 和 [安全与治理](resources/security-and-governance.md)。
-
-以上是阅读路径，各主题可以独立查阅。具体系统需要哪些组件，取决于任务、部署方式和约束。
+- 了解领域划分：[Agentic Infra 领域导览](notes/agentic-infra-overview.md)，查看三类基础设施的关系与主题导航。
+- 查找现有方案：[Agent Runtime 全景](notes/agent-runtime-landscape.md)，浏览开源框架、运行平台与云厂商产品的定位、主要能力和官方入口。
 
 ## License
 

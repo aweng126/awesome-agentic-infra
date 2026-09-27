@@ -30,7 +30,7 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
         <div class="sidebar-note">
           <Icon name="book" size={20}/>
           <p>不确定从哪里开始？</p>
-          <a href={sitePath('notes/agentic-infra-overview/')}>先读基础设施概览 →</a>
+          <a href={sitePath('notes/agentic-infra-overview/')}>查看领域导览 →</a>
         </div>
       </aside>
       <section class="resource-results" aria-label="资源列表">
@@ -60,7 +60,7 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
                     <span class="resource-host">{source.host}</span>
                   </div>
                   <a class="resource-topic-link" href={sitePath(`topics/${resource.topicSlug}/`)}>
-                    {relatedSlugs.has(resource.topicSlug) ? '关联资料' : '主题导读'}：{resource.topicZhTitle}<Icon name="arrow" size={13}/>
+                    {relatedSlugs.has(resource.topicSlug) ? '关联资料' : '所属主题'}：{resource.topicZhTitle}<Icon name="arrow" size={13}/>
                   </a>
                 </div>
               </article>

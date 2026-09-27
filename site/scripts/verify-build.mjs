@@ -31,7 +31,11 @@ for(const [file,document] of documents){
   }
   for (const selector of ['.desktop-nav', '.mobile-nav']) {
     const navigation = document.querySelector(selector);
-    const changelogLink = [...(navigation?.querySelectorAll('a[href]') ?? [])]
+    const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
+    assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
+      ['首页', base], ['主题导航', `${base}#topics`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
+    ], `${relative}: ${selector} exposes the four resource-focused navigation entries`);
+    const changelogLink = links
       .find((link) => link.getAttribute('href') === `${base}changelog/`);
     if (!changelogLink) problems.push(`${relative}: missing changelog link in ${selector}`);
     if (relative === path.join('changelog', 'index.html') && changelogLink?.getAttribute('aria-current') !== 'page') {
@@ -77,6 +81,8 @@ assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))
 const primaryTopicStat = [...home.querySelectorAll('.stats-strip > div')]
   .find((stat) => [...stat.querySelectorAll('span')].some((label) => label.textContent.trim() === '主要主题'));
 assert.equal(primaryTopicStat?.querySelector('strong')?.textContent.trim(), '07', 'Homepage reports 07 primary topics');
+assert.ok(!home.querySelector('.reading-section'), 'Homepage omits the previous research reading column');
+assert.ok(!home.querySelector('.stats-strip').textContent.includes('研究笔记'), 'Homepage statistics describe resources');
 assert.ok(home.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Homepage retains a Serving entry under related infrastructure');
 
 for (const [groupName, expectedSlugs] of [['primary', primarySlugs], ['related', [servingSlug]]]) {
@@ -114,18 +120,18 @@ for (const filename of resourceFiles) {
   assert.equal(currentTopicLinks[0]?.getAttribute('href'), `${base}topics/${topicSlug}/`, `${filename}: the current topic remains active in its group`);
   const tree = parser.parse(await readFile(`../resources/${filename}`, 'utf8'));
   const anchors = new Set();
-  const learningLinks = new Set();
+  const overviewLinks = new Set();
   let inResourceSection = false;
-  let inLearningSection = false;
+  let inOverviewSection = false;
   for (const node of tree.children) {
     if (node.type === 'heading' && node.depth <= 2) {
       inResourceSection = resourceSections.has(textContent(node));
-      inLearningSection = textContent(node) === '学习笔记';
+      inOverviewSection = textContent(node) === '方案总览';
     }
-    if (inLearningSection) {
+    if (inOverviewSection && node.type === 'list') {
       visit(node, 'link', (link) => {
         const notePath = path.posix.normalize(path.posix.join('resources', link.url.split(/[?#]/u)[0]));
-        learningLinks.add(`${base}${notePath.replace(/\.md$/u, '/')}`);
+        overviewLinks.add(`${base}${notePath.replace(/\.md$/u, '/')}`);
       });
     }
     if (node.type !== 'list' || !inResourceSection) continue;
@@ -155,9 +161,13 @@ for (const filename of resourceFiles) {
   assert.equal(topic.querySelectorAll('li[id^="resource-"]').length, anchors.size, `${filename}: every rendered resource anchor must match the source`);
   assert.ok(topic.querySelector(`a[href="${base}resources/?topic=${topicSlug}"]`), `${filename}: topic must lead to its filtered resource index`);
   assert.ok(!topic.querySelector('.reading-navigation'), `${filename}: topic navigation must not imitate article pagination`);
-  const renderedLearningLinks = new Set([...topic.querySelectorAll('.learning-notes h3 a')].map((link) => link.getAttribute('href')));
-  assert.deepEqual(renderedLearningLinks, learningLinks, `${filename}: learning notes must match the Markdown source`);
-  assert.equal(Boolean(topic.getElementById('learning-notes')), learningLinks.size > 0, `${filename}: omit empty learning sections`);
+  const renderedOverviewLinks = new Set([...topic.querySelectorAll('.solution-overviews h3 a')].map((link) => link.getAttribute('href')));
+  assert.deepEqual(renderedOverviewLinks, overviewLinks, `${filename}: solution overviews must match the Markdown source`);
+  assert.equal(Boolean(topic.getElementById('solution-overviews')), overviewLinks.size > 0, `${filename}: omit empty overview sections`);
+  if (overviewLinks.size) {
+    const sections = [...topic.querySelectorAll('.topic-section')];
+    assert.ok(sections.indexOf(topic.querySelector('.reference-section')) < sections.indexOf(topic.querySelector('.overview-section')), `${filename}: resources appear before supplementary overviews`);
+  }
   assert.equal(explorer.querySelector(`.topic-filters button[data-topic="${topicSlug}"] [data-topic-count]`)?.textContent, String(anchors.size), `${filename}: the initial topic count must match its resources and be available to the filter script`);
 }
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');
@@ -178,6 +188,22 @@ assert.deepEqual(entries.map((entry) => entry.id), expectedDates.map((date) => `
 for (const [index, entry] of entries.entries()) {
   assert.equal(entry.querySelector('time')?.getAttribute('datetime'), expectedDates[index], `Changelog ${expectedDates[index]} must expose its date semantically`);
   assert.ok(entry.contains(changelog.getElementById(expectedDates[index])), 'Markdown date links must locate the same published update');
+}
+const expectedChanges = entries.flatMap((entry) => [...entry.querySelectorAll('.changelog-body > ul > li, .changelog-body > ol > li')]
+  .map((item) => ({ date: entry.querySelector('time').getAttribute('datetime'), text: item.textContent.replace(/\s+/gu, ' ').trim(), links: [...item.querySelectorAll('a[href]')].map((link) => link.getAttribute('href')) }))).slice(0, 3);
+const recentChanges = [...home.querySelectorAll('.recent-update')].map((item) => ({
+  date: item.querySelector('time').getAttribute('datetime'),
+  text: item.querySelector('.recent-update-body').textContent.replace(/\s+/gu, ' ').trim(),
+  links: [...item.querySelectorAll('.recent-update-body a[href]')].map((link) => link.getAttribute('href')),
+}));
+assert.deepEqual(recentChanges, expectedChanges, 'Homepage recent updates preserve the latest three changelog entries, dates, and links');
+const guideIndex = documents.get(path.join(root, 'notes/index.html'));
+assert.ok(guideIndex?.querySelector('h1')?.textContent.includes('资源导览'), 'The existing notes address is a secondary resource-guide index');
+for (const [file, document] of documents) {
+  if (path.relative(root, file).startsWith(`notes${path.sep}`)) {
+    assert.ok(!document.querySelector('.reading-navigation'), `${file}: resource guides do not have an automatic article sequence`);
+    assert.ok(!document.querySelector('main').textContent.includes('研究笔记'), `${file}: guides use the resource-focused positioning`);
+  }
 }
 assert.deepEqual(problems,[],'Generated site link/semantic checks');
 console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, and ${dates.length} changelog date groups.`);

@@ -1,86 +1,44 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { getNotes, sitePath } from '../../lib/content';
+import { getNotes, resourceGuideLabel, sitePath } from '../../lib/content';
 
 const notes = await getNotes();
-const entryNote = notes.find((note) => note.slug === 'agentic-infra-overview');
+const guides = [...notes].sort((left, right) => Number(right.slug === 'agentic-infra-overview') - Number(left.slug === 'agentic-infra-overview'));
 ---
 
-<SiteLayout title="研究笔记" description="围绕 Agent 基础设施的组件关系、系统设计与工程取舍，记录有来源的分析与思考。" active="notes">
+<SiteLayout title="资源导览" description="了解 Agentic Infra 的分类范围，浏览开源项目、运行平台与云厂商方案总览。" active="topics">
   <main id="main-content" class="notes-page">
-    <header class="notes-header">
-      <p class="page-kicker"><span class="kicker-line" /> FIELD NOTES</p>
-      <h1>理解系统，<br /><span>从一个问题开始。</span></h1>
-      <p class="notes-intro">围绕 Agent 基础设施的组件关系、系统设计与工程取舍，<br class="desktop-break" />记录有来源的分析与思考。</p>
-      <div class="notes-meta"><span class="status-dot" /><span>持续整理中</span><span class="meta-divider" /> <span>{notes.length} 篇笔记</span></div>
+    <header class="guides-header">
+      <p class="eyebrow">RESOURCE GUIDES</p>
+      <h1>资源导览<span class="accent-dot">。</span></h1>
+      <p>了解主题范围和方案分类，找到适合继续查阅的项目与官方资料。</p>
     </header>
-
-    <section class="notes-collection" aria-labelledby="notes-heading">
-      <div class="section-heading"><h2 id="notes-heading">阅读与思考</h2><span>NOTES / {String(notes.length).padStart(2, '0')}</span></div>
-      <div class="notes-list">
-        {notes.map((note, index) => (
-          <article class="note-card">
-            <div class="note-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</div>
-            <div class="note-content">
-              <p class="note-category">RESEARCH NOTE <span>研究笔记</span></p>
-              <h3><a href={sitePath(`notes/${note.slug}/`)}>{note.title}</a></h3>
-              <p class="note-description">{note.description}</p>
-              <div class="note-metadata"><span>约 {note.readingMinutes} 分钟阅读</span></div>
-            </div>
-            <a class="note-open" href={sitePath(`notes/${note.slug}/`)} aria-label={`阅读：${note.title}`}><span aria-hidden="true">↗</span></a>
-          </article>
-        ))}
-      </div>
+    <section aria-label="领域导览与方案总览">
+      <ul class="guide-list">
+        {guides.map((guide) => <li>
+          <p class="guide-role">{resourceGuideLabel(guide.slug)}</p>
+          <h2><a href={sitePath(`notes/${guide.slug}/`)}>{guide.title}<span aria-hidden="true">→</span></a></h2>
+          <p class="guide-description">{guide.description}</p>
+        </li>)}
+      </ul>
     </section>
-
-    <section class="reading-path" aria-labelledby="path-heading">
-      <div class="path-intro"><p class="page-kicker">A PLACE TO START</p><h2 id="path-heading">第一次来到这里？</h2><p>先建立全景，再沿着感兴趣的问题深入。</p></div>
-      <div class="path-steps">
-        {entryNote && <a class="path-step" href={sitePath(`notes/${entryNote.slug}/`)}><span class="step-number">01</span><div><h3>建立阅读框架</h3><p>从一次任务执行理解各个组件的职责。</p></div><span aria-hidden="true">→</span></a>}
-        <a class="path-step" href={sitePath('resources/')}><span class="step-number">02</span><div><h3>沿主题探索资源</h3><p>查找项目、论文、协议与官方文档。</p></div><span aria-hidden="true">→</span></a>
-        <a class="path-step" href={sitePath('contributing/')}><span class="step-number">03</span><div><h3>补充你的发现</h3><p>分享有价值的资源，或记录一次深入分析。</p></div><span aria-hidden="true">→</span></a>
-      </div>
-    </section>
+    <a class="guides-return" href={sitePath('resources/')}>搜索与筛选全部资源 <span aria-hidden="true">→</span></a>
   </main>
 </SiteLayout>
 
 <style>
-  .notes-page { max-width: 1136px; margin: 0 auto; padding: 82px 36px 96px; }
-  .notes-header { padding-bottom: 62px; }
-  .page-kicker { display: flex; align-items: center; gap: 10px; font: 10px/1.6 var(--font-mono); letter-spacing: .14em; color: var(--accent); margin: 0 0 24px; }
-  .kicker-line { width: 24px; height: 1px; background: var(--accent); }
-  h1 { font-size: clamp(36px, 4.5vw, 54px); letter-spacing: -.065em; line-height: 1.4; font-weight: 600; margin: 0; color: var(--text); }
-  h1 span { color: var(--accent); }
-  .notes-intro { margin: 24px 0 28px; font-size: 14px; line-height: 2; color: var(--muted); }
-  .notes-meta { display: flex; align-items: center; gap: 9px; font-size: 10px; color: var(--muted); }
-  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-  .meta-divider { width: 1px; height: 10px; background: var(--line); margin: 0 6px; }
-  .section-heading { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
-  .section-heading h2 { font-size: 18px; letter-spacing: -.03em; font-weight: 600; margin: 0; }
-  .section-heading > span { font: 10px/1.6 var(--font-mono); letter-spacing: .08em; color: var(--muted); }
-  .note-card { display: grid; grid-template-columns: 58px minmax(0, 1fr) 42px; gap: 20px; padding: 38px 0; border-bottom: 1px solid var(--line); }
-  .note-index { font: 12px/1.8 var(--font-mono); color: var(--muted); opacity: .6; }
-  .note-category { display: flex; gap: 13px; align-items: center; margin: 0 0 13px; font: 9px/1.7 var(--font-mono); letter-spacing: .08em; color: var(--accent); }
-  .note-category span { font-family: inherit; color: var(--muted); letter-spacing: 0; }
-  .note-content h3 { font-size: 25px; line-height: 1.5; font-weight: 550; letter-spacing: -.04em; margin: 0 0 13px; }
-  .note-content h3 a { color: var(--text); text-decoration: none; }
-  .note-content h3 a:hover { color: var(--accent); }
-  .note-description { max-width: 690px; font-size: 13px; line-height: 1.9; color: var(--muted); margin: 0; }
-  .note-metadata { display: flex; flex-wrap: wrap; gap: 20px; font-size: 10px; color: var(--muted); margin-top: 23px; }
-  .note-open { display: flex; align-items: center; justify-content: center; align-self: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; color: var(--accent); text-decoration: none; transition: background .2s, border-color .2s; }
-  .note-open:hover { background: var(--accent-soft); border-color: var(--accent); }
-  .reading-path { display: grid; grid-template-columns: .85fr 1.15fr; gap: 70px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 36px; margin-top: 64px; }
-  .path-intro .page-kicker { font-size: 9px; margin-bottom: 14px; }
-  .path-intro h2 { font-size: 22px; font-weight: 550; margin: 0 0 15px; letter-spacing: -.045em; }
-  .path-intro > p:last-child { font-size: 12px; line-height: 1.9; color: var(--muted); margin: 0; }
-  .path-step { display: flex; gap: 18px; align-items: baseline; text-decoration: none; padding: 18px 0; border-bottom: 1px solid var(--line); }
-  .path-step:first-child { padding-top: 0; }
-  .path-step:last-child { padding-bottom: 0; border-bottom: 0; }
-  .step-number { font: 10px/1.6 var(--font-mono); color: var(--accent); }
-  .path-step h3 { font-size: 13px; color: var(--text); margin: 0 0 7px; font-weight: 550; }
-  .path-step p { font-size: 11px; color: var(--muted); line-height: 1.8; margin: 0; }
-  .path-step > span:last-child { margin-left: auto; color: var(--muted); }
-  .path-step:hover h3, .path-step:hover > span:last-child { color: var(--accent); }
-  @media (max-width: 760px) { .notes-page { padding: 52px 24px 64px; } .notes-header { padding-bottom: 44px; } .note-card { grid-template-columns: 28px minmax(0, 1fr) 32px; gap: 12px; padding: 30px 0; } .note-content h3 { font-size: 21px; } .note-open { width: 32px; height: 32px; } .reading-path { grid-template-columns: 1fr; gap: 30px; margin-top: 44px; padding: 28px; } }
-  @media (max-width: 460px) { .notes-page { padding-inline: 20px; } .desktop-break { display: none; } .note-card { grid-template-columns: minmax(0, 1fr) 30px; } .note-index { display: none; } .note-content h3 { font-size: 20px; } .note-description { font-size: 12px; } .notes-intro { font-size: 13px; } .reading-path { padding: 24px; } }
+  .notes-page { max-width: 900px; margin: 0 auto; padding: 64px 36px 80px; }
+  .guides-header { margin-bottom: 36px; }
+  .guides-header .eyebrow { margin-bottom: 16px; }
+  h1 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -.045em; line-height: 1.4; }
+  .guides-header > p:last-child { margin-top: 18px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+  .guide-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+  .guide-list li { padding: 26px 0; border-bottom: 1px solid var(--line); }
+  .guide-role { margin-bottom: 9px; color: var(--muted); font-size: 11px; }
+  .guide-list h2 { font-size: 20px; font-weight: 550; line-height: 1.65; }
+  .guide-list h2 a { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
+  .guide-list h2 a:hover { color: var(--accent); }
+  .guide-description { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+  .guides-return { display: inline-flex; align-items: center; gap: 12px; margin-top: 28px; color: var(--accent); font-size: 12px; }
+  @media (max-width: 600px) { .notes-page { padding: 40px 20px 60px; } .guide-list h2 { font-size: 18px; } }
 </style>

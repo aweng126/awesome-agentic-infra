@@ -1,5 +1,5 @@
 ---
-import { topics, getNotes, groupTopics, sitePath, repoUrl } from '../lib/content';
+import { topics, getNotes, groupTopics, resourceGuideLabel, sitePath, repoUrl } from '../lib/content';
 
 interface ReadingLink {
   href: string;
@@ -23,12 +23,12 @@ interface Props {
 
 const {
   title, subtitle, kind, slug, html, headings,
-  sourcePath, readingMinutes, itemCount, previous, next,
+  sourcePath, itemCount, previous, next,
 } = Astro.props;
-const notes = await getNotes();
+const notes = [...await getNotes()].sort((left, right) => Number(right.slug === 'agentic-infra-overview') - Number(left.slug === 'agentic-infra-overview'));
 const topicGroups = groupTopics(topics);
 const toc = headings.filter((heading) => heading.depth <= 3);
-const section = kind === 'topic' ? '主题导读' : kind === 'note' ? '研究笔记' : '参与共建';
+const section = kind === 'topic' ? '主题导航' : kind === 'note' ? '资源导览' : '参与共建';
 const sectionPath = kind === 'topic' ? '#topics' : kind === 'note' ? 'notes/' : 'contributing/';
 const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
 ---
@@ -36,8 +36,8 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
 <main id="main-content" class="reader-shell">
   <aside class="reader-sidebar" aria-label="文档导航">
     <details class="chapter-menu" open>
-      <summary>浏览主题与笔记 <span aria-hidden="true">⌄</span></summary>
-      <nav class="chapter-nav" aria-label="主题与笔记">
+      <summary>浏览主题与导览 <span aria-hidden="true">⌄</span></summary>
+      <nav class="chapter-nav" aria-label="主题与导览">
         <p class="sidebar-label">THE COLLECTION</p>
         <a class="all-resources" href={sitePath('resources/')}>
           <span>搜索与筛选全部资源</span><span aria-hidden="true">→</span>
@@ -59,7 +59,7 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
           ))}
         </ol>
         </div>)}
-        <p class="sidebar-label category-label">理解与共建</p>
+        <p class="sidebar-label category-label">资源导览</p>
         {notes.map((note) => (
           <a
             href={sitePath(`notes/${note.slug}/`)}
@@ -70,6 +70,7 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
             <span>{note.title}</span>
           </a>
         ))}
+        <p class="sidebar-label category-label">维护资源</p>
         <a
           href={sitePath('contributing/')}
           class:list={['chapter-link', { selected: kind === 'guide' }]}
@@ -95,12 +96,11 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
     </nav>
     <article>
       <header class="document-header">
-        <p class="document-kicker">{kind === 'topic' ? 'INFRASTRUCTURE / COLLECTION' : kind === 'note' ? 'FIELD NOTES / PERSPECTIVES' : 'OPEN KNOWLEDGE / CONTRIBUTING'}</p>
+        <p class="document-kicker">{kind === 'topic' ? '主题资源 / TOPIC RESOURCES' : kind === 'note' ? `${resourceGuideLabel(slug ?? '')} / RESOURCE GUIDE` : '资源共建 / CONTRIBUTING'}</p>
         <h1>{title}</h1>
         {subtitle && <p class="document-subtitle">{subtitle}</p>}
         <div class="document-meta">
           {typeof itemCount === 'number' && <span>{itemCount} 条资源</span>}
-          {readingMinutes && <span>约 {readingMinutes} 分钟阅读</span>}
           <a href={editUrl} target="_blank" rel="noopener noreferrer">编辑此页 <span aria-hidden="true">↗</span></a>
         </div>
       </header>
@@ -115,17 +115,17 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
       <div class="prose document-body" set:html={html} />
     </article>
 
-    {(previous || next) && <nav class="reading-navigation" aria-label="继续阅读">
-      {previous ? <a href={previous.href} class="reading-link previous-link">
-        <span class="reading-direction"><span aria-hidden="true">←</span> {previous.label || '上一篇'}</span>
+    {(previous || next) && <nav class="document-navigation" aria-label="资源导航">
+      {previous ? <a href={previous.href} class="document-link">
+        <span class="document-link-label">{previous.label || '返回导览'}</span>
         <strong>{previous.title}</strong>
-      </a> : <div class="reading-placeholder" />}
-      {next && <a href={next.href} class="reading-link next-link">
-        <span class="reading-direction">{next.label || '下一篇'} <span aria-hidden="true">→</span></span>
+      </a> : <div />}
+      {next && <a href={next.href} class="document-link">
+        <span class="document-link-label">{next.label || '查看资源'}</span>
         <strong>{next.title}</strong>
       </a>}
     </nav>}
-    <p class="document-endnote">共同维护一份有来源、可追溯的知识索引。<a href={editUrl} target="_blank" rel="noopener noreferrer">发现问题？欢迎改进此页 ↗</a></p>
+    <p class="document-endnote">补充项目或修正资料，<a href={editUrl} target="_blank" rel="noopener noreferrer">欢迎改进此页 ↗</a></p>
   </div>
 
   <aside class="reader-toc" aria-label="本页目录">
@@ -192,18 +192,16 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
   .toc-edit { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
   .back-to-top { margin-top: 12px; }
   .toc-edit:hover, .back-to-top:hover { color: var(--accent); }
-  .reading-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 54px; }
-  .reading-link { border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; color: var(--text); text-decoration: none; transition: border-color .2s, background .2s; }
-  .reading-link:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .reading-direction { display: flex; gap: 8px; font-size: 10px; color: var(--muted); margin-bottom: 9px; }
-  .reading-link strong { font-size: 13px; line-height: 1.7; font-weight: 550; }
-  .next-link { text-align: right; }
-  .next-link .reading-direction { justify-content: flex-end; }
+  .document-navigation { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .document-link { color: var(--text); text-decoration: none; }
+  .document-link:hover { color: var(--accent); }
+  .document-link-label { display: block; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  .document-link strong { font-size: 13px; line-height: 1.7; font-weight: 550; }
   .document-endnote { margin: 32px 0 0; font-size: 10px; line-height: 1.9; color: var(--muted); }
   .document-endnote a { color: var(--muted); text-underline-offset: 3px; }
   @media (max-width: 1250px) { .reader-shell { grid-template-columns: 205px minmax(0, 1fr) 160px; gap: 30px; padding-inline: 28px; } }
   @media (max-width: 1100px) { .reader-shell { grid-template-columns: 205px minmax(0, 740px); gap: 36px; } .reader-toc { display: none; } .mobile-toc { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 30px; color: var(--muted); font-size: 12px; } .mobile-toc summary { display: flex; justify-content: space-between; cursor: pointer; } .mobile-toc ul { margin-top: 14px; } .mobile-toc li { padding: 6px 0; } .mobile-toc li a { color: var(--muted); text-decoration: none; } }
   @media (min-width: 960px) { .chapter-menu:not([open]) > .chapter-nav { display: block; } }
   @media (max-width: 959px) { .reader-shell { display: block; max-width: 820px; padding: 24px 26px 56px; } .reader-sidebar { position: static; margin-bottom: 30px; } .chapter-menu { border: 1px solid var(--line); border-radius: 8px; } .chapter-menu summary { display: flex; justify-content: space-between; padding: 14px 18px; font-size: 12px; color: var(--muted); cursor: pointer; } .chapter-menu[open] summary { border-bottom: 1px solid var(--line); } .chapter-nav { padding: 20px 14px; } .chapter-nav > .sidebar-label:first-child { display: none; } .all-resources { margin-bottom: 18px; } .category-label { margin-top: 18px; } .chapter-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; } .sidebar-source { margin-top: 18px; } .breadcrumbs { margin-bottom: 30px; } }
-  @media (max-width: 560px) { .reader-shell { padding-inline: 20px; } .chapter-list { display: block; } h1 { font-size: 28px; } .document-subtitle { font-size: 15px; } .document-meta { gap: 9px 14px; } .document-meta a { margin-left: 0; } .reading-navigation { gap: 10px; } .reading-link { padding: 16px 13px; } .reading-link strong { font-size: 12px; } .breadcrumbs { font-size: 10px; gap: 7px; } }
+  @media (max-width: 560px) { .reader-shell { padding-inline: 20px; } .chapter-list { display: block; } h1 { font-size: 28px; } .document-subtitle { font-size: 15px; } .document-meta { gap: 9px 14px; } .document-meta a { margin-left: 0; } .breadcrumbs { font-size: 10px; gap: 7px; } }
 </style>

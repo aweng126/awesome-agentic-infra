@@ -1,22 +1,20 @@
 # Observability & Evaluation
 
-关注 Agent 执行过程的追踪与调试、模型和工具调用的度量，以及任务质量和重复运行可靠性的评估。既收录观测与实验平台，也收录可研究其环境和指标设计的基准。
-
-可观测性解释执行过程中发生了什么，评估判断结果是否达到目标。基准任务的得分不能直接代表基础设施性能；比较运行时或沙箱时，还需控制模型、提示词、任务和资源配置。本主题关注测量，访问控制与策略执行归安全与治理。
+收录 Agent 执行追踪、模型与工具调用观测、任务评估和实验管理平台，以及基准论文与遥测规范。
 
 ## Projects & Platforms
 
-- <a id="resource-langfuse"></a> [Langfuse](https://github.com/langfuse/langfuse) — 提供 LLM 应用追踪、评估、数据集与提示词管理；关注：把模型调用、检索和 Agent 操作关联到一次执行过程。
-- <a id="resource-openllmetry"></a> [OpenLLMetry](https://github.com/traceloop/openllmetry) — 基于 OpenTelemetry 的 LLM 应用插桩与 SDK，覆盖模型服务和向量数据库等调用；关注：将 Agent 依赖组件的遥测接入已有观测系统。
-- <a id="resource-phoenix"></a> [Phoenix](https://github.com/Arize-ai/phoenix) — 提供基于 OpenTelemetry 的追踪，以及评估、数据集和实验管理；关注：通过执行记录与数据集分析 Agent 变化带来的影响。
+- <a id="resource-langfuse"></a> [Langfuse](https://github.com/langfuse/langfuse) — LLM 应用观测与评估平台，提供执行追踪、数据集和提示词管理，可将模型调用、检索和 Agent 操作关联到同一次执行。
+- <a id="resource-openllmetry"></a> [OpenLLMetry](https://github.com/traceloop/openllmetry) — 基于 OpenTelemetry 的 LLM 应用插桩工具与 SDK，覆盖模型服务和向量数据库等调用，可将 Agent 依赖组件的遥测接入已有观测系统。
+- <a id="resource-phoenix"></a> [Phoenix](https://github.com/Arize-ai/phoenix) — 提供基于 OpenTelemetry 的执行追踪，以及评估、数据集和实验管理，可结合执行记录与数据集比较 Agent 的运行结果。
 
 ## Papers
 
-- <a id="resource-agentbench"></a> [AgentBench: Evaluating LLMs as Agents](https://arxiv.org/abs/2308.03688)（2024，ICLR；预印本首发于 2023 年）— 在多种交互环境中评估 LLM 作为 Agent 的能力；关注：环境接口、任务执行与评测组织方式。附 [官方实现](https://github.com/THUDM/AgentBench)。
-- <a id="resource-tau-bench"></a> [τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045)（2024，arXiv 预印本）— 研究用户交互、工具调用和领域规则约束下的任务完成情况；关注：重复运行的一致性与工具执行结果。附 [官方实现](https://github.com/sierra-research/tau-bench)。
+- <a id="resource-agentbench"></a> [AgentBench: Evaluating LLMs as Agents](https://arxiv.org/abs/2308.03688)（2024，ICLR；预印本首发于 2023 年）— 在多种交互环境中评估 LLM 作为 Agent 的能力，提供环境接口、任务执行与评测流程。附 [官方实现](https://github.com/THUDM/AgentBench)。
+- <a id="resource-tau-bench"></a> [τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045)（2024，arXiv 预印本）— 评估用户交互、工具调用和领域规则约束下的任务完成情况，涵盖工具执行结果与重复运行的一致性。附 [官方实现](https://github.com/sierra-research/tau-bench)。
 
 ## Specifications
 
-- <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定；关注：模型、Agent 和工具调用的观测数据如何统一表达。采用具体字段前需查看对应规范的稳定性状态。
+- <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定，统一表达模型、Agent 和工具调用的观测数据。具体字段的稳定性状态见对应规范。
 
 [返回首页](../README.md)

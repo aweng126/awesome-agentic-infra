@@ -5,20 +5,19 @@ import { getNotes, sitePath } from '../../lib/content';
 
 export async function getStaticPaths() {
   const notes = await getNotes();
-  return notes.map((note, index) => ({
+  return notes.map((note) => ({
     params: { slug: note.slug },
-    props: {
-      note,
-      previous: index > 0 ? notes[index - 1] : undefined,
-      next: index < notes.length - 1 ? notes[index + 1] : undefined,
-    },
+    props: { note },
   }));
 }
 
-const { note, previous, next } = Astro.props;
+const { note } = Astro.props;
+const resourceLink = note.slug === 'agent-runtime-landscape'
+  ? { href: sitePath('topics/runtime-and-orchestration/'), title: '运行时与编排', label: '查看相关主题' }
+  : { href: sitePath('resources/'), title: '搜索与筛选全部资源', label: '前往资源库' };
 ---
 
-<SiteLayout title={note.title} description={note.description} active="notes">
+<SiteLayout title={note.title} description={note.description} active="topics">
   <DocumentView
     title={note.title}
     kind="note"
@@ -26,8 +25,7 @@ const { note, previous, next } = Astro.props;
     html={note.html}
     headings={note.headings}
     sourcePath={note.sourcePath}
-    readingMinutes={note.readingMinutes}
-    previous={previous ? { href: sitePath(`notes/${previous.slug}/`), title: previous.title } : { href: sitePath('notes/'), title: '全部研究笔记', label: '返回索引' }}
-    next={next ? { href: sitePath(`notes/${next.slug}/`), title: next.title } : { href: sitePath('resources/'), title: '探索基础设施资源', label: '延伸阅读' }}
+    previous={{ href: sitePath('notes/'), title: '资源导览', label: '返回导览' }}
+    next={resourceLink}
   />
 </SiteLayout>

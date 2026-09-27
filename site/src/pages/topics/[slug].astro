@@ -14,7 +14,7 @@ const { topic } = Astro.props;
 const topics = await getTopics();
 const topicGroups = groupTopics(topics);
 const isRelated = topic.scope === 'serving';
-const sectionLabel = isRelated ? '关联基础设施' : '主题导读';
+const sectionLabel = isRelated ? '关联基础设施' : '主题导航';
 const filterPath = `${sitePath('resources/')}?topic=${topic.slug}`;
 const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 ---
@@ -56,29 +56,24 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
       </header>
 
       <section class="topic-section topic-intro" aria-labelledby="topic-guide">
-        <h2 id="topic-guide">{isRelated ? '关联导读' : '主题导读'}</h2>
+        <h2 id="topic-guide">{isRelated ? '关联范围' : '主题范围'}</h2>
         <div class="prose" set:html={topic.introHtml} />
       </section>
 
-      {topic.learningNotes.length > 0 && <section class="topic-section learning-section" aria-labelledby="learning-notes">
-        <div class="section-top"><h2 id="learning-notes">学习笔记</h2><span>沿着具体问题深入</span></div>
-        <ol class="learning-notes">
-          {topic.learningNotes.map((note, index) => <li>
-            <span class="learning-order" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <div>
-              <h3><a href={sitePath(`notes/${note.slug}/`)}>{note.title}</a></h3>
-              <p>{note.description}</p>
-              <a class="note-read" href={sitePath(`notes/${note.slug}/`)}>阅读笔记 <span>约 {note.readingMinutes} 分钟</span><Icon name="arrow" size={16} /></a>
-            </div>
-          </li>)}
-        </ol>
-      </section>}
-
       <section class="topic-section reference-section" aria-labelledby="reference-materials">
-        <div class="section-top"><h2 id="reference-materials">参考资料</h2><span>{topic.entries.length} 条资料</span></div>
+        <div class="section-top"><h2 id="reference-materials">资源清单</h2><span>{topic.entries.length} 条资料</span></div>
         <p class="reference-intro">相关项目、论文与一手文档。<a href={filterPath}>在资源库筛选这些资料 <Icon name="arrow" size={14} /></a></p>
         <div class="prose reference-list" set:html={topic.resourceHtml} />
       </section>
+      {topic.learningNotes.length > 0 && <section class="topic-section overview-section" aria-labelledby="solution-overviews">
+        <h2 id="solution-overviews">方案总览</h2>
+        <ul class="solution-overviews">
+          {topic.learningNotes.map((note) => <li>
+            <h3><a href={sitePath(`notes/${note.slug}/`)}>{note.title}<Icon name="arrow" size={14} /></a></h3>
+            <p>{note.description}</p>
+          </li>)}
+        </ul>
+      </section>}
       <footer class="topic-footer"><a href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 改进本页 <Icon name="external" size={14} /></a></footer>
     </div>
   </main>
@@ -117,16 +112,14 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   .topic-intro > h2 { margin-bottom: 17px; }
   .section-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
   .section-top > span { font-size: 11px; color: var(--muted); }
-  .learning-section { margin-top: 42px; }
-  .learning-notes { list-style: none; padding: 0; margin: 0; border-block: 1px solid var(--line); }
-  .learning-notes > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 18px; padding: 25px 0; }
-  .learning-notes > li + li { border-top: 1px solid var(--line); }
-  .learning-order { color: var(--accent); font: 11px/2 var(--font-mono); }
-  .learning-notes h3 { font-size: 23px; line-height: 1.5; }
-  .learning-notes h3 a:hover { color: var(--accent); }
-  .learning-notes p { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.85; }
-  .note-read { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 16px; font-size: 11px; color: var(--accent); }
-  .note-read span { color: var(--muted); }
+  .overview-section { padding-top: 24px; border-top: 1px solid var(--line); }
+  .overview-section > h2 { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .solution-overviews { list-style: none; padding: 0; margin: 15px 0 0; }
+  .solution-overviews > li + li { margin-top: 18px; }
+  .solution-overviews h3 { font-size: 15px; line-height: 1.7; font-weight: 550; }
+  .solution-overviews h3 a { display: inline-flex; align-items: center; gap: 9px; }
+  .solution-overviews h3 a:hover { color: var(--accent); }
+  .solution-overviews p { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.85; }
   .reference-section { margin-top: 44px; }
   .reference-intro { color: var(--muted); font-size: 12px; line-height: 1.9; margin-top: -6px; }
   .reference-intro a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); }
@@ -143,5 +136,5 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   @media (max-width: 1100px) { .topic-shell { gap: 38px; grid-template-columns: 205px minmax(0, 1fr); padding-inline: 28px; } }
   @media (max-width: 959px) { .topic-shell { display: block; max-width: 820px; padding: 24px 26px 60px; } .topic-sidebar { position: static; margin-bottom: 30px; } .topic-menu { border: 1px solid var(--line); border-radius: 8px; } .topic-menu summary { display: flex; justify-content: space-between; padding: 14px 18px; font-size: 12px; color: var(--muted); cursor: pointer; } .topic-menu[open] summary { border-bottom: 1px solid var(--line); } .topic-menu nav { padding: 14px 10px 20px; } .topic-menu .sidebar-label { display: none; } .topic-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; } .sidebar-resource-link { margin-top: 14px; padding-top: 16px; } .breadcrumbs { margin-bottom: 29px; } }
   @media (max-width: 959px) { .topic-menu .topic-nav-group .sidebar-label { display: block; margin-bottom: 8px; } }
-  @media (max-width: 560px) { .topic-shell { padding-inline: 20px; } .topic-navigation { display: block; } .topic-header { padding-bottom: 25px; } h1 { font-size: 29px; } .topic-subtitle { font-size: 13px; } .section-top { align-items: baseline; gap: 12px; } .section-top > span { font-size: 10px; } .learning-notes > li { grid-template-columns: 20px minmax(0, 1fr); gap: 11px; } .learning-notes h3 { font-size: 20px; } .learning-notes p { font-size: 12px; } .breadcrumbs { gap: 7px; font-size: 10px; } }
+  @media (max-width: 560px) { .topic-shell { padding-inline: 20px; } .topic-navigation { display: block; } .topic-header { padding-bottom: 25px; } h1 { font-size: 29px; } .topic-subtitle { font-size: 13px; } .section-top { align-items: baseline; gap: 12px; } .section-top > span { font-size: 10px; } .breadcrumbs { gap: 7px; font-size: 10px; } }
 </style>
