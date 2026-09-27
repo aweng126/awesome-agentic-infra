@@ -15,7 +15,6 @@ const topics = await getTopics();
 const topicGroups = groupTopics(topics);
 const isRelated = topic.scope === 'serving';
 const sectionLabel = isRelated ? '关联基础设施' : '主题导航';
-const filterPath = `${sitePath('resources/')}?topic=${topic.slug}`;
 const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 ---
 
@@ -62,7 +61,6 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 
       <section class="topic-section reference-section" aria-labelledby="reference-materials">
         <div class="section-top"><h2 id="reference-materials">资源清单</h2><span>{topic.entries.length} 条资料</span></div>
-        <p class="reference-intro">相关项目、论文与一手文档。<a href={filterPath}>在资源库筛选这些资料 <Icon name="arrow" size={14} /></a></p>
         <div class="prose reference-list" set:html={topic.resourceHtml} />
       </section>
       {topic.learningNotes.length > 0 && <section class="topic-section overview-section" aria-labelledby="solution-overviews">
@@ -121,8 +119,6 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   .solution-overviews h3 a:hover { color: var(--accent); }
   .solution-overviews p { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.85; }
   .reference-section { margin-top: 44px; }
-  .reference-intro { color: var(--muted); font-size: 12px; line-height: 1.9; margin-top: -6px; }
-  .reference-intro a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); }
   .reference-list { font-size: 13px; line-height: 1.95; }
   .reference-list :global(h2), .reference-list :global(h3) { font-size: 14px; font-weight: 600; margin-top: 26px; margin-bottom: 12px; padding-top: 0; }
   .reference-list :global(ul) { padding-left: 1.1em; }

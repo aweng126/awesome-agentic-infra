@@ -169,7 +169,6 @@ for (const filename of resourceFiles) {
     }
   }
   assert.equal(topic.querySelectorAll('li[id^="resource-"]').length, anchors.size, `${filename}: every rendered resource anchor must match the source`);
-  assert.ok(topic.querySelector(`a[href="${base}resources/?topic=${topicSlug}"]`), `${filename}: topic must lead to its filtered resource index`);
   assert.ok(!topic.querySelector('.reading-navigation'), `${filename}: topic navigation must not imitate article pagination`);
   const renderedOverviewLinks = new Set([...topic.querySelectorAll('.solution-overviews h3 a')].map((link) => link.getAttribute('href')));
   assert.deepEqual(renderedOverviewLinks, overviewLinks, `${filename}: solution overviews must match the Markdown source`);
