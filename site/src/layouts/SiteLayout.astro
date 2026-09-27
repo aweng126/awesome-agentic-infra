@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Icon from '../components/Icon.astro';
 import { getResources, getNotes, sitePath, resourcePath, resourceGuideLabel, repoUrl } from '../lib/content';
 interface Props { title: string; description?: string; active?: 'home' | 'topics' | 'resources' | 'changelog' | 'contributing'; }
-const { title, description = '按主题发现 Agentic Infra 项目、平台、论文与官方文档，了解各个方案的定位、主要能力和官方入口。', active = 'home' } = Astro.props;
+const { title, description = '按主题发现 Agentic Infra 项目、平台、论文与官方文档，通过中文项目介绍了解方案定位、核心能力与接入方式。', active = 'home' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const resources = await getResources();
 const notes = await getNotes();
@@ -53,7 +53,7 @@ const searchItems = [
       <nav class="mobile-nav" aria-label="移动端主导航"><a href={sitePath()} aria-current={active === 'home' ? 'page' : undefined}>首页</a><a href={`${sitePath()}#topics`} aria-current={active === 'topics' ? 'page' : undefined}>主题导航</a><a href={sitePath('resources/')} aria-current={active === 'resources' ? 'page' : undefined}>资源库</a><a href={sitePath('changelog/')} aria-current={active === 'changelog' ? 'page' : undefined}>更新日志</a></nav>
     </header>
     <slot />
-    <footer class="site-footer"><div class="footer-inner"><div><a class="footer-brand" href={sitePath()}>Agentic Infra<span> / </span>发现项目，了解方案。</a><p>精选 Agent 基础设施资源，连接项目与官方资料。</p></div><div class="footer-links"><a href={sitePath('changelog/')}>更新日志</a><a href={sitePath('contributing/')}>参与贡献</a><a href={`${repoUrl}/blob/main/LICENSE`}>CC BY 4.0</a><a href={repoUrl}>GitHub ↗</a></div></div></footer>
+    <footer class="site-footer"><div class="footer-inner"><div><a class="footer-brand" href={sitePath()}>Agentic Infra<span> / </span>发现项目，了解方案。</a><p>汇集 Agent 基础设施资源，提供中文项目介绍与官方资料入口。</p></div><div class="footer-links"><a href={sitePath('changelog/')}>更新日志</a><a href={sitePath('contributing/')}>参与贡献</a><a href={`${repoUrl}/blob/main/LICENSE`}>CC BY 4.0</a><a href={repoUrl}>GitHub ↗</a></div></div></footer>
     <dialog id="search-dialog" aria-labelledby="search-title">
       <div class="search-dialog-head"><Icon name="search" size={21}/><label id="search-title" class="sr-only" for="global-search">搜索资源与导览</label><input id="global-search" type="search" placeholder="搜索项目、主题或方案…" autocomplete="off"/><button class="icon-button" type="button" data-search-close aria-label="关闭搜索"><Icon name="close" size={19}/></button></div>
       <div class="search-dialog-meta"><span id="search-status" role="status">输入关键词，探索整个知识库</span><kbd>ESC 关闭</kbd></div>

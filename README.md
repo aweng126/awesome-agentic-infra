@@ -33,7 +33,7 @@ A curated guide to agentic infrastructure projects, platforms, papers, and docum
 ## Where to Start
 
 - 了解领域划分：[Agentic Infra 领域导览](notes/agentic-infra-overview.md)，查看三类基础设施的关系与主题导航。
-- 查找现有方案：[Agent Runtime 全景](notes/agent-runtime-landscape.md)，浏览开源框架、运行平台与云厂商产品的定位、主要能力和官方入口。
+- 查找具体方案：在 [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/) 按主题或关键词筛选，阅读项目介绍；运行时方案的集中梳理见 [Agent Runtime 全景](notes/agent-runtime-landscape.md)。
 
 ## License
 

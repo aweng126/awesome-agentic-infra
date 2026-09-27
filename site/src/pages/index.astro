@@ -7,7 +7,7 @@ const topics = await getTopics();
 const resources = await getResources();
 const updates = await getChangelog();
 const recentChanges = updates.flatMap((update) => update.changes.map((html) => ({ date: update.date, html }))).slice(0, 3);
-const resourceTypeCount = new Set(resources.map((resource) => resource.type)).size;
+const projectProfileCount = resources.filter((resource) => resource.type === 'project' && resource.hasProfile).length;
 const topicGroups = groupTopics(topics);
 const primaryTopics = topicGroups.find((group) => group.id === 'primary')?.topics ?? [];
 const relatedTopics = topicGroups.find((group) => group.id === 'related')?.topics ?? [];
@@ -25,7 +25,7 @@ const topicIcons: Record<string, string> = {
 <SiteLayout title="理解 Agent 背后的基础设施" active="home">
   <main id="main-content">
     <section class="hero container" aria-labelledby="hero-title">
-      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p><h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1><p class="hero-description">从运行时到执行环境，从记忆到协作。<br/>汇集开源项目、云产品、论文与文档，<br class="desktop-break"/>了解各类方案的定位与主要能力。</p><div class="hero-buttons"><a class="button primary" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a><a class="button text-button" href={sitePath('notes/agentic-infra-overview/')}>阅读领域导览 <Icon name="book" size={18}/></a></div><p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p></div>
+      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p><h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1><p class="hero-description">汇集 Agent 基础设施项目、云平台与参考资料。<br/>通过中文项目介绍，了解各个方案的定位、<br class="desktop-break"/>核心能力与接入方式。</p><div class="hero-buttons"><a class="button primary" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a><a class="button text-button" href={sitePath('notes/agentic-infra-overview/')}>阅读领域导览 <Icon name="book" size={18}/></a></div><p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p></div>
       <InfrastructureMap />
     </section>
     <section class="topics-section container" id="topics" aria-labelledby="topics-title">
@@ -54,7 +54,12 @@ const topicIcons: Record<string, string> = {
         ))}
       </aside>
     </section>
-    <section class="stats-strip container" aria-label="资源收录概况"><div><strong>{String(primaryTopics.length).padStart(2,'0')}</strong><span>主要主题</span></div><div><strong>{resources.length}</strong><span>精选资源</span></div><div><strong>{String(resourceTypeCount).padStart(2,'0')}</strong><span>资源类型</span></div><div class="stat-statement"><span class="live-dot"></span><span>发现相关方案，<br/><b>找到官方入口。</b></span></div></section>
+    <section class="stats-strip container" aria-label="资源收录概况">
+      <div><strong>{String(primaryTopics.length).padStart(2,'0')}</strong><span>主要主题</span></div>
+      <div><strong>{resources.length}</strong><span>精选资源</span></div>
+      <div><a class="profile-stat-link" href={sitePath('resources/?type=project')} aria-label={`浏览 ${projectProfileCount} 篇项目介绍`}><strong>{projectProfileCount}</strong><span>项目介绍 <Icon name="arrow" size={13}/></span></a></div>
+      <div class="stat-statement"><span class="live-dot"></span><span>发现相关方案，<br/><b>了解项目定位。</b></span></div>
+    </section>
     {recentChanges.length > 0 && (
       <section class="recent-updates container" aria-labelledby="recent-updates-title">
         <div class="section-heading">
@@ -77,6 +82,10 @@ const topicIcons: Record<string, string> = {
 </SiteLayout>
 
 <style>
+  .profile-stat-link { display: flex; align-items: center; gap: 15px; }
+  .profile-stat-link > span { display: inline-flex; align-items: center; gap: 5px; }
+  .profile-stat-link:hover, .profile-stat-link:hover > span { color: var(--accent); }
+  .profile-stat-link:hover > span { text-decoration: underline; text-underline-offset: 4px; }
   .recent-updates { padding-top: 60px; padding-bottom: 54px; }
   .recent-update-list { border-top: 1px solid var(--line); }
   .recent-update { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
@@ -105,11 +114,15 @@ const topicIcons: Record<string, string> = {
   .related-topic:hover h4 { color: var(--accent); }
   .related-topic:hover .related-topic-action { text-decoration: underline; text-underline-offset: 4px; }
   @media (max-width: 1050px) {
+    .profile-stat-link { gap: 10px; }
     .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .topic-card { grid-column: auto; }
     .topic-card:last-child { grid-column: 1 / -1; }
     .related-infrastructure { align-items: flex-start; gap: 12px; flex-direction: column; }
     .related-topic { width: 100%; }
+  }
+  @media (max-width: 760px) {
+    .profile-stat-link { flex-direction: column; gap: 10px; }
   }
   @media (max-width: 600px) {
     .recent-updates { padding-top: 38px; padding-bottom: 36px; }

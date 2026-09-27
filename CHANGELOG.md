@@ -21,6 +21,7 @@
 
 ### 站点改进
 
+- [首页](https://blog.kingwen.cn/awesome-agentic-infra/) 明确中文项目介绍的阅读入口，展示项目介绍数量并支持直接筛选项目与平台；[README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md#where-to-start) 同步更新阅读路径与首页截图。
 - [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/)、主题索引与全站搜索接入项目介绍页，保留官方资料直达入口。资源元数据与介绍集中维护，主题资源清单自动同步。
 - 主导航调整为首页、主题导航、资源库与 [更新日志](CHANGELOG.md)。首页突出主题与资源，增加最近更新；主题页先展示资源清单，再提供方案总览入口。[资源导览](notes/README.md) 保留已有访问地址。
 
