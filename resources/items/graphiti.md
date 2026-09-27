@@ -3,6 +3,10 @@ name: Graphiti
 summary: 构建和查询随时间变化的上下文图，支持事实有效时间、来源追溯、增量更新和混合检索，为 Agent 组织持续积累的事实、关系与历史交互。
 type: project
 topic: memory-and-context
+aliases: ["Graphiti Core"]
+keywords: ["时序知识图谱", "上下文", "实体关系", "混合检索", "Episode", "长期记忆"]
+role: context-framework
+delivery: library
 url: https://github.com/getzep/graphiti
 anchor: resource-graphiti
 order: 1

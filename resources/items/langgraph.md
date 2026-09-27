@@ -3,6 +3,10 @@ name: LangGraph
 summary: 面向有状态、长时间运行 Agent 的图编排框架，可组合确定性步骤与模型决策，支持状态持久化、执行恢复、流式输出与人工介入。
 type: project
 topic: runtime-and-orchestration
+aliases: ["LangGraph OSS"]
+keywords: ["图编排", "持久执行", "检查点", "Checkpointer", "人工介入", "状态管理"]
+role: agent-framework
+delivery: library
 url: https://docs.langchain.com/oss/python/langgraph/overview
 anchor: resource-langgraph
 order: 5

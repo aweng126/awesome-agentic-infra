@@ -3,6 +3,10 @@ name: LlamaIndex OSS
 summary: 提供数据连接器、索引与检索接口，将外部文档和数据组织为 Agent 可查询的上下文，支持检索器组合及索引存储与重载。
 type: project
 topic: memory-and-context
+aliases: ["LlamaIndex", "LlamaIndex OSS"]
+keywords: ["RAG", "数据接入", "检索", "索引", "上下文", "Workflow"]
+role: context-framework
+delivery: library
 url: https://github.com/run-llama/llama_index
 anchor: resource-llamaindex-oss
 order: 3

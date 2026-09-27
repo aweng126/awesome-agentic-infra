@@ -3,6 +3,8 @@ name: "DeltaBox: Scaling Stateful AI Agents with Millisecond-Level Sandbox Check
 summary: 面向 Agent 树搜索与强化学习采样中的高频状态探索，通过 DeltaFS 与 DeltaCR 增量保存文件系统和进程状态，降低沙箱检查点与回滚开销。系统概览见 [作者项目页](https://dongyunpeng-sjtu.github.io/deltabox/)，ATC26 接收信息见 [IPADS 公告](https://ipads.sjtu.edu.cn/zh/news/)。
 type: paper
 topic: sandbox-and-execution
+aliases: ["DeltaBox", "Delta Box"]
+keywords: ["沙盒", "ATC26", "ATC 2026", "沙箱检查点", "checkpoint", "rollback", "DeltaFS", "DeltaCR", "树搜索"]
 url: https://arxiv.org/abs/2605.22781
 anchor: resource-deltabox
 order: 7

@@ -1,0 +1,61 @@
+name: Review resource links and facts
+
+on:
+  schedule:
+    - cron: '20 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Maximum links to request; leave blank to inspect all links'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: resource-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Produce maintenance report
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit sources and review dates
+        env:
+          AUDIT_LINK_LIMIT: ${{ inputs.limit }}
+        run: |
+          if [ -n "$AUDIT_LINK_LIMIT" ]; then
+            npm run resources:audit -- --limit "$AUDIT_LINK_LIMIT"
+          else
+            npm run resources:audit
+          fi
+
+      - name: Upload complete maintenance report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: resource-maintenance-report
+          path: site/reports/resource-audit/
+          if-no-files-found: warn
+          retention-days: 30

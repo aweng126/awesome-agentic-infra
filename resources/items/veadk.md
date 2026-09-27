@@ -3,6 +3,10 @@ name: VeADK
 summary: 火山引擎的开源 Agent 开发工具包，提供 Agent、Runner、子 Agent 组织和会话存储，并支持 AgentKit 应用集成。
 type: project
 topic: runtime-and-orchestration
+aliases: ["火山引擎 ADK", "VeADK Python"]
+keywords: ["字节跳动", "火山引擎", "Agent SDK", "Google ADK", "Runner", "AgentKit"]
+role: agent-framework
+delivery: library
 url: https://github.com/volcengine/veadk-python
 anchor: resource-veadk
 order: 10
@@ -24,7 +28,7 @@ license: Apache-2.0
 
 VeADK 是火山引擎提供的开源 Agent 开发工具包，将模型访问、工具、会话及云服务集成放到 Python 开发接口中。开发者可以从一个简单 Agent 开始，再接入知识库、记忆、子 Agent 和应用服务。[项目介绍](https://github.com/volcengine/veadk-python)
 
-工具包的 Agent 与 Runner 扩展自 Google ADK 对应组件，并加入火山引擎相关能力。它承担应用开发和执行组织；AgentKit 则是可以接入的部署及运行平台，两者处于不同层面。[Agent 定义](https://github.com/volcengine/veadk-python/blob/main/veadk/agent.py)、[Runner 定义](https://github.com/volcengine/veadk-python/blob/main/veadk/runner.py)
+工具包的 Agent 与 Runner 扩展自 [Google ADK](google-adk.md) 对应组件，并加入火山引擎相关能力。它承担应用开发和执行组织；[AgentKit Runtime](volcengine-agentkit-runtime.md) 则是可以接入的部署及运行平台，两者处于不同层面。[Agent 定义](https://github.com/volcengine/veadk-python/blob/main/veadk/agent.py)、[Runner 定义](https://github.com/volcengine/veadk-python/blob/main/veadk/runner.py)
 
 ## 核心能力
 

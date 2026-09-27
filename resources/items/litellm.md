@@ -3,6 +3,10 @@ name: LiteLLM
 summary: 多模型服务接入 SDK 与网关，为 Agent 提供统一的模型访问层，支持路由、重试、回退和用量跟踪。
 type: project
 topic: inference-and-model-serving
+aliases: ["LiteLLM Proxy"]
+keywords: ["模型网关", "模型路由", "多模型", "重试回退", "虚拟密钥", "用量统计"]
+role: model-gateway
+delivery: self-hosted
 url: https://github.com/BerriAI/litellm
 anchor: resource-litellm
 order: 2

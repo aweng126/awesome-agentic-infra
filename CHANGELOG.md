@@ -1,8 +1,27 @@
 # 更新日志
 
-按日期记录本站新增的资源、导览和读者可感知的改进。日期为内容发布日，最新记录在前；点击条目链接即可查看相关内容。
+按发布批次记录本站新增的资源、导览和读者可感知的改进，最新记录在前；点击条目链接即可查看相关内容。日期与时间为本站发布时的北京时间。
 
 ## 2026-09-27
+
+### 21:10 · 资源发现与阅读体验更新
+
+在[资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/)按组件角色与交付方式查找方案，通过中文别名和能力关键词搜索资源；新增 [MCP](resources/items/mcp.md)、[A2A](resources/items/a2a.md) 与 [OpenTelemetry GenAI](resources/items/opentelemetry-genai-semantic-conventions.md) 规范导读，并可通过 RSS 订阅后续更新。
+
+#### 新增内容
+
+- 新增 [MCP](resources/items/mcp.md)、[A2A](resources/items/a2a.md) 和 [OpenTelemetry GenAI](resources/items/opentelemetry-genai-semantic-conventions.md) 规范导读，介绍用途、关键角色、基本交互及相关实现。
+
+#### 内容更新
+
+- 为现有资源补充别名、能力关键词、组件角色及交付方式；[Runtime 全景](notes/agent-runtime-landscape.md) 直接连接项目介绍，补充框架、运行平台与隔离组件之间的阅读链接。
+
+#### 站点改进
+
+- 主题页按资源角色组织清单，项目名称统一进入站内介绍；资源库展示具名官方资料、角色与交付方式，支持组合筛选和移除单个条件。
+- 搜索支持中文别名与能力关键词，名称匹配优先，可展开全部结果；从介绍页返回资源库时保留本次筛选与阅读位置，手机端可收起筛选面板。
+- 更新日志按发布批次组织，首页展示批次摘要，新增 [RSS 订阅](https://blog.kingwen.cn/awesome-agentic-infra/feed.xml)、站点地图及分享图片。
+- 增加独立的每周资源巡检，生成外链状态与待复核事实报告；统一站点地址配置并更新维护说明。
 
 ### 新增内容
 

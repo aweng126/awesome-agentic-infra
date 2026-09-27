@@ -3,6 +3,10 @@ name: 阿里云 AgentCore
 summary: 阿里云的 Agent 构建、运行与治理平台，支持托管 Harness、高代码开发和已有 Agent 纳管，并提供 Workspace 资源与身份权限管理。
 type: project
 topic: deployment-and-scheduling
+aliases: ["Alibaba Cloud AgentCore", "阿里 AgentCore"]
+keywords: ["阿里云", "托管 Harness", "Agent 纳管", "工作空间", "团队协作", "身份权限"]
+role: hosted-runtime
+delivery: managed
 url: https://help.aliyun.com/zh/agentcore/agentcore-product-overview
 anchor: resource-alibaba-cloud-agentcore
 order: 2

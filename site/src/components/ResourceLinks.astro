@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import { resourcePath, resourceIntroLabel, type Resource } from '../lib/content';
+import { getResourceSource } from '../lib/resource-source';
+
+interface Props { resource: Resource; showIntro?: boolean; }
+const { resource, showIntro = true } = Astro.props;
+const primary = resource.links.find((link) => link.url === resource.url);
+const links = [
+  { label: primary && primary.label !== '官方来源' ? primary.label : getResourceSource(resource).label, url: resource.url },
+  ...resource.links.filter((link) => link.url !== resource.url),
+];
+const visibleLinks = resource.type === 'project' ? links.slice(0, 2) : links;
+---
+<div class="resource-source">
+  {showIntro && resource.hasProfile && <a class="resource-profile-link" href={resourcePath(resource)} data-resource-profile-link>
+    {resourceIntroLabel(resource.type)} <Icon name="arrow" size={13}/><span class="sr-only">：{resource.name}</span>
+  </a>}
+  {visibleLinks.map((link) => <a class="resource-source-link" href={link.url} target="_blank" rel="noopener noreferrer">
+    {link.label}<Icon name="external" size={13}/><span class="sr-only">：{resource.name}（在新窗口打开）</span>
+  </a>)}
+</div>

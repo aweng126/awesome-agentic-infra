@@ -1,6 +1,6 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { getChangelog } from '../../lib/content';
+import { getChangelog, sitePath } from '../../lib/content';
 
 const updates = await getChangelog();
 const formatDate = (date: string) => {
@@ -15,7 +15,7 @@ const formatDate = (date: string) => {
       <p class="eyebrow"><span class="live-dot" /> CHANGELOG</p>
       <h1>最近更新<span class="accent-dot">。</span></h1>
       <p>新增资源、内容补充与站点改进。</p>
-      <div class="changelog-meta"><span>按发布时间倒序</span><span aria-hidden="true">/</span><span>点击条目，阅读相关内容</span></div>
+      <div class="changelog-meta"><span>按发布批次倒序 · 北京时间</span><span aria-hidden="true">/</span><a href={sitePath('feed.xml')}>RSS 订阅更新 ↗</a></div>
     </header>
 
     <div class="changelog-timeline" aria-label="网站更新记录">
@@ -25,7 +25,10 @@ const formatDate = (date: string) => {
             <h2 id={update.date}><a href={`#update-${update.date}`} aria-label={`链接到 ${formatDate(update.date)} 的更新`}><time datetime={update.date}>{update.date}</time></a></h2>
             <div class="changelog-date-meta">{index === 0 && <span class="changelog-latest">最近一次</span>}<span>{update.changeCount} 项更新</span></div>
           </div>
-          <div class="changelog-body prose" set:html={update.html} />
+          <div class="changelog-body prose">{update.batches.map(batch => <section class="changelog-batch" id={batch.id}>
+            <h3><a href={`#${batch.id}`}>{batch.time && <time datetime={`${batch.date}T${batch.time}:00+08:00`}>{batch.time} · </time>}{batch.title}</a></h3>
+            <div class="batch-details" set:html={batch.html}/>
+          </section>)}</div>
         </article>
       ))}
     </div>
@@ -33,6 +36,11 @@ const formatDate = (date: string) => {
 </SiteLayout>
 
 <style>
+  .changelog-meta a { color: var(--accent); }
+  .changelog-batch { scroll-margin-top: 130px; }
+  .changelog-batch + .changelog-batch { margin-top: 28px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .changelog-batch > h3 { font-size: 15px; color: var(--text); }
+  .changelog-batch :global(h4) { font-size: 13px; color: var(--accent); margin-block: 22px 8px; }
   .changelog-page { max-width: 1080px; margin: 0 auto; padding: 56px 36px 76px; }
   .changelog-heading { padding-bottom: 34px; }
   .changelog-heading h1 { font-size: clamp(32px, 4vw, 42px); margin: 15px 0 15px; }

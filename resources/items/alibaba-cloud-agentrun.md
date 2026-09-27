@@ -3,6 +3,10 @@ name: 阿里云 AgentRun
 summary: 基于函数计算的 Serverless Agent 基础设施平台，提供可分别使用的 Agent Runtime、Sandbox 与模型治理组件，支持会话亲和、实例生命周期管理和按需伸缩。
 type: project
 topic: deployment-and-scheduling
+aliases: ["Alibaba Cloud AgentRun", "AgentRun"]
+keywords: ["沙盒", "阿里云", "Serverless", "函数计算", "沙箱", "会话亲和", "弹性伸缩"]
+role: hosted-runtime
+delivery: managed
 url: https://help.aliyun.com/zh/agentrun/what-is-agentrun
 anchor: resource-alibaba-cloud-agentrun
 order: 3

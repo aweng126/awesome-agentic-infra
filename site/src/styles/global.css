@@ -147,3 +147,11 @@
   @media(max-width:440px){.resource-links{align-items:flex-start;flex-direction:column}.topic-card{min-height:258px}.topic-description{line-height:1.9}.topic-card h3{font-size:15px}.topic-english{min-height:27px}.topic-icon{width:33px;height:33px}.topic-card-top{margin-bottom:15px}.hero-buttons{gap:5px}.button{font-size:13px;padding-inline:15px}.hero-small{font-size:10px}.brand small{font-size:7px}.github-link{display:none}.section-heading{display:block}.section-heading .inline-link{margin-top:14px}.eyebrow{font-size:9px;letter-spacing:1.2px}}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 }
+.resource-source { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.resource-brief-facts { display: flex; flex-wrap: wrap; gap: 5px 8px; font-size: 11px; line-height: 1.7; color: var(--muted); margin-top: 8px; }
+.resource-brief-facts .fact-separator { opacity: .5; }
+.resource-profile-link { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); }
+.search-show-all { display: block; width: 100%; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-alt); color: var(--accent); padding: 13px; cursor: pointer; font: inherit; }
+.active-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.active-filters[hidden] { display: none; }
+.active-filters button { border: 1px solid var(--line); background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 11px; cursor: pointer; }

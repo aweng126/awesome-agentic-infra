@@ -10,7 +10,8 @@
     "build": "npm run resources:check && astro build && node scripts/verify-build.mjs",
     "preview": "astro preview --host 127.0.0.1",
     "resources:sync": "tsx scripts/sync-resources.ts",
-    "resources:check": "tsx scripts/sync-resources.ts --check"
+    "resources:check": "tsx scripts/sync-resources.ts --check",
+    "resources:audit": "tsx scripts/audit-resources.ts"
   },
   "engines": {
     "node": ">=22.12.0"

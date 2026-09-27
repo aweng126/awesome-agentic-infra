@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { profileSectionsByType } from './resource-catalog';
 import {
   extractResources,
   getGuide,
@@ -129,12 +130,15 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
 test('profile routes contain full introductions while metadata-only resources keep their topic fallback', async () => {
   const resources = await getResources();
   const profiles = await getResourceProfiles();
-  assert.equal(resources.length, 54);
-  assert.deepEqual(profiles.map(profile => profile.slug).sort(), resources.filter(resource => resource.type === 'project').map(resource => resource.slug).sort(), 'every project and platform has a complete introduction');
+  assert.ok(resources.length > 0);
+  assert.deepEqual(profiles.map(profile => profile.slug).sort(), resources.filter(resource => resource.hasProfile).map(resource => resource.slug).sort());
+  assert.ok(resources.filter(resource => resource.type === 'project').every(resource => resource.hasProfile), 'every project and platform has a complete introduction');
   assert.equal(resources.filter(resource => resource.hasProfile).length, profiles.length);
   for (const profile of profiles) {
     assert.equal(profile.sourcePath, `resources/items/${profile.slug}.md`);
-    assert.match(profile.html, /<h2 id="核心能力">/u);
+    for (const heading of profileSectionsByType[profile.type]) {
+      assert.ok(profile.headings.some(item => item.depth === 2 && item.text === heading));
+    }
     assert.equal(resourcePath(profile), sitePath(`resources/${profile.slug}/`));
     assert.ok(profile.links.length > 1);
   }

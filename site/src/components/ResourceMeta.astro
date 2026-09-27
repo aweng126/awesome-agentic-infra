@@ -1,0 +1,10 @@
+---
+import type { Resource } from '../lib/content';
+import { roleLabels, deliveryLabels } from '../lib/resource-taxonomy';
+interface Props { resource: Resource; }
+const { resource } = Astro.props;
+const roleLabel = resource.role && roleLabels[resource.role as keyof typeof roleLabels];
+const deliveryLabel = resource.delivery && deliveryLabels[resource.delivery as keyof typeof deliveryLabels];
+const facts = [roleLabel, deliveryLabel, resource.maintainer].filter(Boolean);
+---
+{facts.length > 0 && <p class="resource-brief-facts">{facts.map((fact, index) => <><span>{fact}</span>{index < facts.length - 1 && <span class="fact-separator" aria-hidden="true">·</span>}</>)}</p>}

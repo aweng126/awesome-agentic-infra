@@ -1,4 +1,4 @@
-import { matchesQuery } from '../lib/search';
+import { matchesQuery, searchRank } from '../lib/search';
 
 const themeButton = document.querySelector<HTMLButtonElement>('.theme-toggle');
 function syncThemeButton() {
@@ -20,9 +20,11 @@ const dialog = document.querySelector<HTMLDialogElement>('#search-dialog')!;
 const input = document.querySelector<HTMLInputElement>('#global-search')!;
 const results = document.querySelector('#search-results')!;
 let previousFocus: HTMLElement | null = null;
+let resultLimit = 12;
 function search() {
-  const filtered = items.filter(item=>matchesQuery(`${item.title} ${item.description} ${item.category} ${item.keywords}`,input.value));
-  const shown = filtered.slice(0,12);
+  const filtered = items.filter(item=>matchesQuery(`${item.title} ${item.description} ${item.category} ${item.keywords}`,input.value))
+    .sort((left, right) => searchRank(right.title, input.value) - searchRank(left.title, input.value));
+  const shown = filtered.slice(0,resultLimit);
   results.replaceChildren();
   shown.forEach(item=>{
     const link=document.createElement('a');link.href=item.url;link.className='search-result';
@@ -31,15 +33,28 @@ function search() {
     const description=document.createElement('p');description.textContent=item.description;
     link.append(category,title,description);results.append(link);
   });
-  document.querySelector('#search-status')!.textContent = filtered.length ? `找到 ${filtered.length} 条结果${filtered.length>12?' · 显示前 12 条':''}` : '没有匹配结果，试试其他关键词';
+  document.querySelector('#search-status')!.textContent = filtered.length ? `找到 ${filtered.length} 条结果${filtered.length>shown.length?` · 显示前 ${shown.length} 条`:''}` : '没有匹配结果，试试其他关键词';
+  if (filtered.length > shown.length) {
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'search-show-all';
+    more.textContent = `显示全部 ${filtered.length} 条结果`;
+    more.addEventListener('click', () => {
+      const nextIndex = shown.length;
+      resultLimit = Number.POSITIVE_INFINITY;
+      search();
+      results.querySelectorAll<HTMLAnchorElement>('a')[nextIndex]?.focus();
+    });
+    results.append(more);
+  }
   if (!shown.length) { const message=document.createElement('p');message.className='search-empty';message.textContent='可以试试「沙箱」「memory」或「MCP」。';results.append(message); }
 }
-function openSearch() { previousFocus = document.activeElement as HTMLElement; dialog.showModal(); search(); input.focus(); }
+function openSearch() { previousFocus = document.activeElement as HTMLElement; resultLimit = 12; dialog.showModal(); search(); input.focus(); }
 document.querySelectorAll('[data-search-open]').forEach(button=>button.addEventListener('click',openSearch));
 document.querySelector('[data-search-close]')?.addEventListener('click',()=>dialog.close());
 dialog.addEventListener('close',()=>previousFocus?.focus());
 dialog.addEventListener('click',(event)=>{const rect=dialog.getBoundingClientRect();if(event.target===dialog&&(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom))dialog.close();});
-input.addEventListener('input',search);
+input.addEventListener('input',()=>{resultLimit=12;search();});
 dialog.addEventListener('keydown',event=>{
   const links=[...results.querySelectorAll<HTMLAnchorElement>('a')];
   const at=links.indexOf(document.activeElement as HTMLAnchorElement);

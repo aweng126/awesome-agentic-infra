@@ -6,7 +6,7 @@ import { getTopics, getResources, getChangelog, groupTopics, sitePath, topicScop
 const topics = await getTopics();
 const resources = await getResources();
 const updates = await getChangelog();
-const recentChanges = updates.flatMap((update) => update.changes.map((html) => ({ date: update.date, html }))).slice(0, 3);
+const recentChanges = updates.flatMap((update) => update.batches).slice(0, 3);
 const projectProfileCount = resources.filter((resource) => resource.type === 'project' && resource.hasProfile).length;
 const topicGroups = groupTopics(topics);
 const primaryTopics = topicGroups.find((group) => group.id === 'primary')?.topics ?? [];
@@ -69,8 +69,8 @@ const topicIcons: Record<string, string> = {
         <div class="recent-update-list">
           {recentChanges.map((change) => (
             <article class="recent-update">
-              <a class="recent-update-date" href={sitePath(`changelog/#update-${change.date}`)} aria-label={`查看 ${change.date} 的更新`}><time datetime={change.date}>{change.date}</time></a>
-              <div class="recent-update-body" set:html={change.html} />
+              <a class="recent-update-date" href={sitePath(`changelog/#${change.id}`)} aria-label={`查看 ${change.date} 的更新`}><time datetime={change.date}>{change.date}{change.time && <><br/>{change.time}</>}</time></a>
+              <div class="recent-update-body"><a class="recent-update-title" href={sitePath(`changelog/#${change.id}`)}>{change.title}</a><div class="recent-update-summary" set:html={change.summaryHtml} /></div>
             </article>
           ))}
         </div>
@@ -82,6 +82,8 @@ const topicIcons: Record<string, string> = {
 </SiteLayout>
 
 <style>
+  .recent-update-title { display: inline-block; color: var(--text); font-weight: 600; margin-bottom: 7px; }
+  .recent-update-summary { color: var(--muted); }
   .profile-stat-link { display: flex; align-items: center; gap: 15px; }
   .profile-stat-link > span { display: inline-flex; align-items: center; gap: 5px; }
   .profile-stat-link:hover, .profile-stat-link:hover > span { color: var(--accent); }
@@ -92,7 +94,7 @@ const topicIcons: Record<string, string> = {
   .recent-update-date { padding-top: 3px; color: var(--muted); font: 11px/1.9 var(--font-mono); }
   .recent-update-date:hover { color: var(--accent); }
   .recent-update-body { min-width: 0; font-size: 13px; line-height: 1.9; color: var(--muted); overflow-wrap: anywhere; }
-  .recent-update-body > :global(ul), .recent-update-body > :global(ol) { padding: 0; list-style: none; }
+  .recent-update-summary > :global(ul), .recent-update-summary > :global(ol) { padding: 0; list-style: none; }
   .recent-update-body :global(li > ul), .recent-update-body :global(li > ol) { margin-top: 8px; padding-left: 20px; }
   .recent-update-body :global(a), .scope-section a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
   .recent-update-body :global(a:hover), .scope-section a:hover { text-decoration-color: var(--accent); }

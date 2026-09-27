@@ -3,6 +3,10 @@ name: Amazon Bedrock AgentCore Runtime
 summary: AWS 的 Agent 与工具托管环境，支持多种框架、长时间运行的会话、microVM 和实例计算类型，提供按需资源供给与文件系统持久化。其中 microVM 的托管会话存储处于 Preview 阶段。
 type: project
 topic: deployment-and-scheduling
+aliases: ["AWS AgentCore Runtime", "Bedrock AgentCore Runtime"]
+keywords: ["AWS", "托管运行时", "microVM", "会话隔离", "文件持久化", "MCP", "A2A"]
+role: hosted-runtime
+delivery: managed
 url: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html
 anchor: resource-amazon-bedrock-agentcore-runtime
 order: 4

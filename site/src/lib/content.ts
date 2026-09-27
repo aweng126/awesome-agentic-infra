@@ -11,11 +11,14 @@ import { visit } from 'unist-util-visit';
 import type { Root as MarkdownRoot, Link, ListItem } from 'mdast';
 import type { Root as HtmlRoot } from 'hast';
 import { topics } from './topic-metadata';
+import siteConfig from '../../site.config.json';
+import type { ResourceRole, ResourceDelivery } from './resource-taxonomy';
+export { resourceIntroLabel } from './resource-taxonomy';
 import { loadResourceCatalog, parseResourceDocument, syncTopicMarkdown, type CatalogResource, type ResourceLink, type ResourceStatus } from './resource-catalog';
 export { topics } from './topic-metadata';
 export type { ResourceLink, ResourceStatus } from './resource-catalog';
 
-export const repoUrl = 'https://github.com/aweng126/awesome-agentic-infra';
+export const repoUrl = siteConfig.repository;
 function findRepositoryRoot(): string {
   // Astro relocates bundled modules, so import.meta.url is not a reliable path
   // to the source repository during the production build.
@@ -30,7 +33,7 @@ function findRepositoryRoot(): string {
   }
 }
 const repositoryRoot = findRepositoryRoot();
-const basePath = '/awesome-agentic-infra/';
+const basePath = siteConfig.base;
 
 export function sitePath(path = ''): string {
   return `${basePath}${path.replace(/^\/+/, '')}`;
@@ -58,6 +61,10 @@ export interface Resource {
   form?: string;
   license?: string;
   status?: ResourceStatus;
+  aliases: string[];
+  keywords: string[];
+  role?: ResourceRole;
+  delivery?: ResourceDelivery;
   links: ResourceLink[];
 }
 
@@ -77,6 +84,17 @@ export interface ChangelogEntry {
   html: string;
   changes: string[];
   changeCount: number;
+  batches: ChangelogBatch[];
+}
+
+export interface ChangelogBatch {
+  id: string;
+  date: string;
+  time?: string;
+  title: string;
+  summaryHtml: string;
+  html: string;
+  changes: string[];
 }
 
 
@@ -335,6 +353,8 @@ export function extractResources(markdown: string, topic: TopicMetadata): Resour
     topicTitle: topic.title,
     topicZhTitle: topic.zhTitle,
     hasProfile: false,
+    aliases: [],
+    keywords: [],
     links: [{ label: '官方来源', url: link.url }],
   }));
 }
@@ -357,6 +377,10 @@ function catalogResource(item: CatalogResource): Resource {
     form: item.form,
     license: item.license,
     status: item.status,
+    aliases: item.aliases,
+    keywords: item.keywords,
+    role: item.role,
+    delivery: item.delivery,
     links: item.links,
   };
 }
@@ -383,7 +407,8 @@ export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]
     if (seen.has(date)) throw new Error(`Duplicate changelog date: ${date}. Combine same-day changes.`);
     seen.add(date);
     const body = markdown.slice(heading.position!.end.offset!, sections[index + 1]?.position?.start.offset ?? markdown.length);
-    const items = parse(body).children.flatMap((node) => node.type === 'list' ? node.children : []);
+    const tree = parse(body);
+    const items = tree.children.flatMap((node) => node.type === 'list' ? node.children : []);
     if (!items.length) throw new Error(`Changelog ${date} needs at least one change.`);
     const [rendered, changes] = await Promise.all([
       renderMarkdown(body, 'CHANGELOG.md', `update-${date}-`),
@@ -392,7 +417,45 @@ export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]
         return (await renderMarkdown(markdown, 'CHANGELOG.md', `update-${date}-change-${itemIndex}-`)).html;
       })),
     ]);
-    return { date, html: rendered.html, changes, changeCount: changes.length };
+    const batchHeadings = tree.children.filter(node => node.type === 'heading' && node.depth === 3);
+    const batches: ChangelogBatch[] = [];
+    const legacyParts = [body.slice(0, batchHeadings[0]?.position?.start.offset ?? body.length)];
+    const times = new Set<string>();
+    for (const [batchIndex, batchHeading] of batchHeadings.entries()) {
+      const label = readableText(batchHeading);
+      const match = /^(\d{2}:\d{2})\s*·\s*(.+)$/u.exec(label);
+      const end = batchHeadings[batchIndex + 1]?.position?.start.offset ?? body.length;
+      if (!match) {
+        if (/^\d{1,2}:/u.test(label)) throw new Error(`Invalid changelog batch: ${label}. Use HH:mm · Title.`);
+        legacyParts.push(body.slice(batchHeading.position!.start.offset!, end));
+        continue;
+      }
+      const [, time, title] = match;
+      if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/u.test(time)) throw new Error(`Invalid changelog batch time: ${time}.`);
+      if (times.has(time)) throw new Error(`Duplicate changelog batch time: ${date} ${time}.`);
+      times.add(time);
+      const batchBody = body.slice(batchHeading.position!.end.offset!, end);
+      const batchTree = parse(batchBody);
+      const summary = batchTree.children.find(node => node.type === 'paragraph');
+      const batchItems = batchTree.children.flatMap(node => node.type === 'list' ? node.children : []);
+      if (!summary || !batchItems.length) throw new Error(`Changelog batch ${date} ${time} needs a summary and at least one change.`);
+      const id = `update-${date}-${time.replace(':', '')}`;
+      const summaryMarkdown = batchBody.slice(summary.position!.start.offset!, summary.position!.end.offset!);
+      batches.push({ id, date, time, title,
+        summaryHtml: (await renderMarkdown(summaryMarkdown, 'CHANGELOG.md')).html,
+        html: (await renderMarkdown(batchBody, 'CHANGELOG.md', `${id}-`)).html,
+        changes: await Promise.all(batchItems.map(async item => (await renderMarkdown(batchBody.slice(item.position!.start.offset!, item.position!.end.offset!), 'CHANGELOG.md')).html)),
+      });
+    }
+    batches.sort((a, b) => b.time!.localeCompare(a.time!));
+    const legacyBody = legacyParts.join('\n');
+    const legacyItems = parse(legacyBody).children.flatMap(node => node.type === 'list' ? node.children : []);
+    if (legacyItems.length) {
+      const legacyChanges = await Promise.all(legacyItems.map(async item => (await renderMarkdown(legacyBody.slice(item.position!.start.offset!, item.position!.end.offset!), 'CHANGELOG.md')).html));
+      batches.push({ id: `update-${date}-earlier`, date, title: batches.length ? '当日较早更新' : '资源与站点更新',
+        summaryHtml: legacyChanges[0], html: (await renderMarkdown(legacyBody, 'CHANGELOG.md', `update-${date}-`)).html, changes: legacyChanges });
+    }
+    return { date, html: rendered.html, changes, changeCount: changes.length, batches };
   }));
   if (!entries.length) throw new Error('CHANGELOG.md needs at least one dated update.');
   return entries.sort((a, b) => b.date.localeCompare(a.date));

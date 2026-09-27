@@ -1,7 +1,10 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, groupTopics, sitePath, repoUrl, topicScopeLabels } from '../../lib/content';
+import ResourceLinks from '../../components/ResourceLinks.astro';
+import ResourceMeta from '../../components/ResourceMeta.astro';
+import { getTopics, groupTopics, sitePath, resourcePath, repoUrl, topicScopeLabels, type Resource } from '../../lib/content';
+import { roleLabels } from '../../lib/resource-taxonomy';
 
 export async function getStaticPaths() {
   return (await getTopics()).map((topic) => ({
@@ -16,6 +19,21 @@ const topicGroups = groupTopics(topics);
 const isRelated = topic.scope === 'serving';
 const sectionLabel = isRelated ? '关联基础设施' : '主题导航';
 const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
+const resourceTypes = [
+  { type: 'project', title: '项目与平台', id: 'projects--platforms' },
+  { type: 'paper', title: '论文', id: 'papers' },
+  { type: 'spec', title: '协议规范', id: 'specifications' },
+  { type: 'article', title: '文章与文档', id: 'articles--documentation' },
+];
+const resourceGroups = resourceTypes.map((kind) => {
+  const entries = (topic.entries as Resource[]).filter((resource) => resource.type === kind.type);
+  const roles = [...new Set(entries.map((resource) => resource.role ?? ''))];
+  return { ...kind, entries, groups: roles.map((role) => ({
+    role,
+    label: role ? roleLabels[role as keyof typeof roleLabels] : '其他资料',
+    entries: entries.filter((resource) => (resource.role ?? '') === role),
+  })) };
+}).filter((kind) => kind.entries.length > 0);
 ---
 
 <SiteLayout title={`${topic.zhTitle} · ${sectionLabel}`} description={topic.description} active="topics">
@@ -61,7 +79,22 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
 
       <section class="topic-section reference-section" aria-labelledby="reference-materials">
         <div class="section-top"><h2 id="reference-materials">资源清单</h2><span>{topic.entries.length} 条资料</span></div>
-        <div class="prose reference-list" set:html={topic.resourceHtml} />
+        <div class="reference-list">
+          {resourceGroups.map((kind) => <section class="resource-kind" aria-labelledby={kind.id}>
+            <h3 id={kind.id}>{kind.title}</h3>
+            {kind.groups.map((group) => <div class="resource-role-group">
+              {kind.groups.length > 1 && <h4 class="resource-role-title">{group.label}</h4>}
+              <ul>
+                {group.entries.map((resource) => <li id={resource.anchor} class="topic-resource-entry">
+                  <p class="topic-resource-title">{resource.hasProfile ? <a href={resourcePath(resource)}>{resource.name}</a> : resource.name}</p>
+                  <ResourceMeta resource={resource}/>
+                  <p class="topic-resource-description">{resource.description}</p>
+                  <ResourceLinks resource={resource}/>
+                </li>)}
+              </ul>
+            </div>)}
+          </section>)}
+        </div>
       </section>
       {topic.learningNotes.length > 0 && <section class="topic-section overview-section" aria-labelledby="solution-overviews">
         <h2 id="solution-overviews">方案总览</h2>
@@ -120,11 +153,16 @@ const editUrl = `${repoUrl}/edit/main/${topic.sourcePath}`;
   .solution-overviews p { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.85; }
   .reference-section { margin-top: 44px; }
   .reference-list { font-size: 13px; line-height: 1.95; }
-  .reference-list :global(h2), .reference-list :global(h3) { font-size: 14px; font-weight: 600; margin-top: 26px; margin-bottom: 12px; padding-top: 0; }
-  .reference-list :global(ul) { padding-left: 1.1em; }
-  .reference-list :global(li) { padding-left: .2em; }
-  .reference-list :global(li + li) { margin-top: 12px; }
-  .reference-list :global(li > a:first-child) { font-weight: 550; }
+  .resource-kind + .resource-kind { margin-top: 34px; }
+  .resource-kind > h3 { font-size: 15px; font-weight: 600; margin: 0 0 15px; scroll-margin-top: 140px; }
+  .resource-role-title { color: var(--muted); font-size: 12px; font-weight: 500; margin: 20px 0 0; }
+  .resource-role-group ul { list-style: none; padding: 0; margin: 0; }
+  .topic-resource-entry { padding: 18px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 140px; }
+  .topic-resource-entry:target { background: var(--accent-soft); box-shadow: 12px 0 var(--accent-soft), -12px 0 var(--accent-soft); }
+  .topic-resource-title { font-size: 15px; font-weight: 550; line-height: 1.65; overflow-wrap: anywhere; }
+  .topic-resource-title a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .topic-resource-description { color: var(--muted); margin: 8px 0 10px; }
+  .topic-resource-entry :global(.resource-source) { font-size: 11px; }
   .topic-footer { margin-top: 35px; padding-top: 23px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
   .topic-footer a { display: inline-flex; align-items: center; gap: 6px; }
   .topic-footer a:hover { color: var(--accent); }

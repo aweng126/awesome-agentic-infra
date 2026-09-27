@@ -3,6 +3,10 @@ name: E2B
 summary: 面向 Agent 的云沙箱，通过 SDK 和环境模板创建 Linux 执行环境，用于运行代码、处理数据和调用工具，支持保存文件系统与内存的暂停和恢复。
 type: project
 topic: sandbox-and-execution
+aliases: []
+keywords: ["沙盒", "沙箱", "代码执行", "环境模板", "Linux", "暂停恢复", "内存持久化"]
+role: sandbox-service
+delivery: managed
 url: https://docs.e2b.dev/
 anchor: resource-e2b
 order: 3

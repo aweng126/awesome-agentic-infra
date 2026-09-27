@@ -1,8 +1,9 @@
 import { defineConfig } from 'astro/config';
+import siteConfig from './site.config.json' with { type: 'json' };
 
 export default defineConfig({
-  site: 'https://blog.kingwen.cn',
-  base: '/awesome-agentic-infra',
+  site: siteConfig.origin,
+  base: siteConfig.base,
   output: 'static',
   trailingSlash: 'always',
   devToolbar: { enabled: false },

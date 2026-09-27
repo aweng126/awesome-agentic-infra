@@ -3,6 +3,10 @@ name: Cedar
 summary: 授权策略语言与评估机制，使用主体、动作、资源和上下文表达 Agent 或用户的操作权限，并支持基于 schema 的策略验证。
 type: project
 topic: security-and-governance
+aliases: ["Cedar Policy"]
+keywords: ["授权", "策略语言", "权限", "Schema", "主体动作资源"]
+role: policy-engine
+delivery: library
 url: https://docs.cedarpolicy.com/
 anchor: resource-cedar
 order: 1

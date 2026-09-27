@@ -2,8 +2,10 @@
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
 import { getResources, getNotes, sitePath, resourcePath, resourceGuideLabel, repoUrl } from '../lib/content';
+import { roleLabels, deliveryLabels } from '../lib/resource-taxonomy';
+import siteConfig from '../../site.config.json';
 interface Props { title: string; description?: string; active?: 'home' | 'topics' | 'resources' | 'changelog' | 'contributing'; }
-const { title, description = '按主题发现 Agentic Infra 项目、平台、论文与官方文档，通过中文项目介绍了解方案定位、核心能力与接入方式。', active = 'home' } = Astro.props;
+const { title, description = siteConfig.description, active = 'home' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const resources = await getResources();
 const notes = await getNotes();
@@ -11,7 +13,7 @@ const searchItems = [
   {title:'主题导航', description:'按七个主要主题浏览 Agent 基础设施项目、平台与参考资料。', category:'站点导航', url:`${sitePath()}#topics`, keywords:'主题 导航 项目 topics'},
   {title:'关联基础设施', description:'了解 Agent 与推理、模型服务基础设施的连接。', category:'站点导航', url:`${sitePath()}#related-infrastructure`, keywords:'模型 推理 serving 关联'},
   {title:'更新日志', description:'查看最近新增的资源、内容更新与站点改进。', category:'站点导航', url:sitePath('changelog/'), keywords:'更新 最近更新 新增 changelog updates'},
-  ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:resourcePath(r), keywords:`${r.topicTitle} ${r.type} ${r.maintainer ?? ''} ${r.form ?? ''}`})),
+  ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:resourcePath(r), keywords:[r.topicTitle, r.type, r.maintainer, r.form, ...r.aliases, ...r.keywords, r.role && roleLabels[r.role], r.delivery && deliveryLabels[r.delivery]].filter(Boolean).join(' ')})),
   ...notes.map(n => ({title:n.title, description:n.description, category:resourceGuideLabel(n.slug), url:sitePath(`notes/${n.slug}/`), keywords:'资源导览 方案总览 guide'})),
 ];
 ---
@@ -25,10 +27,16 @@ const searchItems = [
     <link rel="icon" type="image/svg+xml" href={sitePath('favicon.svg')} />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={`${title} · Agentic Infra`} />
+    <meta property="og:title" content={`${title} · ${siteConfig.title}`} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <title>{title} · Agentic Infra</title>
+    <meta property="og:image" content={new URL(sitePath('social-card.png'), Astro.site)} />
+    <meta property="og:image:alt" content="Agentic Infra · 发现项目，了解方案" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.title} 更新订阅`} href={sitePath('feed.xml')} />
+    <title>{title} · {siteConfig.title}</title>
     <script is:inline>
       try { const saved = localStorage.getItem('agentic-infra-theme'); document.documentElement.dataset.theme = saved === 'dark' || saved === 'light' ? saved : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = 'light'; }
     </script>
@@ -53,7 +61,7 @@ const searchItems = [
       <nav class="mobile-nav" aria-label="移动端主导航"><a href={sitePath()} aria-current={active === 'home' ? 'page' : undefined}>首页</a><a href={`${sitePath()}#topics`} aria-current={active === 'topics' ? 'page' : undefined}>主题导航</a><a href={sitePath('resources/')} aria-current={active === 'resources' ? 'page' : undefined}>资源库</a><a href={sitePath('changelog/')} aria-current={active === 'changelog' ? 'page' : undefined}>更新日志</a></nav>
     </header>
     <slot />
-    <footer class="site-footer"><div class="footer-inner"><div><a class="footer-brand" href={sitePath()}>Agentic Infra<span> / </span>发现项目，了解方案。</a><p>汇集 Agent 基础设施资源，提供中文项目介绍与官方资料入口。</p></div><div class="footer-links"><a href={sitePath('changelog/')}>更新日志</a><a href={sitePath('contributing/')}>参与贡献</a><a href={`${repoUrl}/blob/main/LICENSE`}>CC BY 4.0</a><a href={repoUrl}>GitHub ↗</a></div></div></footer>
+    <footer class="site-footer"><div class="footer-inner"><div><a class="footer-brand" href={sitePath()}>Agentic Infra<span> / </span>发现项目，了解方案。</a><p>汇集 Agent 基础设施资源，提供中文项目介绍与官方资料入口。</p></div><div class="footer-links"><a href={sitePath('changelog/')}>更新日志</a><a href={sitePath('feed.xml')}>RSS 订阅</a><a href={sitePath('contributing/')}>参与贡献</a><a href={`${repoUrl}/blob/main/LICENSE`}>CC BY 4.0</a><a href={repoUrl}>GitHub ↗</a></div></div></footer>
     <dialog id="search-dialog" aria-labelledby="search-title">
       <div class="search-dialog-head"><Icon name="search" size={21}/><label id="search-title" class="sr-only" for="global-search">搜索资源与导览</label><input id="global-search" type="search" placeholder="搜索项目、主题或方案…" autocomplete="off"/><button class="icon-button" type="button" data-search-close aria-label="关闭搜索"><Icon name="close" size={19}/></button></div>
       <div class="search-dialog-meta"><span id="search-status" role="status">输入关键词，探索整个知识库</span><kbd>ESC 关闭</kbd></div>

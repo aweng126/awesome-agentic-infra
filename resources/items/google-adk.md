@@ -3,6 +3,10 @@ name: Google Agent Development Kit (ADK)
 summary: 用于组织 Agent、工具和多 Agent 工作流的开发工具包，支持图工作流、顺序与并行组合，以及会话事件管理和执行恢复。
 type: project
 topic: runtime-and-orchestration
+aliases: ["ADK", "Google ADK", "Agent Development Kit"]
+keywords: ["多 Agent", "开发工具包", "图工作流", "会话", "Runner", "事件"]
+role: agent-framework
+delivery: library
 url: https://adk.dev/
 anchor: resource-google-adk
 order: 4

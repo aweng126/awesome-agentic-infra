@@ -3,6 +3,10 @@ name: OpenLLMetry
 summary: 基于 OpenTelemetry 的 LLM 应用插桩工具与 SDK，覆盖模型服务和向量数据库等调用，可将 Agent 依赖组件的遥测接入已有观测系统。
 type: project
 topic: observability-and-evaluation
+aliases: ["OpenLLMetry", "Traceloop SDK"]
+keywords: ["OpenTelemetry", "OTel", "插桩", "遥测", "Span", "Collector"]
+role: telemetry-instrumentation
+delivery: library
 url: https://github.com/traceloop/openllmetry
 anchor: resource-openllmetry
 order: 2

@@ -3,6 +3,10 @@ name: Agent Sandbox
 summary: 通过 Kubernetes 自定义资源与控制器管理有状态的单实例执行环境，为 Agent 和代码执行工作负载提供稳定身份、持久存储、生命周期管理与预热池。底层隔离由 RuntimeClass 对接的沙箱运行时提供。
 type: project
 topic: deployment-and-scheduling
+aliases: ["Kubernetes Agent Sandbox"]
+keywords: ["沙盒", "沙箱", "Kubernetes", "CRD", "预热池", "执行环境", "生命周期"]
+role: workload-orchestration
+delivery: self-hosted
 url: https://github.com/kubernetes-sigs/agent-sandbox
 anchor: resource-agent-sandbox
 order: 1
@@ -28,7 +32,7 @@ Agent Sandbox 面向需要稳定身份、持久文件和独立生命周期的单
 
 - **有状态环境管理**：为单个沙箱提供稳定身份、可配置的持久存储及创建、暂停、恢复、定期清理等生命周期操作。[文档概览](https://agent-sandbox.sigs.k8s.io/docs/)
 - **模板与预热池**：通过可复用模板定义环境，预先准备可分配的沙箱，再根据用户申请分配实例。[扩展资源](https://github.com/kubernetes-sigs/agent-sandbox#extensions)
-- **运行时接入**：通过 Pod 的 RuntimeClass 等配置对接 gVisor、Kata Containers 等隔离运行时；底层隔离能力由所选运行时提供。[职责范围](https://github.com/kubernetes-sigs/agent-sandbox#agent-sandbox)
+- **运行时接入**：通过 Pod 的 RuntimeClass 等配置对接 [gVisor](gvisor.md)、Kata Containers 等隔离运行时；底层隔离能力由所选运行时提供。[职责范围](https://github.com/kubernetes-sigs/agent-sandbox#agent-sandbox)
 
 ## 核心概念与工作方式
 

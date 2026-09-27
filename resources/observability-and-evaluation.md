@@ -17,7 +17,7 @@
 
 ## Specifications
 
-- <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定，统一表达模型、Agent 和工具调用的观测数据。具体字段的稳定性状态见对应规范。
+- <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定，统一表达模型、Agent 和工具调用的观测数据。具体字段的稳定性状态见对应规范。 [规范导读](items/opentelemetry-genai-semantic-conventions.md)
 
 <!-- resources:end -->
 

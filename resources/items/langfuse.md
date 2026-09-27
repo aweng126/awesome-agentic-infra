@@ -3,6 +3,10 @@ name: Langfuse
 summary: LLM 应用观测与评估平台，提供执行追踪、数据集和提示词管理，可将模型调用、检索和 Agent 操作关联到同一次执行。
 type: project
 topic: observability-and-evaluation
+aliases: []
+keywords: ["可观测性", "Trace", "评估", "提示词管理", "数据集", "OpenTelemetry"]
+role: observability-platform
+delivery: hybrid
 url: https://github.com/langfuse/langfuse
 anchor: resource-langfuse
 order: 1

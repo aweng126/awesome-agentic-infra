@@ -3,6 +3,10 @@ name: Google AX
 summary: Google 开源、可自托管的声明式 Agent 工作负载编排平台，通过 Task、Workspace 和 Model 管理任务、工作环境与模型配置，基于 Kubernetes 上的 Agent Substrate 执行。当前核心规范仍在演进，详见 [概念文档](https://github.com/google/ax/blob/main/docs/concepts.md)。
 type: project
 topic: deployment-and-scheduling
+aliases: ["AX", "Agent Executor"]
+keywords: ["Google", "声明式编排", "Kubernetes", "Task", "Workspace", "Agent Substrate", "任务生命周期"]
+role: workload-orchestration
+delivery: self-hosted
 url: https://github.com/google/ax
 anchor: resource-google-ax
 order: 5

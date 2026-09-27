@@ -1,7 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { parseHTML } from 'linkedom';
+import { DOMParser, parseHTML } from 'linkedom';
+import { inflateSync } from 'node:zlib';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -9,7 +10,11 @@ import { parse as parseYaml } from 'yaml';
 import { visit } from 'unist-util-visit';
 
 const root = path.resolve('dist');
-const base = '/awesome-agentic-infra/';
+const siteConfig = JSON.parse(await readFile(new URL('../site.config.json', import.meta.url), 'utf8'));
+const { base, origin } = siteConfig;
+assert.ok(typeof base === 'string' && base.startsWith('/') && base.endsWith('/'), 'Configured base must begin and end with a slash');
+assert.equal(new URL(origin).origin, origin, 'Configured origin must not include a path');
+const absolute = (sitePath) => new URL(sitePath, origin).href;
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   return (await Promise.all(entries.map(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]))).flat();
@@ -20,6 +25,23 @@ let checkedLinks = 0;
 const documents = new Map();
 for (const page of pages) documents.set(page,parseHTML(await readFile(page,'utf8')).document);
 const problems=[];
+async function verifyLocalUrl(raw, label) {
+  const url = new URL(raw, origin);
+  assert.equal(url.origin, origin, `${label}: local URL uses the configured origin`);
+  assert.ok(url.pathname.startsWith(base), `${label}: local URL stays under the configured base`);
+  let target = path.join(root, decodeURIComponent(url.pathname.slice(base.length)));
+  try {
+    if ((await stat(target)).isDirectory()) target = path.join(target, 'index.html');
+    await stat(target);
+  } catch {
+    assert.fail(`${label}: missing local target: ${raw}`);
+  }
+  if (url.hash && target.endsWith('.html')) {
+    assert.ok(documents.get(target)?.getElementById(decodeURIComponent(url.hash.slice(1))), `${label}: missing local anchor: ${raw}`);
+  }
+  checkedLinks++;
+  return target;
+}
 for(const [file,document] of documents){
   const relative=path.relative(root,file);
   if(document.querySelectorAll('h1').length!==1)problems.push(`${relative}: expected one H1`);
@@ -44,10 +66,19 @@ for(const [file,document] of documents){
     }
   }
   const pagePath=base+relative.replace(/index\.html$/,'');
+  const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href');
+  assert.ok(canonical, `${relative}: canonical URL is present`);
+  if (relative !== '404.html') assert.equal(canonical, absolute(pagePath), `${relative}: canonical uses the configured page URL`);
+  assert.equal(document.querySelector('meta[property="og:url"]')?.getAttribute('content'), canonical, `${relative}: Open Graph URL matches the canonical`);
+  assert.equal(document.querySelector('meta[property="og:image"]')?.getAttribute('content'), absolute(`${base}social-card.png`), `${relative}: Open Graph uses the shared absolute PNG URL`);
+  assert.equal(document.querySelector('meta[property="og:image:width"]')?.getAttribute('content'), '1200', `${relative}: sharing image width is declared`);
+  assert.equal(document.querySelector('meta[property="og:image:height"]')?.getAttribute('content'), '630', `${relative}: sharing image height is declared`);
+  assert.equal(document.querySelector('meta[name="twitter:card"]')?.getAttribute('content'), 'summary_large_image', `${relative}: sharing card uses the large image`);
+  assert.equal(document.querySelector('link[rel="alternate"][type="application/rss+xml"]')?.getAttribute('href'), `${base}feed.xml`, `${relative}: RSS autodiscovery uses the project base`);
   for(const element of document.querySelectorAll('a[href],link[href],script[src],img[src]')){
     const raw=element.getAttribute('href')||element.getAttribute('src');
     if(!raw||/^(https?:|mailto:|data:)/.test(raw))continue;
-    const url=new URL(raw,`https://aweng126.github.io${pagePath}`);
+    const url=new URL(raw,absolute(pagePath));
     if(!url.pathname.startsWith(base)){problems.push(`${relative}: URL outside project base: ${raw}`);continue;}
     let target=path.join(root,decodeURIComponent(url.pathname.slice(base.length)));
     try {if((await stat(target)).isDirectory())target=path.join(target,'index.html');await stat(target);}
@@ -71,7 +102,8 @@ const catalog = await Promise.all((await readdir('../resources/items')).filter((
   const markdown = await readFile(`../resources/items/${file}`, 'utf8');
   const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)([\s\S]*)$/u.exec(markdown);
   assert.ok(match, `${file}: resource metadata must have frontmatter`);
-  return { ...parseYaml(match[1]), slug: file.slice(0, -3), hasProfile: Boolean(match[2].trim()) };
+  const bodyHeadings = parser.parse(match[2]).children.filter((node) => node.type === 'heading' && node.depth === 2).map(textContent);
+  return { ...parseYaml(match[1]), slug: file.slice(0, -3), hasProfile: Boolean(match[2].trim()), bodyHeadings };
 }));
 const profiles = catalog.filter((resource) => resource.hasProfile);
 const detailPages = pages.filter((file) => path.relative(root, file).startsWith(`resources${path.sep}`) && file !== path.join(root, 'resources/index.html'));
@@ -91,6 +123,8 @@ assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))
 const primaryTopicStat = [...home.querySelectorAll('.stats-strip > div')]
   .find((stat) => [...stat.querySelectorAll('span')].some((label) => label.textContent.trim() === '主要主题'));
 assert.equal(primaryTopicStat?.querySelector('strong')?.textContent.trim(), '07', 'Homepage reports 07 primary topics');
+assert.equal(home.querySelector('.stats-strip > div:nth-child(2) strong')?.textContent.trim(), String(catalog.length), 'Homepage resource count comes from the catalog');
+assert.equal(home.querySelector('.profile-stat-link strong')?.textContent.trim(), String(profiles.filter(resource => resource.type === 'project').length), 'Homepage project count excludes other resource guides');
 assert.ok(!home.querySelector('.reading-section'), 'Homepage omits the previous research reading column');
 assert.ok(!home.querySelector('.stats-strip').textContent.includes('研究笔记'), 'Homepage statistics describe resources');
 assert.ok(home.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Homepage retains a Serving entry under related infrastructure');
@@ -199,9 +233,9 @@ for (const resource of catalog) {
   const page = documents.get(path.join(root, 'resources', resource.slug, 'index.html'));
   assert.ok(page?.querySelector('main.resource-profile'), `${resource.slug}: detail page uses the resource layout`);
   assert.equal(page.querySelector('h1').textContent.trim(), resource.name, `${resource.slug}: detail title uses catalog data`);
-  for (const heading of ['背景与目标', '核心能力', '核心概念与工作方式', '使用场景与接入方式']) {
-    assert.ok([...page.querySelectorAll('.profile-body h2')].some((node) => node.textContent.trim() === heading), `${resource.slug}: detail includes ${heading}`);
-  }
+  assert.ok(resource.bodyHeadings.length > 0, `${resource.slug}: introduction declares substantive sections`);
+  assert.deepEqual([...page.querySelectorAll('.profile-body h2')].map((node) => node.textContent.trim()), resource.bodyHeadings,
+    `${resource.slug}: detail preserves its own ${resource.type} sections in source order`);
   for (const link of resource.links ?? []) {
     assert.ok([...page.querySelectorAll('.official-links a')].some((node) => node.getAttribute('href') === link.url), `${resource.slug}: official links expose ${link.label}`);
   }
@@ -216,10 +250,10 @@ assert.equal(explorer.querySelector('.topic-filters button[data-topic="all"] [da
 
 const changelog = documents.get(path.join(root, 'changelog', 'index.html'));
 assert.ok(changelog, 'Changelog page must be generated');
-const changelogSource = parser.parse(await readFile('../CHANGELOG.md', 'utf8'));
-const dates = changelogSource.children
-  .filter((node) => node.type === 'heading' && node.depth === 2)
-  .map(textContent);
+const changelogMarkdown = await readFile('../CHANGELOG.md', 'utf8');
+const changelogSource = parser.parse(changelogMarkdown);
+const dateHeadings = changelogSource.children.filter((node) => node.type === 'heading' && node.depth === 2);
+const dates = dateHeadings.map(textContent);
 assert.ok(dates.length > 0, 'Changelog must include a dated update');
 assert.ok(dates.every((date) => /^\d{4}-\d{2}-\d{2}$/u.test(date)), 'Changelog H2 headings must be release dates');
 assert.equal(new Set(dates).size, dates.length, 'Changelog dates must be unique');
@@ -230,14 +264,132 @@ for (const [index, entry] of entries.entries()) {
   assert.equal(entry.querySelector('time')?.getAttribute('datetime'), expectedDates[index], `Changelog ${expectedDates[index]} must expose its date semantically`);
   assert.ok(entry.contains(changelog.getElementById(expectedDates[index])), 'Markdown date links must locate the same published update');
 }
-const expectedChanges = entries.flatMap((entry) => [...entry.querySelectorAll('.changelog-body > ul > li, .changelog-body > ol > li')]
-  .map((item) => ({ date: entry.querySelector('time').getAttribute('datetime'), text: item.textContent.replace(/\s+/gu, ' ').trim(), links: [...item.querySelectorAll('a[href]')].map((link) => link.getAttribute('href')) }))).slice(0, 3);
+const normalizeText = (text) => text.replace(/\s+/gu, ' ').trim();
+const linkHrefs = (node) => [...node.querySelectorAll('a[href]')].map((link) => link.getAttribute('href'));
+const expectedSourceBatches = new Map(dateHeadings.map((heading, index) => {
+  const date = textContent(heading);
+  const body = changelogMarkdown.slice(heading.position.end.offset, dateHeadings[index + 1]?.position.start.offset ?? changelogMarkdown.length);
+  const batches = [];
+  let inTimedBatch = false;
+  let hasEarlierUpdates = false;
+  for (const node of parser.parse(body).children) {
+    if (node.type === 'heading' && node.depth === 3) {
+      const match = /^(\d{2}:\d{2})\s*·\s*(.+)$/u.exec(textContent(node));
+      inTimedBatch = Boolean(match);
+      if (match) batches.push({ id: `update-${date}-${match[1].replace(':', '')}`, date, time: match[1], title: match[2] });
+    }
+    if (node.type === 'list' && !inTimedBatch) hasEarlierUpdates = true;
+  }
+  batches.sort((a, b) => b.time.localeCompare(a.time));
+  if (hasEarlierUpdates) batches.push({ id: `update-${date}-earlier`, date, time: undefined, title: batches.length ? '当日较早更新' : '资源与站点更新' });
+  return [date, batches];
+}));
+const batches = entries.flatMap((entry) => {
+  const date = entry.querySelector('.changelog-date time').getAttribute('datetime');
+  const published = [...entry.querySelectorAll('.changelog-batch')].map((batch) => {
+    const heading = batch.querySelector('h3');
+    assert.ok(batch.id && heading, `${date}: every batch has a stable ID and heading`);
+    const headingCopy = heading.cloneNode(true);
+    const timeElement = headingCopy.querySelector('time');
+    const time = timeElement?.textContent.replace(/\s*·\s*$/u, '').trim();
+    timeElement?.remove();
+    if (time) assert.equal(heading.querySelector('time').getAttribute('datetime'), `${date}T${time}:00+08:00`, `${batch.id}: batch time uses Beijing time`);
+    assert.equal(heading.querySelector('a')?.getAttribute('href'), `#${batch.id}`, `${batch.id}: batch heading links to its stable anchor`);
+    const details = batch.querySelector('.batch-details');
+    assert.ok(details?.querySelector('li'), `${batch.id}: batch details retain the individual changes`);
+    const summary = time
+      ? [...details.children].find((node) => node.localName === 'p')
+      : details.querySelector('ul > li, ol > li');
+    assert.ok(summary && normalizeText(summary.textContent), `${batch.id}: visible batch details contain the summary`);
+    return { id: batch.id, date, time, title: normalizeText(headingCopy.textContent),
+      text: normalizeText(summary.textContent), links: linkHrefs(summary), details };
+  });
+  assert.deepEqual(published.map(({ id, date, time, title }) => ({ id, date, time, title })), expectedSourceBatches.get(date), `${date}: published batches preserve source titles, times and descending order`);
+  return published;
+});
+assert.ok(batches.length > 0, 'Changelog exposes at least one release batch');
+const expectedChanges = batches.slice(0, 3).map(batch => ({ date: batch.date, title: batch.title,
+  href: `${base}changelog/#${batch.id}`, text: batch.text, links: batch.links }));
 const recentChanges = [...home.querySelectorAll('.recent-update')].map((item) => ({
   date: item.querySelector('time').getAttribute('datetime'),
-  text: item.querySelector('.recent-update-body').textContent.replace(/\s+/gu, ' ').trim(),
-  links: [...item.querySelectorAll('.recent-update-body a[href]')].map((link) => link.getAttribute('href')),
+  title: normalizeText(item.querySelector('.recent-update-title').textContent),
+  href: item.querySelector('.recent-update-title').getAttribute('href'),
+  text: normalizeText(item.querySelector('.recent-update-summary').textContent),
+  links: linkHrefs(item.querySelector('.recent-update-summary')),
 }));
-assert.deepEqual(recentChanges, expectedChanges, 'Homepage recent updates preserve the latest three changelog entries, dates, and links');
+assert.deepEqual(recentChanges, expectedChanges, 'Homepage recent updates preserve the latest three release batches, summaries and links');
+
+const feedSource = await readFile(path.join(root, 'feed.xml'), 'utf8');
+assert.match(feedSource, /^<\?xml version="1\.0" encoding="UTF-8"\?>/u, 'RSS declares its encoding');
+const feed = new DOMParser().parseFromString(feedSource, 'application/xml');
+assert.equal(feed.documentElement.localName, 'rss', 'RSS root is present');
+assert.equal(feed.documentElement.getAttribute('version'), '2.0', 'Feed uses RSS 2.0');
+assert.equal(feed.querySelector('channel > link')?.textContent, absolute(base), 'RSS channel links to the configured homepage');
+assert.equal(feed.getElementsByTagName('atom:link')[0]?.getAttribute('href'), absolute(`${base}feed.xml`), 'RSS self-link uses the configured feed URL');
+const feedItems = [...feed.querySelectorAll('channel > item')];
+assert.equal(feedItems.length, batches.length, 'RSS includes each release batch once');
+const feedGuids = new Set();
+for (const [index, item] of feedItems.entries()) {
+  const batch = batches[index];
+  const permalink = absolute(`${base}changelog/#${batch.id}`);
+  assert.equal(item.querySelector('title')?.textContent, `${batch.date} · ${batch.title}`, `${batch.id}: RSS preserves the batch title`);
+  assert.equal(item.querySelector('link')?.textContent, permalink, `${batch.id}: RSS links directly to the batch`);
+  const guid = item.querySelector('guid');
+  assert.equal(guid?.textContent, permalink, `${batch.id}: RSS GUID is the stable permalink`);
+  assert.equal(guid?.getAttribute('isPermaLink'), 'true', `${batch.id}: RSS GUID is explicitly a permalink`);
+  assert.ok(!feedGuids.has(guid.textContent), `${batch.id}: RSS GUID is unique`);
+  feedGuids.add(guid.textContent);
+  if (batch.time) {
+    assert.equal(item.querySelector('pubDate')?.textContent, new Date(`${batch.date}T${batch.time}:00+08:00`).toUTCString(), `${batch.id}: RSS publication time preserves the recorded batch time and timezone`);
+  } else {
+    assert.equal(item.querySelector('pubDate'), null, `${batch.id}: legacy RSS entries do not invent a precise publication time`);
+  }
+  await verifyLocalUrl(permalink, `${batch.id}: RSS permalink`);
+  const description = item.querySelector('description')?.textContent;
+  assert.ok(description, `${batch.id}: RSS contains readable details`);
+  const body = parseHTML(`<main>${description}</main>`).document.querySelector('main');
+  assert.equal(normalizeText(body.textContent), normalizeText(batch.details.textContent), `${batch.id}: RSS description preserves the complete batch details`);
+  for (const element of body.querySelectorAll('a[href],img[src]')) {
+    const raw = element.getAttribute('href') ?? element.getAttribute('src');
+    const url = new URL(raw);
+    assert.ok(['https:', 'http:'].includes(url.protocol), `${batch.id}: feed links are absolute HTTP(S) URLs`);
+    if (url.origin === origin && url.pathname.startsWith(base)) await verifyLocalUrl(raw, `${batch.id}: RSS content`);
+  }
+}
+
+const sitemapSource = await readFile(path.join(root, 'sitemap.xml'), 'utf8');
+assert.match(sitemapSource, /^<\?xml version="1\.0" encoding="UTF-8"\?>/u, 'Sitemap declares its encoding');
+const sitemap = new DOMParser().parseFromString(sitemapSource, 'application/xml');
+assert.equal(sitemap.documentElement.localName, 'urlset', 'Sitemap root is present');
+assert.equal(sitemap.documentElement.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9', 'Sitemap declares the standard namespace');
+const sitemapUrls = [...sitemap.querySelectorAll('url > loc')].map(node => node.textContent);
+assert.equal(new Set(sitemapUrls).size, sitemapUrls.length, 'Sitemap URLs are unique');
+const expectedSitemapUrls = pages.filter(file => path.relative(root, file) !== '404.html')
+  .map(file => absolute(base + path.relative(root, file).replace(/index\.html$/u, ''))).sort();
+assert.deepEqual([...sitemapUrls].sort(), expectedSitemapUrls, 'Sitemap lists every published page except the error page');
+for (const url of sitemapUrls) {
+  const parsed = new URL(url);
+  assert.ok(!parsed.search && !parsed.hash, 'Sitemap lists canonical pages without filters or anchors');
+  await verifyLocalUrl(url, 'Sitemap');
+}
+
+const socialImage = await readFile(await verifyLocalUrl(absolute(`${base}social-card.png`), 'Open Graph image'));
+assert.deepEqual(socialImage.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), 'Sharing image has a PNG signature');
+assert.equal(socialImage.toString('ascii', 12, 16), 'IHDR', 'Sharing image has a PNG header');
+assert.equal(socialImage.readUInt32BE(16), 1200, 'Sharing image is 1200 pixels wide');
+assert.equal(socialImage.readUInt32BE(20), 630, 'Sharing image is 630 pixels high');
+const compressedImage = [];
+let imageEnd = false;
+for (let offset = 8; offset < socialImage.length;) {
+  const size = socialImage.readUInt32BE(offset);
+  const kind = socialImage.toString('ascii', offset + 4, offset + 8);
+  assert.ok(offset + size + 12 <= socialImage.length, 'PNG chunks are complete');
+  if (kind === 'IDAT') compressedImage.push(socialImage.subarray(offset + 8, offset + 8 + size));
+  offset += size + 12;
+  if (kind === 'IEND') { imageEnd = true; assert.equal(offset, socialImage.length, 'PNG terminates after IEND'); }
+}
+assert.ok(imageEnd && compressedImage.length, 'PNG contains image data and its terminating chunk');
+assert.ok(inflateSync(Buffer.concat(compressedImage)).length > 0, 'PNG image data can be decompressed');
 const guideIndex = documents.get(path.join(root, 'notes/index.html'));
 assert.ok(guideIndex?.querySelector('h1')?.textContent.includes('资源导览'), 'The existing notes address is a secondary resource-guide index');
 for (const [file, document] of documents) {
@@ -247,4 +399,4 @@ for (const [file, document] of documents) {
   }
 }
 assert.deepEqual(problems,[],'Generated site link/semantic checks');
-console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, ${profiles.length} resource introductions, and ${dates.length} changelog date groups.`);
+console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, ${profiles.length} resource introductions, ${batches.length} release batches, RSS, sitemap, and the sharing PNG.`);

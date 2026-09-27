@@ -43,24 +43,24 @@ npm run preview
 | 内容与站点更新记录 | 根目录 `CHANGELOG.md` |
 | 收录规则与贡献方式 | 根目录 `CONTRIBUTING.md` |
 | 首页、布局与交互 | 本目录 `src/` |
-| 站点域名与路径前缀 | 本目录 `astro.config.mjs` |
+| 站点域名、路径前缀与仓库地址 | 本目录 `site.config.json` |
 
-部署到其他仓库或路径时，同时更新 `src/lib/content.ts` 中的 `basePath` 与 `repoUrl`，以及构建检查脚本 `scripts/verify-build.mjs` 中的 `base`。它们共同保证 Markdown 链接、资源路径与 GitHub 编辑入口一致。
+部署到其他仓库或路径时，编辑 `site.config.json` 中的 `origin`、`base` 与 `repository`。Astro、Markdown 链接转换和构建检查共用这份配置；`title` 与 `description` 用于站点介绍。
 
 Markdown 内继续使用仓库相对链接，站点构建负责转换对应的网页链接。资源条目格式与收录规则见 [贡献指南](../CONTRIBUTING.md)。
 
 ### 主题资源、资源库与导览
 
-- `/topics/<slug>/` 组合主题文件的范围说明、资源目录生成的清单及 `## 方案总览` 中的关联链接，保留原有资源定位锚点。
-- `/resources/` 读取 `resources/items/*.md` 的名称、简介、类型和分类，提供搜索与筛选。有完整介绍的项目名称进入站内详情，来源链接保留直达官方资料的入口。
-- `/resources/<slug>/` 展示同一资源文件中的完整正文、项目资料和官方链接；没有正文的条目不生成详情页。
+- `/topics/<slug>/` 组合主题文件的范围说明、资源目录生成的清单及 `## 方案总览` 中的关联链接。项目清单按主要职责组织，保留原有资源定位锚点。
+- `/resources/` 读取 `resources/items/*.md` 的名称、简介、别名、关键词和分类，提供搜索与筛选。有完整介绍的资源名称进入站内详情，来源链接保留直达官方资料的入口。
+- `/resources/<slug>/` 展示同一资源文件中的完整正文、资料和官方链接；项目、规范等使用相应的介绍模板，没有正文的条目不生成详情页。
 - `/notes/<slug>/` 展示领域导览或方案总览全文，正文来自根目录的 `notes/<slug>.md`。
 
-主导航为首页、主题导航、资源库和更新日志。`/notes/` 保留为辅助的资源导览索引，现有文档地址不变。资源详情页、资源库和全站搜索共用同一份资源数据，主题页不复制完整介绍或导览正文。现有 `/topics/<slug>/#resource-*` 定位链接继续有效，供日志、导览引用和全站搜索使用；主题页的“在资源库筛选本主题”链接使用 `/resources/?topic=<slug>`。
+主导航为首页、主题导航、资源库和更新日志。`/notes/` 保留为辅助的资源导览索引，现有文档地址不变。资源详情页、资源库和全站搜索共用同一份资源数据，主题页不复制完整介绍或导览正文。现有 `/topics/<slug>/#resource-*` 定位链接继续有效，供日志、导览引用和全站搜索使用。
 
 ### 维护资源目录
 
-资源文件使用 YAML frontmatter，名称、摘要、类型、主题、主来源、固定锚点和顺序是必填元数据。项目详情可选填维护方、方案形态、许可证、附来源与核验日期的状态，以及多种官方入口；格式与正文要求见 [贡献指南](../CONTRIBUTING.md#entry-format)。
+资源文件使用 YAML frontmatter，名称、摘要、类型、主题、主来源、固定锚点和顺序是必填元数据。`aliases` 与 `keywords` 补充检索词，`role` 与 `delivery` 分别描述主要职责和交付方式，取值集中在 `src/lib/resource-taxonomy.ts`。`form` 保留面向读者的形态说明，不代替受控分类。资源详情可补充维护方、许可证、附来源与核验日期的状态，以及多种官方入口；格式与分类型正文要求见 [贡献指南](../CONTRIBUTING.md#entry-format)。
 
 从 `site/` 目录运行：
 
@@ -73,11 +73,34 @@ npm run resources:check
 
 主题的手写范围说明与方案总览保留在生成区域之外。正文链接可使用相对路径，例如从其他资源介绍引用 `langgraph.md`；站点将其转换为详情地址，尚未提供正文的资源链接指向原主题条目。
 
+### 外部链接与事实复核
+
+[资源巡检工作流](../.github/workflows/resource-audit.yml) 每周一 02:20 UTC 运行，也可在 Actions 中手动启动。它独立于站点发布，仅生成任务摘要与报告附件，不自动修改资源、创建 Issue 或发送消息。
+
+从 `site/` 目录运行：
+
+```sh
+# 只核对资料日期、提取链接，不访问外部网站
+npm run resources:audit -- --offline
+
+# 抽查前三条去重后的链接
+npm run resources:audit -- --limit 3
+
+# 完整巡检，结果写入指定位置
+npm run resources:audit -- --out-dir /tmp/agentic-infra-audit
+```
+
+默认报告为 `reports/resource-audit/report.md` 和 `report.json`。脚本从资源 frontmatter、简介和正文收集 HTTP(S) 链接，去除片段后按 URL 去重，保留引用位置；跟随并记录重定向，限制并发、超时和重试，拒绝本地或私有目标。`--concurrency` 可设为 1–8，`--timeout-ms` 为 1000–30000；完整巡检采用 15 分钟时间预算，未请求的链接明确标记为未巡检。
+
+404、410 归为疑似失效；403、429、DNS 错误、超时和其他异常进入待复核，不自动当作死链。先检查是否存在官方新入口或访问限制，再修改内容。配置错误会使命令失败；在线巡检若没有任何选中链接被确认可达，也会在保存报告后以退出码 2 结束。访问结果、跳转链和事实待办全部保留在报告中，不能将部分抽样或离线报告解读为全部链接通过。
+
+`reviewedAt` 是人工核对整条介绍的日期，`status.checked` 只标记对应状态声明的核验日期。默认超过 90 天进入复核清单，可用 `--max-age-days` 调整周期。缺少 `reviewedAt` 的既有内容列为待建档，只有实际核验后才填写；巡检不会把链接可达当作事实更新，也不会回填日期。
+
 ### 维护更新日志
 
-导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容；首页自动展示其中最近三个顶层列表条目，按日期倒序、同日按文件顺序排列，无需重复维护。
+导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容；首页和订阅源按发布批次展示摘要，不再从类别列表中截取前三条。
 
-每批发布内容时，同时更新日志：以 `## YYYY-MM-DD` 记录本站实际发布日，日期倒序、同一天一组；在日期下按需要使用 `### 新增内容`、`### 内容更新` 和 `### 站点改进`，用列表说明具体变化并提供直达链接。省略空类别，资源移除时说明原因并提供仍可访问的相关说明。
+每批发布内容时，同时更新日志：以 `## YYYY-MM-DD` 记录本站实际发布日，日期倒序、同一天一组；每批使用 `### HH:mm · 批次标题`，紧接一段包含直达链接的简短摘要，再按需要用 `#### 新增内容`、`#### 内容更新` 和 `#### 站点改进` 展开列表。同日批次时间倒序，使用北京时间；旧的无时间分类保留为当日早期记录，不追填推测的发布时间。省略空类别，资源移除时说明原因并提供仍可访问的相关说明。
 
 资源条目通过主题 Markdown 中的固定锚点定位，格式为 `- <a id="resource-langgraph"></a> [LangGraph](https://...) — 简介`，锚点与名称链接放在同一列表项中。标识以 `resource-` 开头，仅使用小写 ASCII 字母、数字与连字符，在本主题内唯一，更名时保留。根目录日志可写 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)`；从本说明链接同一条目则使用 [LangGraph](../resources/runtime-and-orchestration.md#resource-langgraph)。导览更新可直接链接到对应章节。构建验证会检查生成页面中的内部链接与锚点。
 

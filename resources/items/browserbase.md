@@ -3,6 +3,10 @@ name: Browserbase
 summary: 承载 Agent 网页交互任务的云浏览器平台，可通过 API 创建、控制和观察浏览器会话，并接入 Playwright、Puppeteer 和 Selenium。
 type: project
 topic: sandbox-and-execution
+aliases: []
+keywords: ["云浏览器", "浏览器自动化", "Playwright", "Puppeteer", "Selenium", "会话回放"]
+role: browser-service
+delivery: managed
 url: https://docs.browserbase.com/welcome/introduction
 anchor: resource-browserbase
 order: 1

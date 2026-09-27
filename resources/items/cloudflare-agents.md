@@ -3,6 +3,10 @@ name: Cloudflare Agents
 summary: 基于 Durable Objects 的有状态 Agent SDK，在 Cloudflare 托管环境中提供持久身份、SQLite 状态、事件驱动执行和定时任务，可与 Workflows 组合使用。
 type: project
 topic: runtime-and-orchestration
+aliases: ["Cloudflare Agents SDK"]
+keywords: ["Durable Objects", "Workers", "SQLite", "持久状态", "WebSocket", "定时任务"]
+role: agent-framework
+delivery: managed
 url: https://developers.cloudflare.com/agents/runtime/agents-api/
 anchor: resource-cloudflare-agents
 order: 3

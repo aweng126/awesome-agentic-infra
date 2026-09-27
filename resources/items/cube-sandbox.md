@@ -3,6 +3,10 @@ name: Cube Sandbox
 summary: 腾讯云开源的 Agent 沙箱服务，基于 RustVMM 与 KVM 提供 MicroVM 执行环境，支持自部署、E2B 兼容接口，以及环境模板、暂停恢复、快照克隆与回滚。
 type: project
 topic: sandbox-and-execution
+aliases: ["CubeSandbox", "腾讯 Cube Sandbox"]
+keywords: ["沙盒", "沙箱", "MicroVM", "KVM", "RustVMM", "E2B 兼容", "快照", "回滚", "克隆"]
+role: sandbox-service
+delivery: self-hosted
 url: https://github.com/TencentCloud/CubeSandbox
 anchor: resource-cube-sandbox
 order: 6

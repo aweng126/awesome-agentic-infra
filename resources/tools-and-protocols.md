@@ -11,8 +11,8 @@
 
 ## Specifications
 
-- <a id="resource-mcp"></a> [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/latest) — 连接 AI 应用与上下文、工具服务的通信协议，以 JSON-RPC 消息定义 tools、resources 和 prompts 等接口，支持宿主通过客户端接入不同服务。
-- <a id="resource-a2a"></a> [Agent2Agent Protocol (A2A)](https://a2a-protocol.org/latest/specification/) — 面向独立 Agent 系统的通信与协作协议，定义 Agent Card、任务生命周期和产物表示，支持能力发现、消息交换及流式和异步更新。
+- <a id="resource-mcp"></a> [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/latest) — 连接 AI 应用与上下文、工具服务的通信协议，以 JSON-RPC 消息定义 tools、resources 和 prompts 等接口，支持宿主通过客户端接入不同服务。 [规范导读](items/mcp.md)
+- <a id="resource-a2a"></a> [Agent2Agent Protocol (A2A)](https://a2a-protocol.org/latest/specification/) — 面向独立 Agent 系统的通信与协作协议，定义 Agent Card、任务生命周期和产物表示，支持能力发现、消息交换及流式和异步更新。 [规范导读](items/a2a.md)
 
 <!-- resources:end -->
 

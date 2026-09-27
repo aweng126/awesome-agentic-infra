@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f8f2"/>
+  <rect x="30" y="30" width="1140" height="570" rx="28" fill="#fffefa" stroke="#dce4d6" stroke-width="2"/>
+  <rect x="78" y="78" width="54" height="54" rx="16" fill="#215e4a"/>
+  <g stroke="#f7f8f2" fill="none" stroke-width="2"><path d="m91 99 14-7 14 7-14 7Z"/><path d="m91 106 14 7 14-7m-28 7 14 7 14-7"/></g>
+  <g font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="150" y="116" fill="#273029" font-weight="700" font-size="30">Agentic Infra</text>
+    <text x="80" y="266" fill="#202b24" font-weight="700" font-size="70">理解 Agent 背后的</text>
+    <text x="80" y="356" fill="#215e4a" font-weight="700" font-size="76">基础设施。</text>
+    <text x="82" y="434" fill="#657365" font-size="27">发现项目，了解方案。</text>
+    <text x="82" y="538" fill="#657365" font-size="18">开源项目 · 云平台 · 论文与规范 · 中文导读</text>
+  </g>
+  <g fill="#e6efdc" stroke="#215e4a" stroke-width="2"><rect x="892" y="205" width="190" height="70" rx="12"/><rect x="892" y="319" width="190" height="70" rx="12"/><rect x="892" y="433" width="190" height="70" rx="12"/></g>
+  <path d="M987 275v44m0 70v44" stroke="#8caa99" stroke-width="2"/>
+  <g fill="#215e4a" font-family="monospace" font-size="22" text-anchor="middle"><text x="987" y="249">AGENTIC</text><text x="987" y="363">SERVING</text><text x="987" y="477">TRAINING</text></g>
+</svg>

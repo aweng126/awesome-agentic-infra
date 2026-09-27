@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { stringify } from 'yaml';
-import { assertResourceIndexes, loadResourceCatalog, parseResourceDocument, profileSections, syncTopicMarkdown, validateResourceCatalog } from './resource-catalog';
+import { assertResourceIndexes, loadResourceCatalog, parseResourceDocument, profileSections, profileSectionsByType, syncTopicMarkdown, validateResourceCatalog } from './resource-catalog';
 import { topics } from './topic-metadata';
 
 const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url));
@@ -35,6 +35,19 @@ test('catalog metadata rejects malformed classification, URLs, duplicate identif
   assert.throws(() => validateResourceCatalog([entry, entry]), /Duplicate resource slug/);
   assert.throws(() => validateResourceCatalog([entry, { ...entry, slug: 'second' }]), /Duplicate resource anchor/);
   assert.throws(() => validateResourceCatalog([entry, { ...entry, slug: 'second', anchor: 'resource-second' }]), /Duplicate resource order/);
+});
+
+test('discovery metadata is bounded and resource guides require type-specific sections', () => {
+  const entry = parseResourceDocument(document({ aliases: ['别名', '别名'], keywords: ['检查点'], role: 'agent-framework', delivery: 'library', reviewedAt: '2026-09-27' }), 'example');
+  assert.deepEqual(entry.aliases, ['别名']);
+  for (const data of [{ aliases: 'alias' }, { keywords: ['bad\nterm'] }, { role: '__proto__' }, { delivery: 'unknown' }, { reviewedAt: '2026-02-30' }]) {
+    assert.throws(() => parseResourceDocument(document(data), 'example'));
+  }
+  for (const type of ['spec', 'paper', 'article'] as const) {
+    const body = profileSectionsByType[type].map(heading => `## ${heading}\n\n具体导读内容。`).join('\n\n');
+    assert.equal(parseResourceDocument(document({ type }, body), 'example').hasProfile, true);
+    assert.throws(() => parseResourceDocument(document({ type }, profileSections.map(heading => `## ${heading}\n\n内容。`).join('\n\n')), 'example'), /profile needs/);
+  }
 });
 
 test('only substantive complete introductions become detail pages', () => {

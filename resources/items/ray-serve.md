@@ -3,6 +3,10 @@ name: Ray Serve
 summary: 将 Python 逻辑和模型组合为在线服务，可分别部署 Agent、模型与工具组件，支持服务组合、副本伸缩、资源配置和跨机器调度。
 type: project
 topic: deployment-and-scheduling
+aliases: ["Ray Serve"]
+keywords: ["分布式服务", "Python", "在线服务", "服务组合", "副本伸缩", "GPU 调度"]
+role: service-deployment
+delivery: self-hosted
 url: https://docs.ray.io/en/latest/serve/index.html
 anchor: resource-ray-serve
 order: 9
@@ -41,3 +45,5 @@ Ray Serve 根据服务请求量调整副本，Ray 集群层根据这些副本所
 它适用于把检索、模型推理、后处理和工具接口组织为在线服务，也可以将 Agent 业务逻辑作为入口组件。对于使用专用推理引擎的模型服务，Ray Serve 可以承担外部服务封装与分布式部署；Agent 的任务状态和执行流程由应用层继续定义。[服务范围](https://docs.ray.io/en/latest/serve/index.html)
 
 接入时安装 Ray Serve，在 Python 类上声明 Deployment，通过 `bind` 组合应用，再使用 `serve.run` 或部署命令启动。官方入门从单机 HTTP 服务开始，后续可以配置副本、资源并部署到 Ray 集群。[快速开始](https://docs.ray.io/en/latest/serve/getting_started.html)
+
+需要把 Agent、模型与工具拆成服务时，可继续阅读本站收录的 [Ray 官方 Agent 部署教程](build-a-tool-using-agent.md)。
