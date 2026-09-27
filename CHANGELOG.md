@@ -2,6 +2,12 @@
 
 按日期记录本站新增的资源、笔记和读者可感知的改进。日期为内容发布日，最新记录在前；点击条目链接即可查看相关内容。
 
+## 2026-09-27
+
+### 内容更新
+
+- 移除《任务失败后如何恢复：检查点、重试与外部副作用》，同步清理主题页、专题索引与延伸阅读入口；首页和 README 改为推荐 [Agent Runtime 全景](notes/agent-runtime-landscape.md)，帮助读者了解现有项目与平台。
+
 ## 2026-09-26
 
 ### 新增内容
@@ -9,7 +15,7 @@
 - 在 [运行时与编排](resources/runtime-and-orchestration.md#resource-paperclip) 中收录 Paperclip，并在 [Runtime 全景](notes/agent-runtime-landscape.md#上层协作平台) 中补充上层协作平台，介绍组织级多 Agent 协作及其与任务执行平台的分工。
 - 在 [部署与调度](resources/deployment-and-scheduling.md#resource-google-ax) 中收录 Google AX，并在 [Runtime 全景](notes/agent-runtime-landscape.md#开源运行平台) 中增加开源运行平台分类，区分开发框架、自托管平台与云厂商产品。
 - 新增 [Agent Runtime 全景：开源框架、运行平台与云厂商产品](notes/agent-runtime-landscape.md)，汇总代表性方案的维护方、产品定位、主要特点和官方入口，作为 [运行时与编排](resources/runtime-and-orchestration.md) 的学习笔记；同步补充该主题与 [部署与调度](resources/deployment-and-scheduling.md) 中的框架和托管平台资源。
-- 新增 [任务失败后如何恢复：检查点、重试与外部副作用](notes/task-recovery-and-side-effects.md)，通过报告任务的故障窗口，解释状态持久化、重放、幂等键与人工审批，并附官方来源和验证检查表。
+- 曾发布《任务失败后如何恢复：检查点、重试与外部副作用》，通过报告任务的故障窗口介绍恢复机制；该文章已于 2026-09-27 移除。
 - 首次收录 40 项基础设施资源，覆盖 [运行时与编排](resources/runtime-and-orchestration.md)、[沙箱与执行](resources/sandbox-and-execution.md)、[记忆与上下文](resources/memory-and-context.md)、[工具与协议](resources/tools-and-protocols.md)、[推理与模型服务](resources/inference-and-model-serving.md)、[部署与调度](resources/deployment-and-scheduling.md)、[可观测性与评估](resources/observability-and-evaluation.md)、[安全与治理](resources/security-and-governance.md) 八个主题，每项提供简介、一手来源和研究切入点。
 - 发布概览笔记 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md)，介绍基础设施能力、执行链路与主题间的关系，作为首次阅读的起点。
 

@@ -71,6 +71,5 @@ Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/refe
 本篇及上层协作平台的主条目归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，AX 与云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
 
 - **相关基础组件**：[Temporal](../resources/runtime-and-orchestration.md#resource-temporal) 是持久工作流平台，其官方 [AI 应用文档](https://docs.temporal.io/ai) 提供 Agent 集成入口。
-- **机制专题**：[任务失败后如何恢复](task-recovery-and-side-effects.md)，讨论检查点、重试与外部副作用。
 
 [返回笔记索引](README.md) · [返回首页](../README.md)

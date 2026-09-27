@@ -33,7 +33,7 @@ A curated collection of infrastructure resources and original notes on building 
 ## Where to Start
 
 1. 先读 [Agentic Infra 的范围、组件与分类边界](notes/agentic-infra-overview.md)，建立整体认识。
-2. 研究长任务的执行机制时，阅读 [任务失败后如何恢复](notes/task-recovery-and-side-effects.md)，再结合 [运行时与编排](resources/runtime-and-orchestration.md) 中的项目资料理解具体实现。
+2. 了解现有实现方案时，阅读 [Agent Runtime 全景](notes/agent-runtime-landscape.md)，查看开源框架、运行平台与云厂商产品的定位和主要能力。
 3. 研究长任务与规模化运行时，结合 [记忆与上下文](resources/memory-and-context.md)、[部署与调度](resources/deployment-and-scheduling.md) 和 [模型服务](resources/inference-and-model-serving.md)。
 4. 设计验证与运行管理时，结合 [可观测性与评估](resources/observability-and-evaluation.md) 和 [安全与治理](resources/security-and-governance.md)。
 
