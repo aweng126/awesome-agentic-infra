@@ -4,6 +4,14 @@
 
 ## 2026-09-27
 
+### 22:00 · 精简仓库首页
+
+精简 [README](https://github.com/aweng126/awesome-agentic-infra/blob/main/README.md)，集中展示项目定位、阅读入口和主题导航。
+
+#### 内容更新
+
+- 合并重复介绍和阅读指引，将主题目录改为中文链接列表，保留网站截图、独立的模型服务入口及简短许可说明；旧章节锚点继续可用。
+
 ### 21:40 · 补充 Docker 执行环境
 
 新增 [Docker Engine](resources/items/docker-engine.md) 与 [Docker Sandboxes](resources/items/docker-sandboxes.md) 介绍，分别了解容器执行底座和面向 Agent 的本地、云端沙箱产品。
