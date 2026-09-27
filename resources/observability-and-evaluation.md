@@ -6,9 +6,9 @@
 
 ## Projects & Platforms
 
-- <a id="resource-langfuse"></a> [Langfuse](https://github.com/langfuse/langfuse) — LLM 应用观测与评估平台，提供执行追踪、数据集和提示词管理，可将模型调用、检索和 Agent 操作关联到同一次执行。
-- <a id="resource-openllmetry"></a> [OpenLLMetry](https://github.com/traceloop/openllmetry) — 基于 OpenTelemetry 的 LLM 应用插桩工具与 SDK，覆盖模型服务和向量数据库等调用，可将 Agent 依赖组件的遥测接入已有观测系统。
-- <a id="resource-phoenix"></a> [Phoenix](https://github.com/Arize-ai/phoenix) — 提供基于 OpenTelemetry 的执行追踪，以及评估、数据集和实验管理，可结合执行记录与数据集比较 Agent 的运行结果。
+- <a id="resource-langfuse"></a> [Langfuse](https://github.com/langfuse/langfuse) — LLM 应用观测与评估平台，提供执行追踪、数据集和提示词管理，可将模型调用、检索和 Agent 操作关联到同一次执行。 [项目介绍](items/langfuse.md)
+- <a id="resource-openllmetry"></a> [OpenLLMetry](https://github.com/traceloop/openllmetry) — 基于 OpenTelemetry 的 LLM 应用插桩工具与 SDK，覆盖模型服务和向量数据库等调用，可将 Agent 依赖组件的遥测接入已有观测系统。 [项目介绍](items/openllmetry.md)
+- <a id="resource-phoenix"></a> [Phoenix](https://github.com/Arize-ai/phoenix) — 提供基于 OpenTelemetry 的执行追踪，以及评估、数据集和实验管理，可结合执行记录与数据集比较 Agent 的运行结果。 [项目介绍](items/phoenix.md)
 
 ## Papers
 

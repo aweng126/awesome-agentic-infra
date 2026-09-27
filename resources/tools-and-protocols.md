@@ -6,8 +6,8 @@
 
 ## Projects & Platforms
 
-- <a id="resource-composio"></a> [Composio](https://github.com/ComposioHQ/composio) — 为 Agent 提供应用工具集、认证和按用户组织的会话，支持工具搜索、执行与事件触发，包含托管工具服务、配套 SDK 和框架适配器。
-- <a id="resource-playwright-mcp"></a> [Playwright MCP](https://github.com/microsoft/playwright-mcp) — 将 Playwright 浏览器自动化能力封装为 MCP 服务，让 Agent 通过结构化无障碍快照读取页面状态并执行浏览器操作。
+- <a id="resource-composio"></a> [Composio](https://github.com/ComposioHQ/composio) — 为 Agent 提供应用工具集、认证和按用户组织的会话，支持工具搜索、执行与事件触发，包含托管工具服务、配套 SDK 和框架适配器。 [项目介绍](items/composio.md)
+- <a id="resource-playwright-mcp"></a> [Playwright MCP](https://github.com/microsoft/playwright-mcp) — 将 Playwright 浏览器自动化能力封装为 MCP 服务，让 Agent 通过结构化无障碍快照读取页面状态并执行浏览器操作。 [项目介绍](items/playwright-mcp.md)
 
 ## Specifications
 

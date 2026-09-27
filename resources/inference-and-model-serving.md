@@ -6,10 +6,10 @@
 
 ## Projects & Platforms
 
-- <a id="resource-dynamo"></a> [Dynamo](https://github.com/ai-dynamo/dynamo) — 协调推理引擎的分布式服务框架，提供 prefill/decode 分离、感知 KV cache 的路由和缓存管理，用于多节点推理服务的请求调度。
-- <a id="resource-litellm"></a> [LiteLLM](https://github.com/BerriAI/litellm) — 多模型服务接入 SDK 与网关，为 Agent 提供统一的模型访问层，支持路由、重试、回退和用量跟踪。
-- <a id="resource-sglang"></a> [SGLang](https://github.com/sgl-project/sglang) — 大语言模型与多模态模型服务框架，支持结构化输出与工具调用，可为 Agent 提供推理服务。配置方式见 [官方文档](https://docs.sglang.io/)。
-- <a id="resource-vllm"></a> [vLLM](https://github.com/vllm-project/vllm) — 大语言模型推理与服务引擎，提供连续批处理、前缀缓存和工具调用解析等能力，可承载 Agent 的多轮模型请求。
+- <a id="resource-dynamo"></a> [Dynamo](https://github.com/ai-dynamo/dynamo) — 协调推理引擎的分布式服务框架，提供 prefill/decode 分离、感知 KV cache 的路由和缓存管理，用于多节点推理服务的请求调度。 [项目介绍](items/dynamo.md)
+- <a id="resource-litellm"></a> [LiteLLM](https://github.com/BerriAI/litellm) — 多模型服务接入 SDK 与网关，为 Agent 提供统一的模型访问层，支持路由、重试、回退和用量跟踪。 [项目介绍](items/litellm.md)
+- <a id="resource-sglang"></a> [SGLang](https://github.com/sgl-project/sglang) — 大语言模型与多模态模型服务框架，支持结构化输出与工具调用，可为 Agent 提供推理服务。配置方式见 [官方文档](https://docs.sglang.io/)。 [项目介绍](items/sglang.md)
+- <a id="resource-vllm"></a> [vLLM](https://github.com/vllm-project/vllm) — 大语言模型推理与服务引擎，提供连续批处理、前缀缓存和工具调用解析等能力，可承载 Agent 的多轮模型请求。 [项目介绍](items/vllm.md)
 
 ## Papers
 

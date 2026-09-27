@@ -6,11 +6,15 @@
 
 ### 新增内容
 
+- 补齐其余 39 个项目与平台的介绍页，现有 43 项均可在站内阅读背景、能力、核心概念和接入方式。覆盖 [记忆与上下文](resources/memory-and-context.md)、[工具与协议](resources/tools-and-protocols.md)、[可观测性与评估](resources/observability-and-evaluation.md) 和 [安全与治理](resources/security-and-governance.md) 中的全部项目，并保留官方资料入口。
+- 完成 [运行时框架](resources/runtime-and-orchestration.md) 与 [云端部署方案](resources/deployment-and-scheduling.md) 介绍，包括 [Paperclip](resources/items/paperclip.md)、[阿里云 AgentCore](resources/items/alibaba-cloud-agentcore.md)、[Google Cloud Agent Runtime](resources/items/google-cloud-agent-runtime.md)、[Microsoft Foundry Hosted Agents](resources/items/microsoft-foundry-hosted-agents.md) 和 [火山引擎 AgentKit Runtime](resources/items/volcengine-agentkit-runtime.md)，区分应用框架、组织协作与托管运行服务。
+- 补齐 [沙箱与执行环境](resources/sandbox-and-execution.md) 及关联的 [推理与模型服务](resources/inference-and-model-serving.md) 项目介绍，说明托管平台、隔离组件与模型服务各自的用途。
 - 新增 [LangGraph](resources/items/langgraph.md) 与 [Google AX](resources/items/google-ax.md) 项目介绍，了解开发框架与声明式运行平台的背景、能力、核心概念和接入方式。
 - 新增 [E2B](resources/items/e2b.md) 与 [AWS AgentCore Runtime](resources/items/amazon-bedrock-agentcore-runtime.md) 项目介绍，了解代码执行沙箱与托管运行服务，并提供官网、文档和快速开始入口。
 
 ### 内容更新
 
+- 根据官方资料补充 [AutoGen](resources/items/autogen.md) 的维护模式、[Daytona](resources/items/daytona.md) 的仓库迁移，以及 [腾讯云 Agent Runtime](resources/items/tencent-cloud-agent-runtime.md) 弹性部署的 Beta 状态；介绍页分别说明项目、客户端与托管服务的形态和许可。
 - 更新 [领域导览](notes/agentic-infra-overview.md)，集中介绍三类基础设施的关系、七个主要主题与关联的模型服务；[Runtime 全景](notes/agent-runtime-landscape.md) 保留为运行时主题下的方案总览。
 - 调整 [各主题资源简介](README.md#topics)，以项目定位、主要能力和方案形态帮助读者认识现有资源，移除统一的研究切入点；[贡献指南](CONTRIBUTING.md) 同步更新条目模板。
 - 移除《任务失败后如何恢复：检查点、重试与外部副作用》，同步清理主题页、导览索引与延伸阅读入口，保留 [Agent Runtime 全景](notes/agent-runtime-landscape.md) 作为现有框架与平台的汇总。

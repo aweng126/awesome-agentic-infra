@@ -116,7 +116,8 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
   assert.equal(rewriteMarkdownUrl('../CHANGELOG.md', 'notes/overview.md'), sitePath('changelog/'));
   assert.equal(rewriteMarkdownUrl('resources/runtime-and-orchestration.md#resource-langgraph', 'CHANGELOG.md'), sitePath('topics/runtime-and-orchestration/#resource-langgraph'));
   assert.equal(rewriteMarkdownUrl('items/langgraph.md?source=index#核心能力', 'resources/runtime-and-orchestration.md'), sitePath('resources/langgraph/?source=index#核心能力'));
-  assert.equal(rewriteMarkdownUrl('../resources/items/autogen.md?source=guide', 'notes/overview.md'), sitePath('topics/runtime-and-orchestration/?source=guide#resource-autogen'));
+  assert.equal(rewriteMarkdownUrl('../resources/items/autogen.md?source=guide', 'notes/overview.md'), sitePath('resources/autogen/?source=guide'));
+  assert.equal(rewriteMarkdownUrl('../resources/items/build-a-tool-using-agent.md?source=guide', 'notes/overview.md'), sitePath('topics/deployment-and-scheduling/?source=guide#resource-build-a-tool-using-agent'));
   assert.throws(() => rewriteMarkdownUrl('resources/items/missing-project.md', 'CHANGELOG.md'), /Unknown resource document/);
   assert.equal(rewriteMarkdownUrl('LICENSE', 'CONTRIBUTING.md'), `${repoUrl}/blob/main/LICENSE`);
   assert.equal(rewriteMarkdownUrl('../../outside.md', 'notes/overview.md'), null);
@@ -129,7 +130,7 @@ test('profile routes contain full introductions while metadata-only resources ke
   const resources = await getResources();
   const profiles = await getResourceProfiles();
   assert.equal(resources.length, 52);
-  assert.deepEqual(profiles.map(profile => profile.slug).sort(), ['amazon-bedrock-agentcore-runtime', 'e2b', 'google-ax', 'langgraph']);
+  assert.deepEqual(profiles.map(profile => profile.slug).sort(), resources.filter(resource => resource.type === 'project').map(resource => resource.slug).sort(), 'every project and platform has a complete introduction');
   assert.equal(resources.filter(resource => resource.hasProfile).length, profiles.length);
   for (const profile of profiles) {
     assert.equal(profile.sourcePath, `resources/items/${profile.slug}.md`);
