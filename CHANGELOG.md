@@ -4,6 +4,11 @@
 
 ## 2026-09-27
 
+### 新增内容
+
+- 新增 [LangGraph](resources/items/langgraph.md) 与 [Google AX](resources/items/google-ax.md) 项目介绍，了解开发框架与声明式运行平台的背景、能力、核心概念和接入方式。
+- 新增 [E2B](resources/items/e2b.md) 与 [AWS AgentCore Runtime](resources/items/amazon-bedrock-agentcore-runtime.md) 项目介绍，了解代码执行沙箱与托管运行服务，并提供官网、文档和快速开始入口。
+
 ### 内容更新
 
 - 更新 [领域导览](notes/agentic-infra-overview.md)，集中介绍三类基础设施的关系、七个主要主题与关联的模型服务；[Runtime 全景](notes/agent-runtime-landscape.md) 保留为运行时主题下的方案总览。
@@ -12,6 +17,7 @@
 
 ### 站点改进
 
+- [资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/)、主题索引与全站搜索接入项目介绍页，保留官方资料直达入口。资源元数据与介绍集中维护，主题资源清单自动同步。
 - 主导航调整为首页、主题导航、资源库与 [更新日志](CHANGELOG.md)。首页突出主题与资源，增加最近更新；主题页先展示资源清单，再提供方案总览入口。[资源导览](notes/README.md) 保留已有访问地址。
 
 ## 2026-09-26

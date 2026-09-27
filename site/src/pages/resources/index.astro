@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { getTopics, getResources, groupTopics, sitePath } from '../../lib/content';
+import { getTopics, getResources, groupTopics, resourcePath, sitePath } from '../../lib/content';
 import { getResourceSource } from '../../lib/resource-source';
 const topics = await getTopics();
 const resources = await getResources();
@@ -12,7 +12,7 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
 ---
 <SiteLayout title="资源库" description="按主题、资源类型和关键词，查找 Agent 基础设施项目、论文与技术资料。" active="resources">
   <main id="main-content" class="container explorer" data-resource-explorer>
-    <div class="page-heading"><p class="eyebrow">THE RESOURCE LIBRARY</p><h1>查找基础设施资料<span class="accent-dot">。</span></h1><p>按主题、类型或关键词筛选，前往项目、论文与文档的来源。</p></div>
+    <div class="page-heading"><p class="eyebrow">THE RESOURCE LIBRARY</p><h1>查找基础设施资料<span class="accent-dot">。</span></h1><p>按主题、类型或关键词筛选，了解项目与方案，继续探索官方资料。</p></div>
     <div class="explorer-search"><Icon name="search" size={22}/><label class="sr-only" for="resource-search">搜索资源</label><input id="resource-search" type="search" autocomplete="off" placeholder="搜索名称、技术机制或关键词，如 sandbox、记忆、MCP…"/><span>已收录 {resources.length} 条</span></div>
     <div class="explorer-layout">
       <aside class="filter-sidebar" aria-label="按主题筛选">
@@ -45,14 +45,15 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
           {resources.map(resource => {
             const source = getResourceSource(resource);
             return (
-              <article class="resource-card" id={resource.id} data-id={resource.id} data-topic={resource.topicSlug} data-type={resource.type} data-search={`${resource.name} ${resource.description} ${resource.topicTitle} ${resource.topicZhTitle}`}>
+              <article class="resource-card" id={resource.id} data-id={resource.id} data-topic={resource.topicSlug} data-type={resource.type} data-search={`${resource.name} ${resource.description} ${resource.topicTitle} ${resource.topicZhTitle} ${resource.maintainer ?? ''} ${resource.form ?? ''}`}>
                 <div class="resource-card-heading">
-                  <h2>{resource.name}</h2>
+                  <h2>{resource.hasProfile ? <a class="resource-profile-title" href={resourcePath(resource)}>{resource.name}</a> : resource.name}</h2>
                   <span class="resource-type">{typeLabel[resource.type]}</span>
                 </div>
                 <p>{resource.description}</p>
                 <div class="resource-links">
                   <div class="resource-source">
+                    {resource.hasProfile && <a class="resource-profile-link" href={resourcePath(resource)}>项目介绍 <Icon name="arrow" size={13}/><span class="sr-only">：{resource.name}</span></a>}
                     <a class="resource-source-link" href={resource.url} target="_blank" rel="noopener noreferrer">
                       {source.label}<Icon name="external" size={13}/>
                       <span class="sr-only">：{resource.name}（在新窗口打开）</span>
@@ -81,6 +82,10 @@ const typeLabel = Object.fromEntries(types.map(type=>[type.id,type.label]));
 </SiteLayout>
 
 <style>
+  .resource-profile-title:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
+  .resource-profile-link { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; color: var(--accent); }
+  .resource-profile-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .resource-profile-link + .resource-source-link { color: var(--muted); }
   .topic-filter-group { margin-top: 22px; }
   .topic-filter-group + .topic-filter-group { padding-top: 18px; border-top: 1px solid var(--line); }
   .topic-filter-group h3 { margin: 0 11px 9px; font-size: 11px; font-weight: 500; letter-spacing: .05em; color: var(--muted); }

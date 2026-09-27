@@ -1,0 +1,163 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { getResourceProfiles, sitePath, repoUrl } from '../../lib/content';
+
+export async function getStaticPaths() {
+  return (await getResourceProfiles()).map((resource) => ({
+    params: { slug: resource.slug },
+    props: { resource },
+  }));
+}
+
+const { resource } = Astro.props;
+const typeLabels = { project: '项目与平台', paper: '论文', spec: '协议规范', article: '文章与文档' };
+const toc = resource.headings.filter((heading) => heading.depth <= 3);
+const topicPath = sitePath(`topics/${resource.topicSlug}/`);
+const editUrl = `${repoUrl}/edit/main/${resource.sourcePath}`;
+const hasFacts = Boolean(resource.maintainer || resource.form || resource.license || resource.status);
+---
+
+<SiteLayout title={resource.name} description={resource.description} active="resources">
+  <main id="main-content" class="resource-profile">
+    <nav class="breadcrumbs" aria-label="面包屑">
+      <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
+      <a href={sitePath('resources/')}>资源库</a><span aria-hidden="true">/</span>
+      <span aria-current="page">{resource.name}</span>
+    </nav>
+
+    <div class="profile-layout">
+      <header class="profile-header">
+        <p class="eyebrow">RESOURCE PROFILE</p>
+        <h1 id="resource-title">{resource.name}</h1>
+        <p class="profile-description">{resource.description}</p>
+        <div class="profile-tags">
+          <span>{typeLabels[resource.type]}</span>
+          <a href={topicPath}>{resource.topicZhTitle}<Icon name="arrow" size={13}/></a>
+        </div>
+        <nav class="official-links" aria-label="官方资料">
+          {resource.links.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer">
+            {link.label}<Icon name="external" size={14}/><span class="sr-only">（在新窗口打开）</span>
+          </a>)}
+        </nav>
+      </header>
+
+      {hasFacts && <aside class="profile-facts" aria-labelledby="profile-facts-title">
+        <h2 id="profile-facts-title">项目信息</h2>
+        <dl>
+          {resource.maintainer && <div><dt>维护方</dt><dd>{resource.maintainer}</dd></div>}
+          {resource.form && <div><dt>产品形态</dt><dd>{resource.form}</dd></div>}
+          {resource.license && <div><dt>许可证</dt><dd>{resource.license}</dd></div>}
+          {resource.status && <div class="profile-status">
+            <dt>项目状态</dt>
+            <dd>
+              <span>{resource.status.label}</span>
+              <span class="status-reference"><a href={resource.status.source} target="_blank" rel="noopener noreferrer">官方依据 <Icon name="external" size={11}/><span class="sr-only">（在新窗口打开）</span></a><span>核对于 <time datetime={resource.status.checked}>{resource.status.checked}</time></span></span>
+            </dd>
+          </div>}
+        </dl>
+      </aside>}
+
+      <article class="profile-article" aria-labelledby="resource-title">
+        {toc.length > 0 && <details class="mobile-toc">
+          <summary>本页目录 <span aria-hidden="true">+</span></summary>
+          <nav aria-label="本页目录">
+            <ul>{toc.map((heading) => <li class:list={{ 'toc-child': heading.depth > 2 }}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ul>
+          </nav>
+        </details>}
+        <div class="prose profile-body" set:html={resource.html} />
+        <footer class="profile-footer">
+          <a class="profile-topic-link" href={topicPath}>浏览{resource.topicZhTitle}资源 <Icon name="arrow" size={15}/></a>
+          <a href={editUrl} target="_blank" rel="noopener noreferrer">在 GitHub 改进本页 <Icon name="external" size={13}/></a>
+        </footer>
+      </article>
+
+      <aside class="profile-toc" aria-label="本页目录">
+        <div class="toc-sticky">
+          <p>本页目录</p>
+          <nav><ul>{toc.map((heading) => <li class:list={{ 'toc-child': heading.depth > 2 }}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ul></nav>
+          <a class="back-to-library" href={sitePath('resources/')}>返回资源库 <Icon name="arrow" size={14}/></a>
+        </div>
+      </aside>
+    </div>
+  </main>
+</SiteLayout>
+
+<style>
+  .resource-profile { max-width: 1160px; padding: 38px 36px 80px; margin: 0 auto; }
+  .breadcrumbs { display: flex; align-items: baseline; flex-wrap: wrap; gap: 9px; margin-bottom: 34px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+  .breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumbs [aria-current] { color: var(--text); overflow-wrap: anywhere; }
+  .profile-layout { display: grid; grid-template-columns: minmax(0, 750px) minmax(220px, 260px); grid-template-areas: 'header facts' 'article toc'; align-items: start; gap: 38px 60px; }
+  .profile-header { grid-area: header; }
+  .profile-facts { grid-area: facts; }
+  .profile-article { grid-area: article; }
+  .profile-toc { grid-area: toc; }
+  .profile-header, .profile-article { min-width: 0; }
+  .profile-header .eyebrow { color: var(--accent); margin-bottom: 15px; }
+  h1 { font-size: clamp(29px, 3.2vw, 42px); line-height: 1.35; letter-spacing: -.04em; overflow-wrap: anywhere; }
+  .profile-description { margin-top: 18px; color: var(--muted); font-size: 15px; line-height: 1.9; overflow-wrap: anywhere; }
+  .profile-tags { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 21px; color: var(--muted); font-size: 11px; }
+  .profile-tags > span { padding: 4px 8px; border-radius: 4px; background: var(--surface-alt); }
+  .profile-tags a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); padding-block: 4px; }
+  .profile-tags a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .official-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 25px; }
+  .official-links a { display: inline-flex; align-items: center; gap: 9px; padding: 8px 12px; min-height: 37px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--accent); font-size: 12px; line-height: 1.5; }
+  .official-links a:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .profile-facts { padding: 21px; background: var(--surface-alt); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+  .profile-facts h2 { font-size: 12px; font-weight: 600; margin-bottom: 19px; }
+  .profile-facts dl { margin: 0; }
+  .profile-facts dl > div + div { margin-top: 16px; }
+  .profile-facts dt { color: var(--muted); font-size: 10px; margin-bottom: 5px; }
+  .profile-facts dd { margin: 0; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+  .profile-status { padding-top: 15px; border-top: 1px solid var(--line); }
+  .status-reference { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; color: var(--muted); font-size: 10px; line-height: 1.8; }
+  .status-reference a { display: inline-flex; align-items: center; align-self: flex-start; gap: 4px; color: var(--accent); }
+  .status-reference a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .profile-article { border-top: 1px solid var(--line); padding-top: 28px; }
+  .profile-body :global(h2:first-child) { margin-top: 0; padding-top: 0; }
+  .profile-body :global(h2) { font-size: 21px; scroll-margin-top: 130px; }
+  .profile-body :global(h3) { font-size: 16px; }
+  .profile-body :global(li + li) { margin-top: 12px; }
+  .profile-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 13px 20px; margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .profile-footer a { display: inline-flex; align-items: center; gap: 6px; }
+  .profile-footer a:hover { color: var(--accent); }
+  .profile-footer .profile-topic-link { color: var(--accent); }
+  .profile-toc { align-self: stretch; min-width: 0; padding: 5px 0 0 21px; }
+  .toc-sticky { position: sticky; top: 124px; }
+  .toc-sticky > p { margin-bottom: 18px; font-size: 11px; color: var(--muted); }
+  .profile-toc ul, .mobile-toc ul { list-style: none; padding: 0; margin: 0; }
+  .profile-toc li { margin-top: 13px; font-size: 11px; line-height: 1.7; }
+  .profile-toc li a { display: block; padding-left: 12px; border-left: 1px solid var(--line); color: var(--muted); }
+  .profile-toc li a:hover { color: var(--accent); border-color: var(--accent); }
+  .toc-child { padding-left: 12px; }
+  .back-to-library { display: inline-flex; align-items: center; gap: 8px; padding-top: 23px; margin-top: 24px; border-top: 1px solid var(--line); color: var(--accent); font-size: 11px; }
+  .mobile-toc { display: none; }
+  @media (max-width: 1000px) {
+    .resource-profile { padding-inline: 28px; }
+    .profile-layout { column-gap: 34px; grid-template-columns: minmax(0, 1fr) 230px; }
+  }
+  @media (max-width: 760px) {
+    .resource-profile { max-width: 720px; padding: 26px 22px 56px; }
+    .breadcrumbs { margin-bottom: 28px; font-size: 10px; gap: 7px; }
+    .profile-layout { display: block; }
+    h1 { font-size: 30px; }
+    .profile-description { font-size: 14px; margin-top: 15px; }
+    .official-links { margin-top: 22px; gap: 8px; }
+    .official-links a { padding-inline: 10px; font-size: 11px; }
+    .profile-facts { margin-top: 28px; padding: 18px; }
+    .profile-facts h2 { margin-bottom: 15px; }
+    .profile-facts dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+    .profile-facts dl > div + div { margin-top: 0; }
+    .profile-facts .profile-status { grid-column: 1 / -1; }
+    .status-reference { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; }
+    .profile-article { border-top: 0; padding-top: 26px; }
+    .mobile-toc { display: block; margin-bottom: 30px; border: 1px solid var(--line); border-radius: 7px; padding: 13px 16px; font-size: 12px; color: var(--muted); }
+    .mobile-toc summary { display: flex; justify-content: space-between; cursor: pointer; }
+    .mobile-toc ul { padding-top: 13px; }
+    .mobile-toc li { padding-block: 6px; }
+    .mobile-toc a:hover { color: var(--accent); }
+    .profile-toc { display: none; }
+    .profile-body :global(h2) { font-size: 20px; }
+  }
+</style>

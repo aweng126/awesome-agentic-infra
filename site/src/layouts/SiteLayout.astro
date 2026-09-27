@@ -11,7 +11,7 @@ const searchItems = [
   {title:'主题导航', description:'按七个主要主题浏览 Agent 基础设施项目、平台与参考资料。', category:'站点导航', url:`${sitePath()}#topics`, keywords:'主题 导航 项目 topics'},
   {title:'关联基础设施', description:'了解 Agent 与推理、模型服务基础设施的连接。', category:'站点导航', url:`${sitePath()}#related-infrastructure`, keywords:'模型 推理 serving 关联'},
   {title:'更新日志', description:'查看最近新增的资源、内容更新与站点改进。', category:'站点导航', url:sitePath('changelog/'), keywords:'更新 最近更新 新增 changelog updates'},
-  ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:resourcePath(r), keywords:`${r.topicTitle} ${r.type}`})),
+  ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:resourcePath(r), keywords:`${r.topicTitle} ${r.type} ${r.maintainer ?? ''} ${r.form ?? ''}`})),
   ...notes.map(n => ({title:n.title, description:n.description, category:resourceGuideLabel(n.slug), url:sitePath(`notes/${n.slug}/`), keywords:'资源导览 方案总览 guide'})),
 ];
 ---

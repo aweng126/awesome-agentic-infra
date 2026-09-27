@@ -13,46 +13,87 @@
 
 ## Where to Put It
 
-在 `resources/` 中选择最贴近资源主要职责的主题。每个项目只维护一个完整主条目，其他主题使用相对链接引用对应主题或小节。不同性质的论文与实现可分别收录，并说明各自价值。
+每条资源在 `resources/items/<slug>.md` 维护名称、简介、官方链接和可选的完整介绍，选择最贴近其主要职责的 `topic`。一个资源只维护一份内容；主题索引、网页列表和搜索共用这份资料。不同性质的论文与实现可分别收录，并说明各自价值。
 
 七个主要主题覆盖四项 Agent 核心能力，以及部署与调度、可观测性与评估、安全与治理三项跨领域能力。任务执行、恢复、上下文与工具机制进入相应的 Agent 主题；跨领域资源需说明所讨论的 Agent 工作负载与具体问题。
 
 LLM Serving Infra 在“关联基础设施”中单独提供入口：模型 API、推理与 KV cache 管理等资料放入 [推理与模型服务](resources/inference-and-model-serving.md)，并说明与 Agent 模型接入、多轮调用、长上下文或并发任务的具体联系。LLM Training Infra 的训练与微调目前作为概览背景，不新增空的训练资源栏目。
 
-主题文件按实际内容使用以下小节，不保留空小节：
+`resources/<topic>.md` 保留主题范围和方案总览，资源清单由同步命令按 `type` 自动生成：
 
-- `Projects & Platforms`：项目、框架和托管平台。
-- `Papers`：论文，注明年份与已核验的发表信息；预印本标明 arXiv。
-- `Specifications`：协议与规范。
-- `Articles & Documentation`：工程文章、官方教程和参考文档。
+- `project` → `Projects & Platforms`：项目、框架和托管平台。
+- `paper` → `Papers`：论文，注明年份与已核验的发表信息；预印本标明 arXiv。
+- `spec` → `Specifications`：协议与规范。
+- `article` → `Articles & Documentation`：工程文章、官方教程和参考文档。
 
 ## Entry Format
 
-项目条目采用以下格式，将尖括号中的占位内容替换为实际信息：
+在 `resources/items/` 新建 Markdown 文件，文件名作为稳定的资源标识。例如 `example.md`：
 
-```text
-- <a id="resource-project-name"></a> [<项目名称>](<官方入口>) — <项目定位与主要能力>；形态：<开源框架、自托管平台或托管服务等>。
+```yaml
+---
+name: Example
+summary: 面向有状态 Agent 的运行框架，提供任务编排、状态保存与工具接入。
+type: project
+topic: runtime-and-orchestration
+url: https://example.org/docs
+anchor: resource-example
+order: 11
+links:
+  - label: 官方文档
+    url: https://example.org/docs
+---
 ```
 
-论文条目采用以下格式：
+`summary` 是各个列表使用的短简介，可包含必要的官方补充链接。`url` 指向主要来源，`links` 保存官网、仓库、文档等具名入口。论文通过 `publication` 补充年份与已核验的会议或预印本信息。`order` 表示主题内的排列顺序，不表达排名。
 
-```text
-- <a id="resource-paper-name"></a> [<论文标题>](<论文链接>)（<年份>，<会议或 arXiv 预印本>）— <主要贡献及与本主题的关系>。
+文件名和 `anchor` 发布后保持稳定，条目更名或简介更新时不改变已有访问地址。主题中的固定锚点由同步命令生成；原有的 `resources/<topic>.md#resource-*` 链接继续有效。
+
+### 项目介绍
+
+项目与平台可以在同一文件的 frontmatter 中补充 `maintainer`、`form`、`license`，并在正文介绍以下内容：
+
+```markdown
+## 背景与目标
+项目面向的场景、解决的问题与官方目标。
+
+## 核心能力
+帮助读者理解项目用途的主要能力。
+
+## 核心概念与工作方式
+关键组件、抽象和基本协作关系。
+
+## 使用场景与接入方式
+官方支持的使用方式、环境要求与上手入口。
 ```
 
-每个资源在同一列表项内、名称链接之前放置固定锚点。锚点以 `resource-` 开头，只使用小写 ASCII 字母、数字与连字符，在本主题内唯一；将示例中的 `project-name` 或 `paper-name` 替换为资源的简短标识。条目更名时保留原锚点，避免已有链接失效。可通过 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)` 这样的相对链接直接定位到条目；从其他目录引用时按所在文件调整路径。
+有完整介绍的资源会生成 `/resources/<slug>/` 页面，资源库、主题索引和搜索提供对应入口。只有元数据的资源继续展示短简介和来源链接。正文集中介绍项目事实；背景动机应有官方出处，设计评价、实验和个人技术判断由博客独立承载。
 
-方案形态也可以自然写入简介，例如“开源 Agent 框架”或“托管运行服务”，无需重复标注。官方入口优先选择仓库或产品文档，必要时补充另一个官方链接。
+状态按需补充，使用明确的官方声明，区分整个项目和特定功能的状态。例如：
 
-保持条目简短，技术缩写首次出现时按需要解释。不使用无来源的性能宣称；确需引用数字时附上来源和比较条件。版本号、价格等易变化信息，仅在说明产品状态或定位所必需时记录，并注明日期。
+```yaml
+status:
+  label: 公开预览
+  source: https://example.org/releases/preview
+  checked: '2026-09-27'
+```
 
-同一小节可以按能力分组；没有自然分组时按名称排序。顺序表达阅读组织，不表达排名。
+核验日期显示在状态字段旁。不开设缺少内容的章节，不凭星标或提交频率推断维护状态；价格和版本号仅在理解方案所必需时记录。论文、协议和普通文章目前使用简洁的索引条目，无需套用项目介绍模板。
+
+修改资源后，从仓库根目录执行：
+
+```sh
+npm --prefix site run resources:sync
+npm --prefix site run resources:check
+```
+
+同步命令更新主题文件中的 `<!-- resources:start -->` 与 `<!-- resources:end -->` 区域。该区域由资源文件生成，手动内容放在区域之外；主题范围和方案总览继续在主题文件维护。提交资源文件及同步后的索引，构建会检查两者是否一致。
 
 ## Submitting Changes
 
 1. 查找已有条目，确认主分类和描述是否需要更新。
 2. 打开一手来源，核对名称、功能与链接。
-3. 在对应主题文件中补充资源，或修正事实与链接。
+3. 在 `resources/items/` 补充或修订资源，执行 `resources:sync` 同步主题索引。
 4. 同批更新 [更新日志](CHANGELOG.md)，概括读者可感知的变化，并提供相关内容的直接链接。
 5. 检查本地相对路径、固定资源锚点、标题锚点、Markdown 格式以及外部链接，避免重复条目和空小节。
 6. 在 Pull Request 中说明新增或修改了什么，以及为什么适合本仓库。一个 PR 尽量围绕一个明确主题。

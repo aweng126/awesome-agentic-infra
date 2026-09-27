@@ -1,5 +1,5 @@
 import { readFile, readdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, posix, resolve } from 'node:path';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
@@ -10,6 +10,10 @@ import rehypeStringify from 'rehype-stringify';
 import { visit } from 'unist-util-visit';
 import type { Root as MarkdownRoot, Link, ListItem } from 'mdast';
 import type { Root as HtmlRoot } from 'hast';
+import { topics } from './topic-metadata';
+import { loadResourceCatalog, parseResourceDocument, syncTopicMarkdown, type CatalogResource, type ResourceLink, type ResourceStatus } from './resource-catalog';
+export { topics } from './topic-metadata';
+export type { ResourceLink, ResourceStatus } from './resource-catalog';
 
 export const repoUrl = 'https://github.com/aweng126/awesome-agentic-infra';
 function findRepositoryRoot(): string {
@@ -40,6 +44,7 @@ export interface Heading {
 
 export interface Resource {
   id: string;
+  slug: string;
   anchor: string;
   name: string;
   url: string;
@@ -48,9 +53,22 @@ export interface Resource {
   topicSlug: string;
   topicTitle: string;
   topicZhTitle: string;
+  hasProfile: boolean;
+  maintainer?: string;
+  form?: string;
+  license?: string;
+  status?: ResourceStatus;
+  links: ResourceLink[];
 }
 
-export function resourcePath(resource: Pick<Resource, 'topicSlug' | 'anchor'>): string {
+export interface ResourceProfile extends Resource {
+  html: string;
+  headings: Heading[];
+  sourcePath: string;
+}
+
+export function resourcePath(resource: Pick<Resource, 'topicSlug' | 'anchor'> & Partial<Pick<Resource, 'slug' | 'hasProfile'>>): string {
+  if (resource.hasProfile && resource.slug) return sitePath(`resources/${resource.slug}/`);
   return sitePath(`topics/${resource.topicSlug}/#${resource.anchor}`);
 }
 
@@ -61,72 +79,6 @@ export interface ChangelogEntry {
   changeCount: number;
 }
 
-export const topics = [
-  {
-    slug: 'runtime-and-orchestration',
-    title: 'Runtime & Orchestration',
-    zhTitle: '运行时与编排',
-    scope: 'core',
-    description: '让 Agent 任务持续推进，在协作、中断与失败之后恢复执行。',
-    icon: 'workflow',
-  },
-  {
-    slug: 'sandbox-and-execution',
-    title: 'Sandbox & Execution',
-    zhTitle: '沙箱与执行环境',
-    scope: 'core',
-    description: '为代码、命令和浏览器操作提供可管理、可隔离的执行环境。',
-    icon: 'sandbox',
-  },
-  {
-    slug: 'memory-and-context',
-    title: 'Memory & Context',
-    zhTitle: '记忆与上下文',
-    scope: 'core',
-    description: '保存任务所需的状态与记忆，为下一次模型调用组织上下文。',
-    icon: 'memory',
-  },
-  {
-    slug: 'tools-and-protocols',
-    title: 'Tools & Protocols',
-    zhTitle: '工具与协议',
-    scope: 'core',
-    description: '连接外部工具与独立 Agent，统一能力发现、调用和通信接口。',
-    icon: 'plug',
-  },
-  {
-    slug: 'inference-and-model-serving',
-    title: 'Inference & Model Serving',
-    zhTitle: '推理与模型服务',
-    scope: 'serving',
-    description: '为 Agent 提供模型服务，处理多轮请求、批处理与推理缓存。',
-    icon: 'model',
-  },
-  {
-    slug: 'deployment-and-scheduling',
-    title: 'Deployment & Scheduling',
-    zhTitle: '部署与调度',
-    scope: 'crossCutting',
-    description: '围绕 Agent 工作负载，管理工作节点、执行环境与弹性伸缩。',
-    icon: 'server',
-  },
-  {
-    slug: 'observability-and-evaluation',
-    title: 'Observability & Evaluation',
-    zhTitle: '可观测性与评估',
-    scope: 'crossCutting',
-    description: '追踪任务执行过程，衡量质量、可靠性、延迟与资源消耗。',
-    icon: 'activity',
-  },
-  {
-    slug: 'security-and-governance',
-    title: 'Security & Governance',
-    zhTitle: '安全与治理',
-    scope: 'crossCutting',
-    description: '确认操作主体与权限，让身份、策略与审计贯穿执行过程。',
-    icon: 'shield',
-  },
-] as const;
 
 export const topicScopeLabels = {
   core: 'Agentic 核心能力',
@@ -229,6 +181,16 @@ export function rewriteMarkdownUrl(url: string, sourcePath: string): string | nu
   if (/^CONTRIBUTING\.md$/iu.test(localPath)) return `${sitePath('contributing/')}${suffix}`;
   if (/^CHANGELOG\.md$/iu.test(localPath)) return `${sitePath('changelog/')}${suffix}`;
   if (/^notes\/README\.md$/iu.test(localPath)) return `${sitePath('notes/')}${suffix}`;
+
+  const profile = localPath.match(/^resources\/items\/([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/u);
+  if (profile) {
+    const path = `${repositoryRoot}/${localPath}`;
+    if (!existsSync(path)) throw new Error(`Unknown resource document: ${localPath}`);
+    const item = parseResourceDocument(readFileSync(path, 'utf8'), profile[1]);
+    if (item.hasProfile) return `${sitePath(`resources/${item.slug}/`)}${suffix}`;
+    const query = suffix.startsWith('?') ? suffix.split('#')[0] : '';
+    return `${sitePath(`topics/${item.topic}/`)}${query}#${item.anchor}`;
+  }
 
   const topic = localPath.match(/^resources\/([^/]+)\.md$/u);
   if (topic && topics.some(({ slug }) => slug === topic[1])) {
@@ -363,6 +325,7 @@ function resourceItems(tree: MarkdownRoot) {
 export function extractResources(markdown: string, topic: TopicMetadata): Resource[] {
   return resourceItems(parse(markdown)).map(({ item, link, type, anchor }) => ({
     id: `${topic.slug}-${anchor}`,
+    slug: anchor.replace(/^resource-/u, ''),
     anchor,
     name: readableText(link),
     url: link.url,
@@ -371,7 +334,40 @@ export function extractResources(markdown: string, topic: TopicMetadata): Resour
     topicSlug: topic.slug,
     topicTitle: topic.title,
     topicZhTitle: topic.zhTitle,
+    hasProfile: false,
+    links: [{ label: '官方来源', url: link.url }],
   }));
+}
+
+function catalogResource(item: CatalogResource): Resource {
+  const topic = topics.find(topic => topic.slug === item.topic)!;
+  return {
+    id: `${topic.slug}-${item.anchor}`,
+    slug: item.slug,
+    anchor: item.anchor,
+    name: item.name,
+    url: item.url,
+    description: `${item.publication ? `（${item.publication}）— ` : ''}${readableText(parse(item.summary))}`,
+    type: item.type,
+    topicSlug: topic.slug,
+    topicTitle: topic.title,
+    topicZhTitle: topic.zhTitle,
+    hasProfile: item.hasProfile,
+    maintainer: item.maintainer,
+    form: item.form,
+    license: item.license,
+    status: item.status,
+    links: item.links,
+  };
+}
+
+export async function getResourceProfiles(): Promise<ResourceProfile[]> {
+  const catalog = await loadResourceCatalog(repositoryRoot);
+  return Promise.all(catalog.filter(item => item.hasProfile).map(async item => ({
+    ...catalogResource(item),
+    ...(await renderMarkdown(item.body, item.sourcePath)),
+    sourcePath: item.sourcePath,
+  })));
 }
 
 export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]> {
@@ -434,14 +430,15 @@ async function loadNote(sourcePath: string, slug: string, titleOverride?: string
 }
 
 export async function getTopics(): Promise<Topic[]> {
-  const notes = await getNotes();
+  const [notes, catalog] = await Promise.all([getNotes(), loadResourceCatalog(repositoryRoot)]);
   return Promise.all(topics.map(async (topic) => {
     const sourcePath = `resources/${topic.slug}.md`;
-    const markdown = await readFile(`${repositoryRoot}/${sourcePath}`, 'utf8');
+    const entries = catalog.filter(item => item.topic === topic.slug);
+    const markdown = syncTopicMarkdown(await readFile(`${repositoryRoot}/${sourcePath}`, 'utf8'), entries);
     return {
       ...topic,
       ...(await renderMarkdown(markdown, sourcePath)),
-      entries: extractResources(markdown, topic),
+      entries: entries.map(catalogResource),
       ...(await getTopicSections(markdown, sourcePath, notes)),
       sourcePath,
     };
@@ -478,7 +475,7 @@ export async function getTopicSections(markdown: string, sourcePath: string, not
 }
 
 export async function getResources(): Promise<Resource[]> {
-  return (await getTopics()).flatMap((topic) => topic.entries);
+  return (await loadResourceCatalog(repositoryRoot)).map(catalogResource);
 }
 
 export async function getNotes(): Promise<Note[]> {

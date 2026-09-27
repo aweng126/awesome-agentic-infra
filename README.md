@@ -2,7 +2,7 @@
 
 Awesome Agentic Infra 是面向 **Agent 持续、可靠运行** 的基础设施资源导航，按主题整理开源项目、云厂商平台、论文、规范与官方文档。
 
-通过中文项目简介、领域导览与方案全景，了解各类基础设施的职责、主要能力和官方入口。
+通过中文项目介绍、领域导览与方案全景，了解各类基础设施的定位、主要能力、工作方式和官方入口。
 
 A curated guide to agentic infrastructure projects, platforms, papers, and documentation.
 

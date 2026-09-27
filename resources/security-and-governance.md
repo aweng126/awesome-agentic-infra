@@ -2,6 +2,8 @@
 
 收录 Agent 身份、授权、策略决策和交互检查组件，以及威胁分类与安全指南。代码执行环境的隔离组件见 [Sandbox & Execution](sandbox-and-execution.md)。
 
+<!-- resources:start -->
+
 ## Projects & Platforms
 
 - <a id="resource-cedar"></a> [Cedar](https://docs.cedarpolicy.com/) — 授权策略语言与评估机制，使用主体、动作、资源和上下文表达 Agent 或用户的操作权限，并支持基于 schema 的策略验证。
@@ -12,5 +14,7 @@
 ## Articles & Documentation
 
 - <a id="resource-owasp-agentic-security-initiative"></a> [OWASP Agentic Security Initiative](https://genai.owasp.org/initiatives/agentic-security-initiative/) — 面向自主 Agent 和多步骤工作流的安全资料集合，包括 Agentic Top 10 与 MCP 服务开发指南，涵盖威胁分类、工具连接防护和系统控制要求。
+
+<!-- resources:end -->
 
 [返回首页](../README.md)

@@ -5,6 +5,7 @@ import { parseHTML } from 'linkedom';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
+import { parse as parseYaml } from 'yaml';
 import { visit } from 'unist-util-visit';
 
 const root = path.resolve('dist');
@@ -66,6 +67,15 @@ const resourceSections = new Set([
   'Projects & Platforms', 'Papers', 'Specifications', 'Articles & Documentation', 'Articles & Talks',
 ]);
 const resourceFiles=(await readdir('../resources')).filter((file) => file.endsWith('.md'));
+const catalog = await Promise.all((await readdir('../resources/items')).filter((file) => file.endsWith('.md')).map(async (file) => {
+  const markdown = await readFile(`../resources/items/${file}`, 'utf8');
+  const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)([\s\S]*)$/u.exec(markdown);
+  assert.ok(match, `${file}: resource metadata must have frontmatter`);
+  return { ...parseYaml(match[1]), slug: file.slice(0, -3), hasProfile: Boolean(match[2].trim()) };
+}));
+const profiles = catalog.filter((resource) => resource.hasProfile);
+const detailPages = pages.filter((file) => path.relative(root, file).startsWith(`resources${path.sep}`) && file !== path.join(root, 'resources/index.html'));
+assert.equal(detailPages.length, profiles.length, 'Only resources with substantive introductions have detail pages');
 assert.equal(pages.filter(p=>path.relative(root,p).startsWith(`topics${path.sep}`)).length,resourceFiles.length,'Each source topic needs a page');
 const servingSlug = 'inference-and-model-serving';
 const servingPath = `${base}topics/${servingSlug}/`;
@@ -170,7 +180,39 @@ for (const filename of resourceFiles) {
   }
   assert.equal(explorer.querySelector(`.topic-filters button[data-topic="${topicSlug}"] [data-topic-count]`)?.textContent, String(anchors.size), `${filename}: the initial topic count must match its resources and be available to the filter script`);
 }
+assert.equal(sourceCount, catalog.length, 'Generated topic indexes and the single resource catalog have the same count');
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');
+const searchItems = JSON.parse(home.getElementById('search-data').textContent);
+for (const resource of catalog) {
+  const card = explorer.getElementById(`${resource.topic}-${resource.anchor}`);
+  assert.ok(card, `${resource.slug}: catalog record has a resource card`);
+  const matches = searchItems.filter((item) => item.title === resource.name);
+  assert.equal(matches.length, 1, `${resource.slug}: search includes one resource result`);
+  const expectedPath = resource.hasProfile ? `${base}resources/${resource.slug}/` : `${base}topics/${resource.topic}/#${resource.anchor}`;
+  assert.equal(matches[0].url, expectedPath, `${resource.slug}: search uses the detail page or existing topic anchor`);
+  if (!resource.hasProfile) {
+    assert.ok(!documents.has(path.join(root, 'resources', resource.slug, 'index.html')), `${resource.slug}: metadata-only entries do not create empty detail pages`);
+    continue;
+  }
+  assert.equal(card.querySelector('h2 a')?.getAttribute('href'), expectedPath, `${resource.slug}: resource title opens its introduction`);
+  const topic = documents.get(path.join(root, 'topics', resource.topic, 'index.html'));
+  assert.ok(topic.getElementById(resource.anchor).querySelector(`a[href="${expectedPath}"]`), `${resource.slug}: existing topic entry links to its introduction`);
+  const page = documents.get(path.join(root, 'resources', resource.slug, 'index.html'));
+  assert.ok(page?.querySelector('main.resource-profile'), `${resource.slug}: detail page uses the resource layout`);
+  assert.equal(page.querySelector('h1').textContent.trim(), resource.name, `${resource.slug}: detail title uses catalog data`);
+  for (const heading of ['背景与目标', '核心能力', '核心概念与工作方式', '使用场景与接入方式']) {
+    assert.ok([...page.querySelectorAll('.profile-body h2')].some((node) => node.textContent.trim() === heading), `${resource.slug}: detail includes ${heading}`);
+  }
+  for (const link of resource.links ?? []) {
+    assert.ok([...page.querySelectorAll('.official-links a')].some((node) => node.getAttribute('href') === link.url), `${resource.slug}: official links expose ${link.label}`);
+  }
+  if (resource.status) {
+    assert.ok(page.querySelector('.profile-facts').textContent.includes(resource.status.label), `${resource.slug}: detail displays its sourced status`);
+    assert.ok(page.querySelector(`.profile-facts a[href="${resource.status.source}"]`), `${resource.slug}: status links to evidence`);
+    assert.equal(page.querySelector('.profile-facts time')?.getAttribute('datetime'), resource.status.checked, `${resource.slug}: status date stays beside the field`);
+  }
+  assert.equal(page.querySelector(`.desktop-nav a[href="${base}resources/"]`)?.getAttribute('aria-current'), 'page', `${resource.slug}: resource navigation is active`);
+}
 assert.equal(explorer.querySelector('.topic-filters button[data-topic="all"] [data-topic-count]')?.textContent, String(sourceCount), 'The initial all-topics count must match the full explorer');
 
 const changelog = documents.get(path.join(root, 'changelog', 'index.html'));
@@ -206,4 +248,4 @@ for (const [file, document] of documents) {
   }
 }
 assert.deepEqual(problems,[],'Generated site link/semantic checks');
-console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, and ${dates.length} changelog date groups.`);
+console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, ${profiles.length} resource introductions, and ${dates.length} changelog date groups.`);

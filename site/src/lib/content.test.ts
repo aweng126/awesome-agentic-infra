@@ -7,6 +7,7 @@ import {
   getGuide,
   getNotes,
   getResources,
+  getResourceProfiles,
   getTopics,
   getTopicSections,
   renderMarkdown,
@@ -40,7 +41,7 @@ test('topic sources produce nonempty, unique resources in metadata order', async
       assert.equal(resource.topicTitle, topic.title);
       assert.equal(resource.topicZhTitle, topic.zhTitle);
       assert.ok(topic.html.includes(`id="${resource.anchor}"`), 'every resource has a direct target in its topic');
-      assert.equal(resourcePath(resource), sitePath(`topics/${topic.slug}/#${resource.anchor}`));
+      assert.equal(resourcePath(resource), resource.hasProfile ? sitePath(`resources/${resource.slug}/`) : sitePath(`topics/${topic.slug}/#${resource.anchor}`));
     }
     assert.doesNotMatch(topic.html, /<h1(?:\s|>)/u);
     assert.doesNotMatch(topic.html, /返回首页/u);
@@ -114,10 +115,30 @@ test('Markdown routes respect the GitHub Pages base, source folder, query, and f
   assert.equal(rewriteMarkdownUrl('../CONTRIBUTING.md#what-to-include', 'notes/overview.md'), sitePath('contributing/#what-to-include'));
   assert.equal(rewriteMarkdownUrl('../CHANGELOG.md', 'notes/overview.md'), sitePath('changelog/'));
   assert.equal(rewriteMarkdownUrl('resources/runtime-and-orchestration.md#resource-langgraph', 'CHANGELOG.md'), sitePath('topics/runtime-and-orchestration/#resource-langgraph'));
+  assert.equal(rewriteMarkdownUrl('items/langgraph.md?source=index#核心能力', 'resources/runtime-and-orchestration.md'), sitePath('resources/langgraph/?source=index#核心能力'));
+  assert.equal(rewriteMarkdownUrl('../resources/items/autogen.md?source=guide', 'notes/overview.md'), sitePath('topics/runtime-and-orchestration/?source=guide#resource-autogen'));
+  assert.throws(() => rewriteMarkdownUrl('resources/items/missing-project.md', 'CHANGELOG.md'), /Unknown resource document/);
   assert.equal(rewriteMarkdownUrl('LICENSE', 'CONTRIBUTING.md'), `${repoUrl}/blob/main/LICENSE`);
   assert.equal(rewriteMarkdownUrl('../../outside.md', 'notes/overview.md'), null);
   for (const url of ['https://example.com/README.md#scope', '//example.com/a.md', 'mailto:hello@example.com', '#本地标题']) {
     assert.equal(rewriteMarkdownUrl(url, 'notes/overview.md'), url);
+  }
+});
+
+test('profile routes contain full introductions while metadata-only resources keep their topic fallback', async () => {
+  const resources = await getResources();
+  const profiles = await getResourceProfiles();
+  assert.equal(resources.length, 52);
+  assert.deepEqual(profiles.map(profile => profile.slug).sort(), ['amazon-bedrock-agentcore-runtime', 'e2b', 'google-ax', 'langgraph']);
+  assert.equal(resources.filter(resource => resource.hasProfile).length, profiles.length);
+  for (const profile of profiles) {
+    assert.equal(profile.sourcePath, `resources/items/${profile.slug}.md`);
+    assert.match(profile.html, /<h2 id="核心能力">/u);
+    assert.equal(resourcePath(profile), sitePath(`resources/${profile.slug}/`));
+    assert.ok(profile.links.length > 1);
+  }
+  for (const resource of resources.filter(resource => !resource.hasProfile)) {
+    assert.equal(resourcePath(resource), sitePath(`topics/${resource.topicSlug}/#${resource.anchor}`));
   }
 });
 

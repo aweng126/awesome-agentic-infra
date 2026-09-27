@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev --host 127.0.0.1",
-    "check": "astro check",
+    "check": "npm run resources:check && astro check",
     "test": "tsx --test src/lib/*.test.ts",
-    "build": "astro build && node scripts/verify-build.mjs",
-    "preview": "astro preview --host 127.0.0.1"
+    "build": "npm run resources:check && astro build && node scripts/verify-build.mjs",
+    "preview": "astro preview --host 127.0.0.1",
+    "resources:sync": "tsx scripts/sync-resources.ts",
+    "resources:check": "tsx scripts/sync-resources.ts --check"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -27,7 +29,8 @@
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",
     "unified": "11.0.5",
-    "unist-util-visit": "5.1.0"
+    "unist-util-visit": "5.1.0",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

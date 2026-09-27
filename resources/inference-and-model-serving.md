@@ -2,6 +2,8 @@
 
 收录与 Agent 模型接入、多轮调用、长上下文和并发请求相关的模型网关、推理引擎与分布式服务资料。**LLM Serving Infra** 作为关联基础设施，在七个主要主题之外提供独立入口；它与 Agentic Infra、LLM Training Infra 的关系见 [领域导览](../notes/agentic-infra-overview.md)。
 
+<!-- resources:start -->
+
 ## Projects & Platforms
 
 - <a id="resource-dynamo"></a> [Dynamo](https://github.com/ai-dynamo/dynamo) — 协调推理引擎的分布式服务框架，提供 prefill/decode 分离、感知 KV cache 的路由和缓存管理，用于多节点推理服务的请求调度。
@@ -12,5 +14,7 @@
 ## Papers
 
 - <a id="resource-pagedattention"></a> [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180)（2023，SOSP）— 提出 PagedAttention，改进 LLM 服务中的 KV cache 内存管理，讨论长上下文和并发生成的服务端内存开销。
+
+<!-- resources:end -->
 
 [返回首页](../README.md)

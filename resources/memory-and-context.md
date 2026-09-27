@@ -2,6 +2,8 @@
 
 收录 Agent 记忆管理、上下文存储、数据接入与检索组件，以及相关论文。
 
+<!-- resources:start -->
+
 ## Projects & Platforms
 
 - <a id="resource-graphiti"></a> [Graphiti](https://github.com/getzep/graphiti) — 构建和查询随时间变化的上下文图，支持事实有效时间、来源追溯、增量更新和混合检索，为 Agent 组织持续积累的事实、关系与历史交互。
@@ -12,5 +14,7 @@
 ## Papers
 
 - <a id="resource-memgpt-towards-llms-as-operating-systems"></a> [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560)（2023，arXiv 预印本；2024 年修订）— 借鉴操作系统的分层存储思想，在有限上下文窗口内管理不同层级的记忆，提出虚拟上下文管理、记忆层间数据移动和流程中断机制。
+
+<!-- resources:end -->
 
 [返回首页](../README.md)

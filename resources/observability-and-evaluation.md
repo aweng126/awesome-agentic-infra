@@ -2,6 +2,8 @@
 
 收录 Agent 执行追踪、模型与工具调用观测、任务评估和实验管理平台，以及基准论文与遥测规范。
 
+<!-- resources:start -->
+
 ## Projects & Platforms
 
 - <a id="resource-langfuse"></a> [Langfuse](https://github.com/langfuse/langfuse) — LLM 应用观测与评估平台，提供执行追踪、数据集和提示词管理，可将模型调用、检索和 Agent 操作关联到同一次执行。
@@ -16,5 +18,7 @@
 ## Specifications
 
 - <a id="resource-opentelemetry-genai-semantic-conventions"></a> [OpenTelemetry GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) — 为生成式 AI 遥测定义共享的语义约定，统一表达模型、Agent 和工具调用的观测数据。具体字段的稳定性状态见对应规范。
+
+<!-- resources:end -->
 
 [返回首页](../README.md)
