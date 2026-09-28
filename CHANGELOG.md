@@ -2,6 +2,17 @@
 
 按发布批次记录本站新增的资源、导览和读者可感知的改进，最新记录在前；点击条目链接即可查看相关内容。日期与时间为本站发布时的北京时间。
 
+## 2026-09-28
+
+### 16:38 · 完善 Strands Harness 介绍
+
+更新 [Strands Agents（Harness SDK）](resources/items/strands-agents.md) 介绍，区分用于自行组合 Agent 的 Harness SDK 与预装配的 Strands harness，补充主要能力和官方接入入口。
+
+#### 内容更新
+
+- 补充上下文、会话与运行控制说明，分别提供 SDK 和预装配 Harness 的阅读路径；支持通过 Harness 相关名称搜索该资源。
+- 同步[运行时与编排](resources/runtime-and-orchestration.md)主题索引和 [Runtime 全景](notes/agent-runtime-landscape.md)中的名称与定位。
+
 ## 2026-09-27
 
 ### 22:00 · 精简仓库首页
