@@ -4,6 +4,7 @@
 
 ## 2026-09-28
 
+- 在[运行时与编排](resources/runtime-and-orchestration.md)新增 Agent Harness 分类及 11 篇项目介绍，覆盖 Pi、Codex、Claude Agent SDK、OpenCode、Gemini CLI、GitHub Copilot SDK，以及 Qwen Code、Kimi Code CLI、CodeBuddy Code、[ZCode](resources/items/zcode.md) 和 TraeCode CLI；[Runtime 全景](notes/agent-runtime-landscape.md#agent-harness-与-coding-agent)同步汇总各方案定位与接入方式。
 - 完善 [Strands Agents（Harness SDK）](resources/items/strands-agents.md) 介绍，区分可组合的 SDK 与预装配 Harness，补充上下文、会话和运行控制说明；同步 [Runtime 全景](notes/agent-runtime-landscape.md)中的名称与定位。
 - 在[首页](https://blog.kingwen.cn/awesome-agentic-infra/)直接展示[领域导览](notes/agentic-infra-overview.md)与 [Runtime 全景](notes/agent-runtime-landscape.md)，主导航和文章侧栏提供[资源导览](notes/README.md)入口。
 - 主题导航直接进入[运行时与编排](resources/runtime-and-orchestration.md)，通过侧栏切换主题；精简范围介绍，首页提供“按主题浏览”入口，手机菜单显示当前主题。

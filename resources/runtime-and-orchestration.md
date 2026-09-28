@@ -1,6 +1,6 @@
 # Runtime & Orchestration
 
-收录 Agent 开发框架、工作流引擎与多 Agent 协作平台，覆盖执行编排、状态管理和任务恢复。
+收录 Agent 开发框架、Agent Harness、工作流引擎与多 Agent 协作平台，覆盖执行循环、上下文与会话管理、任务编排和恢复。
 
 <!-- resources:start -->
 
@@ -16,11 +16,22 @@
 - <a id="resource-strands-agents"></a> [Strands Agents（Harness SDK）](https://strandsagents.com/docs/user-guide/sdk/) — 开源的 Python / TypeScript Agent Harness SDK，提供执行循环、工具接入、上下文与会话管理等组件，并提供预装配的 Strands harness，支持快速构建和定制 Agent。 [项目介绍](items/strands-agents.md)
 - <a id="resource-temporal"></a> [Temporal](https://docs.temporal.io/ai) — 通用持久执行平台，通过 Workflow 与 Activity 组织任务，支持失败重试及等待外部事件后继续执行。官方提供 Agent 循环、工具调用和人工审批的集成示例。 [项目介绍](items/temporal.md)
 - <a id="resource-veadk"></a> [VeADK](https://github.com/volcengine/veadk-python) — 火山引擎的开源 Agent 开发工具包，提供 Agent、Runner、子 Agent 组织和会话存储，并支持 AgentKit 应用集成。 [项目介绍](items/veadk.md)
+- <a id="resource-pi"></a> [Pi Agent Harness](https://pi.dev/docs/latest) — 可扩展的开源 Agent Harness，提供终端编码 Agent、TypeScript SDK 与 RPC 接口，组合工具执行、会话管理和上下文压缩，可嵌入自有应用。 [项目介绍](items/pi.md)
+- <a id="resource-codex"></a> [Codex（Agent Harness）](https://developers.openai.com/blog/codex-as-a-platform) — OpenAI 的可复用 Agent Harness，通过 CLI、SDK 与 App Server 提供工具执行、会话状态、流式事件及审批接口，可接入自有产品和自动化流程。 [项目介绍](items/codex.md)
+- <a id="resource-claude-agent-sdk"></a> [Claude Agent SDK（Claude Code）](https://code.claude.com/docs/en/agent-sdk/overview) — 将 Claude Code 的执行循环、内置工具和上下文管理开放给 Python 与 TypeScript 应用，提供会话、权限、Hooks、MCP 与子 Agent 接口。 [项目介绍](items/claude-agent-sdk.md)
+- <a id="resource-opencode"></a> [OpenCode](https://opencode.ai/v2/docs/build/) — 开源编码 Agent，提供可独立运行的服务、客户端 API 与内嵌 SDK，支持围绕会话、工具和插件构建自定义 Agent 界面与自动化流程。 [项目介绍](items/opencode.md)
+- <a id="resource-gemini-cli"></a> [Gemini CLI](https://github.com/google-gemini/gemini-cli) — Google 开源的终端 Agent，组合 Gemini 模型、文件与命令工具、项目上下文和会话管理，可通过 Headless 模式接入脚本与自动化流程。 [项目介绍](items/gemini-cli.md)
+- <a id="resource-github-copilot"></a> [GitHub Copilot SDK（Copilot CLI）](https://github.com/github/copilot-sdk) — 将 Copilot CLI 的 Agent 执行能力开放给应用的多语言 SDK，支持会话、流式事件、自定义工具和 MCP，复用任务规划与工具执行能力。 [项目介绍](items/github-copilot.md)
+- <a id="resource-qwen-code"></a> [Qwen Code](https://github.com/QwenLM/qwen-code) — 阿里 Qwen 团队的开源 Coding Agent，提供本地执行循环、工具与会话管理，可通过非交互 CLI、SDK 和 ACP 接入自动化流程。 [项目介绍](items/qwen-code.md)
+- <a id="resource-kimi-code"></a> [Kimi Code CLI](https://github.com/MoonshotAI/kimi-code) — 月之暗面的开源本地 Coding Agent，提供工具执行、子 Agent、非交互命令和 ACP，并通过实验性本地 API 暴露会话控制能力。 [项目介绍](items/kimi-code.md)
+- <a id="resource-codebuddy-code"></a> [CodeBuddy Code](https://www.codebuddy.cn/docs/cli/quickstart) — 腾讯的本地 Coding Agent CLI，支持无头执行、会话恢复、MCP 与权限控制，并提供 TypeScript、Python Agent SDK 接入研发自动化。 [项目介绍](items/codebuddy-code.md)
+- <a id="resource-zcode"></a> [ZCode](https://github.com/zai-org/ZCode) — 智谱 Z.ai 的开源编程 Agent Harness，提供桌面、Web 与终端入口，公开 Agent CLI 和运行时源码，支持通过插件、MCP 与 Hooks 扩展执行能力。 [项目介绍](items/zcode.md)
+- <a id="resource-trae-code-cli"></a> [TraeCode CLI](https://docs.trae.cn/cli_about-trae-code-cli-2) — 字节跳动 TRAE 的本地编程 Agent，支持交互式终端、脚本与 CI 非交互执行，通过 ACP 接入编辑器，并提供会话管理、工具扩展和权限控制。 [项目介绍](items/trae-code-cli.md)
 
 <!-- resources:end -->
 
 ## 方案总览
 
-- [Agent Runtime 全景：开源框架、运行平台与云厂商产品](../notes/agent-runtime-landscape.md) — 汇总代表性开源框架、可自托管的运行平台与云厂商产品，介绍各方案的维护方、产品定位、主要特点和官方入口。
+- [Agent Runtime 全景：框架、Agent Harness 与运行平台](../notes/agent-runtime-landscape.md) — 汇总开发框架、Coding Agent 执行系统、自托管平台与云厂商产品，介绍各方案的定位、特点和接入入口。
 
 [返回首页](../README.md)

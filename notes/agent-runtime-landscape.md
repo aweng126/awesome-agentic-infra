@@ -1,8 +1,8 @@
-# Agent Runtime 全景：开源框架、运行平台与云厂商产品
+# Agent Runtime 全景：框架、Agent Harness 与运行平台
 
-Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架、可自托管的运行平台，以及云厂商的托管产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
+Agent Runtime 生态涵盖开发框架、可以直接使用或集成的 Agent Harness、自托管运行平台，以及云厂商的托管产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
 
-下面先按这三种形态组织清单：开源框架提供 Agent 开发与编排能力；开源运行平台供团队自行部署，管理 Agent 工作负载与运行环境；云厂商产品提供构建、部署、运行和管理服务。它们可以配合使用，一个框架可以接入不同运行平台，同一厂商也可能同时提供开发工具包、开源平台和托管产品。随后补充围绕目标、分工与交付协调多个 Agent 的上层协作平台。
+下面按主要使用方式组织清单：开发框架供开发者组合 Agent 行为；Harness 提供已经组合好的执行系统，包含许多 Coding Agent；运行平台管理工作负载和运行环境；云厂商产品提供托管能力。随后补充围绕目标、分工与交付协调多个 Agent 的上层协作平台。分类之间可能有能力重叠，同一厂商也可能同时提供 SDK、本地产品与云端服务。
 
 ## 开源框架与项目
 
@@ -19,6 +19,26 @@ Agent Runtime 生态涵盖用于编写和组织 Agent 行为的开源框架、�
 | [Cloudflare Agents](../resources/items/cloudflare-agents.md) | Cloudflare 团队与社区 | 在 Cloudflare 平台构建有状态 Agent 的开源 SDK | 状态管理、实时通信、任务调度、模型与 MCP 集成 | [文档](https://developers.cloudflare.com/agents/) · [仓库](https://github.com/cloudflare/agents) |
 
 旧 [AgentScope Runtime](https://github.com/agentscope-ai/agentscope-runtime) 的能力已整合进 AgentScope 2.0，因此这里作为一个项目介绍。
+
+## Agent Harness 与 Coding Agent
+
+这一组将模型调用、工具执行、上下文和会话组合成可运行的 Agent 系统。Coding Agent 描述其编程用途；SDK、程序化 CLI 和客户端协议则是复用执行能力的不同方式。表中区分各项目的接入入口，开源范围、产品形态及使用条件见各自介绍。
+
+| 项目 | 维护方 | 一句话定位 | 接入与扩展方式 | 官方入口 |
+| --- | --- | --- | --- | --- |
+| [Pi](../resources/items/pi.md) | Earendil 与社区 | 可扩展的编程 Harness 与 Agent 组件 | 终端、TypeScript SDK、RPC；会话管理与扩展 | [仓库](https://github.com/earendil-works/pi) · [SDK](https://pi.dev/docs/latest/sdk) |
+| [Codex](../resources/items/codex.md) | OpenAI | 支撑 Codex 多种产品入口的执行系统 | 非交互 CLI、SDK、app-server；线程、工具与审批交互 | [平台说明](https://developers.openai.com/blog/codex-as-a-platform) |
+| [Claude Agent SDK（Claude Code）](../resources/items/claude-agent-sdk.md) | Anthropic | 在程序中使用 Claude Code 的执行能力 | Python / TypeScript SDK；工具、会话、权限与 Hooks | [SDK 文档](https://code.claude.com/docs/en/agent-sdk/overview) |
+| [OpenCode](../resources/items/opencode.md) | OpenCode 团队与社区 | 可嵌入应用的开源编程 Agent | SDK 内嵌运行、客户端接口与插件扩展 | [SDK 文档](https://opencode.ai/v2/docs/build/sdk) |
+| [Gemini CLI](../resources/items/gemini-cli.md) | Google 与社区 | 终端中的开源编程 Agent | 交互 CLI、Headless 模式及 JSON / JSONL 输出 | [文档](https://geminicli.com/docs/) |
+| [GitHub Copilot SDK](../resources/items/github-copilot.md) | GitHub | 将 Copilot CLI 的 Agent 能力集成到应用 | 多语言 SDK；会话、工具及执行事件 | [SDK 仓库](https://github.com/github/copilot-sdk) |
+| [Qwen Code](../resources/items/qwen-code.md) | 阿里巴巴 Qwen 团队与社区 | 面向代码任务的开源 Agent | Headless CLI、SDK、MCP 与编辑器集成 | [仓库](https://github.com/QwenLM/qwen-code) |
+| [Kimi Code CLI](../resources/items/kimi-code.md) | 月之暗面 Moonshot AI | 面向终端及编辑器的编程 Agent | 命令行、ACP 与程序化接入 | [仓库](https://github.com/MoonshotAI/kimi-code) |
+| [CodeBuddy Code](../resources/items/codebuddy-code.md) | 腾讯 | 可接入研发流程的编程 Agent | Headless CLI、Agent SDK、工具与会话控制 | [CLI 文档](https://www.codebuddy.cn/docs/cli/quickstart) |
+| [ZCode](../resources/items/zcode.md) | 智谱 Z.ai | 开源编程 Harness 与多入口工作台 | 桌面、Web 与 CLI；公开运行时源码、插件、MCP 与 Hooks | [仓库](https://github.com/zai-org/ZCode) |
+| [TraeCode CLI](../resources/items/trae-code-cli.md) | 字节跳动 TRAE 团队 | 用于终端和自动化流程的编程 Agent | 非交互 `exec`、ACP、插件与 MCP；CLI 2.0 面向企业版旗舰版客户 | [CLI 文档](https://docs.trae.cn/cli_about-trae-code-cli-2) |
+
+前述 [Strands Agents](../resources/items/strands-agents.md) 同时提供可组合的 Harness SDK 与预装配 Harness，因此保留在开发框架分组介绍。SDK 是否开源、Agent 在何处运行以及模型如何接入，是需要分别了解的三个方面。
 
 ## 开源运行平台
 

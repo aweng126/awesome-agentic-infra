@@ -54,7 +54,7 @@ flowchart TB
 
 | 主题 | 主要职责 | 资源入口 |
 | --- | --- | --- |
-| Runtime & Orchestration | 执行流程、多 Agent 协作、任务状态与恢复 | [资源](../resources/runtime-and-orchestration.md) |
+| Runtime & Orchestration | Agent 框架与 Harness、执行流程、会话状态与恢复、多 Agent 协作 | [资源](../resources/runtime-and-orchestration.md) |
 | Sandbox & Execution | 为生成的代码或浏览器操作提供执行环境与隔离边界 | [资源](../resources/sandbox-and-execution.md) |
 | Memory & Context | 保存会话与长期信息，为下一次模型调用选择上下文 | [资源](../resources/memory-and-context.md) |
 | Tools & Protocols | 描述工具接口，传递请求和结果，与其他 Agent 互联 | [资源](../resources/tools-and-protocols.md) |
@@ -66,6 +66,7 @@ flowchart TB
 
 ## 容易混淆的边界
 
+- **Coding Agent 与 Agent Harness**：Coding Agent 描述编程用途，Harness 描述组织模型调用、工具执行、上下文和会话的执行系统。可通过 SDK、程序化 CLI 或公开协议复用的执行能力归入运行时；同一项目的编程界面与可集成组件合并介绍。
 - **任务编排与资源调度**：下一步执行什么、任务如何继续，归入运行时；执行环境如何供应、资源如何分配，归入部署与调度。
 - **任务状态、Agent 记忆与 KV cache**：执行进度归入运行时，供后续上下文使用的信息归入记忆，推理引擎的 KV cache 归入关联的模型服务。
 - **工具接口与执行环境**：工具的发现和调用规则归入工具与协议，承载代码或浏览器操作的环境归入沙箱与执行。
