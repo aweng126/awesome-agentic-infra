@@ -1,6 +1,6 @@
 # Deployment & Scheduling
 
-收录 Agent 与工具服务的运行平台、工作负载编排和弹性伸缩组件。开发框架见 [Runtime & Orchestration](runtime-and-orchestration.md)，沙箱与隔离组件见 [Sandbox & Execution](sandbox-and-execution.md)。
+收录 Agent 与工具服务的运行平台、工作负载编排和弹性伸缩组件。
 
 <!-- resources:start -->
 

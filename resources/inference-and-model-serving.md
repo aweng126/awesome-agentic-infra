@@ -1,6 +1,6 @@
 # Inference & Model Serving
 
-收录与 Agent 模型接入、多轮调用、长上下文和并发请求相关的模型网关、推理引擎与分布式服务资料。**LLM Serving Infra** 作为关联基础设施，在七个主要主题之外提供独立入口；它与 Agentic Infra、LLM Training Infra 的关系见 [领域导览](../notes/agentic-infra-overview.md)。
+收录与 Agent 模型接入、多轮调用、长上下文和并发请求相关的模型网关、推理引擎与分布式服务资料。
 
 <!-- resources:start -->
 

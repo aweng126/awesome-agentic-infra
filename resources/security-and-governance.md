@@ -1,6 +1,6 @@
 # Security & Governance
 
-收录 Agent 身份、授权、策略决策和交互检查组件，以及威胁分类与安全指南。代码执行环境的隔离组件见 [Sandbox & Execution](sandbox-and-execution.md)。
+收录 Agent 身份、授权、策略决策和交互检查组件，以及威胁分类与安全指南。
 
 <!-- resources:start -->
 

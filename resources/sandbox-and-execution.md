@@ -1,6 +1,6 @@
 # Sandbox & Execution
 
-收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱环境与服务、云浏览器，以及容器执行和隔离底座；也关注执行环境的状态检查点、回滚与分支机制。身份与授权组件见 [Security & Governance](security-and-governance.md)，集群资源管理见 [Deployment & Scheduling](deployment-and-scheduling.md)。
+收录 Agent 代码执行、文件操作与浏览器交互所需的沙箱环境与服务、云浏览器，以及容器执行和隔离底座；也关注执行环境的状态检查点、回滚与分支机制。
 
 <!-- resources:start -->
 

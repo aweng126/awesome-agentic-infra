@@ -1,6 +1,6 @@
 # Runtime & Orchestration
 
-收录 Agent 开发框架、工作流引擎与多 Agent 协作平台，覆盖执行编排、状态管理和任务恢复。运行托管见 [Deployment & Scheduling](deployment-and-scheduling.md)，记忆与检索组件见 [Memory & Context](memory-and-context.md)。
+收录 Agent 开发框架、工作流引擎与多 Agent 协作平台，覆盖执行编排、状态管理和任务恢复。
 
 <!-- resources:start -->
 
