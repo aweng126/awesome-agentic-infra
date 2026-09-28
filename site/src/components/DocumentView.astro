@@ -29,7 +29,7 @@ const notes = [...await getNotes()].sort((left, right) => Number(right.slug === 
 const topicGroups = groupTopics(topics);
 const toc = headings.filter((heading) => heading.depth <= 3);
 const section = kind === 'topic' ? '主题导航' : kind === 'note' ? '资源导览' : '参与共建';
-const sectionPath = kind === 'topic' ? 'topics/' : kind === 'note' ? 'notes/' : 'contributing/';
+const sectionPath = kind === 'note' ? 'notes/' : 'contributing/';
 const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
 ---
 
@@ -92,7 +92,7 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
     <nav class="breadcrumbs" aria-label="面包屑">
       <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
       {kind === 'guide' ? <span aria-current="page">{section}</span> : <>
-        <a href={sitePath(sectionPath)}>{section}</a>
+        {kind === 'topic' ? <span>{section}</span> : <a href={sitePath(sectionPath)}>{section}</a>}
         <span aria-hidden="true">/</span><span aria-current="page">{title}</span>
       </>}
     </nav>

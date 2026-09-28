@@ -3,6 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { DOMParser, parseHTML } from 'linkedom';
 import { inflateSync } from 'node:zlib';
+import { runInNewContext } from 'node:vm';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -21,6 +22,8 @@ async function walk(dir) {
 }
 const files = await walk(root);
 const pages = files.filter(file=>file.endsWith('.html'));
+const topicRedirectFile = path.join(root, 'topics/index.html');
+const defaultTopicPath = `${base}topics/runtime-and-orchestration/`;
 let checkedLinks = 0;
 const documents = new Map();
 for (const page of pages) documents.set(page,parseHTML(await readFile(page,'utf8')).document);
@@ -52,35 +55,37 @@ for(const [file,document] of documents){
     if (ids.has(id)) problems.push(`${relative}: duplicate ID: ${id}`);
     ids.add(id);
   }
-  for (const selector of ['.desktop-nav', '.mobile-nav']) {
-    const navigation = document.querySelector(selector);
-    const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
-    assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
-      ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', `${base}topics/`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
-    ], `${relative}: ${selector} exposes the five resource-focused navigation entries`);
-    if (relative.startsWith(`notes${path.sep}`)) {
-      assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}notes/`], `${relative}: guides have their own active navigation entry in ${selector}`);
-    }
-    if (relative.startsWith(`topics${path.sep}`)) {
-      assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}topics/`], `${relative}: topic index and detail pages share the active topic navigation entry in ${selector}`);
-    }
-    const changelogLink = links
-      .find((link) => link.getAttribute('href') === `${base}changelog/`);
-    if (!changelogLink) problems.push(`${relative}: missing changelog link in ${selector}`);
-    if (relative === path.join('changelog', 'index.html') && changelogLink?.getAttribute('aria-current') !== 'page') {
-      problems.push(`${relative}: changelog must be active in ${selector}`);
-    }
-  }
   const pagePath=base+relative.replace(/index\.html$/,'');
-  const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href');
-  assert.ok(canonical, `${relative}: canonical URL is present`);
-  if (relative !== '404.html') assert.equal(canonical, absolute(pagePath), `${relative}: canonical uses the configured page URL`);
-  assert.equal(document.querySelector('meta[property="og:url"]')?.getAttribute('content'), canonical, `${relative}: Open Graph URL matches the canonical`);
-  assert.equal(document.querySelector('meta[property="og:image"]')?.getAttribute('content'), absolute(`${base}social-card.png`), `${relative}: Open Graph uses the shared absolute PNG URL`);
-  assert.equal(document.querySelector('meta[property="og:image:width"]')?.getAttribute('content'), '1200', `${relative}: sharing image width is declared`);
-  assert.equal(document.querySelector('meta[property="og:image:height"]')?.getAttribute('content'), '630', `${relative}: sharing image height is declared`);
-  assert.equal(document.querySelector('meta[name="twitter:card"]')?.getAttribute('content'), 'summary_large_image', `${relative}: sharing card uses the large image`);
-  assert.equal(document.querySelector('link[rel="alternate"][type="application/rss+xml"]')?.getAttribute('href'), `${base}feed.xml`, `${relative}: RSS autodiscovery uses the project base`);
+  if (file !== topicRedirectFile) {
+    for (const selector of ['.desktop-nav', '.mobile-nav']) {
+      const navigation = document.querySelector(selector);
+      const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
+      assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
+        ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', defaultTopicPath], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
+      ], `${relative}: ${selector} exposes the five resource-focused navigation entries`);
+      if (relative.startsWith(`notes${path.sep}`)) {
+        assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}notes/`], `${relative}: guides have their own active navigation entry in ${selector}`);
+      }
+      if (relative.startsWith(`topics${path.sep}`)) {
+        assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [defaultTopicPath], `${relative}: topic pages keep the topic navigation active in ${selector}`);
+      }
+      const changelogLink = links
+        .find((link) => link.getAttribute('href') === `${base}changelog/`);
+      if (!changelogLink) problems.push(`${relative}: missing changelog link in ${selector}`);
+      if (relative === path.join('changelog', 'index.html') && changelogLink?.getAttribute('aria-current') !== 'page') {
+        problems.push(`${relative}: changelog must be active in ${selector}`);
+      }
+    }
+    const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href');
+    assert.ok(canonical, `${relative}: canonical URL is present`);
+    if (relative !== '404.html') assert.equal(canonical, absolute(pagePath), `${relative}: canonical uses the configured page URL`);
+    assert.equal(document.querySelector('meta[property="og:url"]')?.getAttribute('content'), canonical, `${relative}: Open Graph URL matches the canonical`);
+    assert.equal(document.querySelector('meta[property="og:image"]')?.getAttribute('content'), absolute(`${base}social-card.png`), `${relative}: Open Graph uses the shared absolute PNG URL`);
+    assert.equal(document.querySelector('meta[property="og:image:width"]')?.getAttribute('content'), '1200', `${relative}: sharing image width is declared`);
+    assert.equal(document.querySelector('meta[property="og:image:height"]')?.getAttribute('content'), '630', `${relative}: sharing image height is declared`);
+    assert.equal(document.querySelector('meta[name="twitter:card"]')?.getAttribute('content'), 'summary_large_image', `${relative}: sharing card uses the large image`);
+    assert.equal(document.querySelector('link[rel="alternate"][type="application/rss+xml"]')?.getAttribute('href'), `${base}feed.xml`, `${relative}: RSS autodiscovery uses the project base`);
+  }
   for(const element of document.querySelectorAll('a[href],link[href],script[src],img[src]')){
     const raw=element.getAttribute('href')||element.getAttribute('src');
     if(!raw||/^(https?:|mailto:|data:)/.test(raw))continue;
@@ -121,29 +126,37 @@ const primarySlugs = resourceFiles.map((filename) => filename.slice(0, -3)).filt
 assert.equal(primarySlugs.length, 7, 'The collection has seven primary Agent infrastructure topics');
 assert.ok(resourceFiles.includes(`${servingSlug}.md`), 'Serving remains a source topic with its existing address');
 const primaryTopicPaths = new Set(primarySlugs.map((slug) => `${base}topics/${slug}/`));
-const topicIndex = documents.get(path.join(root, 'topics/index.html'));
-assert.ok(topicIndex, 'An independent topic index must be generated');
-const directoryCards = [...topicIndex.querySelectorAll('.topic-directory-card')];
-assert.equal(directoryCards.length, resourceFiles.length, 'Topic index includes every topic once');
-assert.deepEqual(new Set(directoryCards.map(card => card.getAttribute('href'))), new Set([...primaryTopicPaths, servingPath]), 'Topic index links directly to the existing topic pages');
-const directoryScopes = new Map();
-for (const card of directoryCards) {
-  const slug = card.getAttribute('data-topic');
-  const scope = card.getAttribute('data-topic-scope');
-  directoryScopes.set(scope, (directoryScopes.get(scope) ?? 0) + 1);
-  assert.equal(card.getAttribute('href'), `${base}topics/${slug}/`, `${slug}: topic card URL matches its identifier`);
-  assert.equal(Number.parseInt(card.querySelector('[data-resource-count]')?.textContent, 10), catalog.filter(resource => resource.topic === slug).length, `${slug}: directory count matches the resource catalog`);
+const topicRedirect = documents.get(topicRedirectFile);
+assert.ok(topicRedirect, 'The previous topic index keeps a compatibility page');
+assert.equal(topicRedirect.querySelector('meta[name="robots"]')?.getAttribute('content'), 'noindex, follow', 'The compatibility page is not indexed as duplicate content');
+assert.equal(topicRedirect.querySelector('link[rel="canonical"]')?.getAttribute('href'), absolute(defaultTopicPath), 'The compatibility page points to the default topic');
+assert.equal(topicRedirect.querySelectorAll('.topic-directory-card').length, 0, 'The intermediate topic-card index has been removed');
+const redirectScript = topicRedirect.querySelector('#topic-redirect')?.textContent;
+assert.ok(redirectScript, 'The compatibility page redirects readers to topic content');
+const legacyTargets = new Map([
+  ['', defaultTopicPath],
+  ['#agent-core', defaultTopicPath],
+  ['#cross-cutting', `${base}topics/deployment-and-scheduling/`],
+  ['#related-infrastructure', servingPath],
+]);
+for (const [hash, target] of legacyTargets) {
+  let destination;
+  runInNewContext(redirectScript, { location: { hash, search: '', replace: url => { destination = url; } } }, { timeout: 1000 });
+  assert.equal(destination, target, `Old topic entry ${hash || '/topics/'} reaches the matching content`);
+  await verifyLocalUrl(target, 'Topic compatibility destination');
+  if (hash) assert.equal(topicRedirect.querySelector(`${hash} a`)?.getAttribute('href'), target, 'Readers without JavaScript can follow the matching topic link');
 }
-assert.deepEqual(directoryScopes, new Map([['core', 4], ['crossCutting', 3], ['serving', 1]]), 'Topic index distinguishes core capabilities, cross-cutting support and Serving');
-assert.ok(topicIndex.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Related infrastructure has a direct topic-index anchor');
+let preservedDestination;
+runInNewContext(redirectScript, { location: { hash: '#resource-langgraph', search: '?from=bookmark', replace: url => { preservedDestination = url; } } }, { timeout: 1000 });
+assert.equal(preservedDestination, `${defaultTopicPath}?from=bookmark#resource-langgraph`, 'Compatibility navigation preserves query parameters and content anchors');
 const home = documents.get(path.join(root, 'index.html'));
 assert.ok(home, 'Homepage must be generated');
 const homeTopicCards = [...home.querySelectorAll('.topic-card')];
 assert.equal(homeTopicCards.length, 7, 'Homepage highlights seven primary topic cards');
 assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))), primaryTopicPaths, 'Homepage primary cards include all Agent topics and exclude Serving');
 assert.equal(home.querySelector('[data-stat="topics"] strong')?.textContent.trim(), String(primarySlugs.length), 'Homepage reports the primary topic count');
-assert.equal(home.querySelector('[data-stat="topics"]')?.getAttribute('href'), `${base}topics/`, 'Homepage topic count opens the independent index');
-assert.equal(home.querySelector('#topics .section-heading .inline-link')?.getAttribute('href'), `${base}topics/`, 'Homepage offers a link to all topics');
+assert.equal(home.querySelector('[data-stat="topics"]')?.getAttribute('href'), defaultTopicPath, 'Homepage topic count opens the default topic content');
+assert.equal(home.querySelector('#topics .section-heading .inline-link')?.getAttribute('href'), defaultTopicPath, 'Homepage topic browsing opens content directly');
 assert.equal(home.querySelector('[data-stat="resources"] strong')?.textContent.trim(), String(catalog.length), 'Homepage resource count comes from the catalog');
 assert.equal(home.querySelector('[data-stat="projects"] strong')?.textContent.trim(), String(profiles.filter(resource => resource.type === 'project').length), 'Homepage project count excludes other resource guides');
 assert.equal(home.querySelector('[data-stat="projects"]')?.getAttribute('href'), `${base}resources/?type=project`, 'Project count opens the project resource filter');
@@ -193,7 +206,9 @@ for (const filename of resourceFiles) {
   const currentTopicLinks = [...topic.querySelectorAll('.topic-sidebar a[aria-current="page"]')];
   assert.equal(currentTopicLinks.length, 1, `${filename}: navigation marks only the current topic`);
   assert.equal(currentTopicLinks[0]?.getAttribute('href'), `${base}topics/${topicSlug}/`, `${filename}: the current topic remains active in its group`);
-  assert.equal(topic.querySelectorAll('.breadcrumbs a')[1]?.getAttribute('href'), `${base}topics/${topicSlug === servingSlug ? '#related-infrastructure' : ''}`, `${filename}: breadcrumb returns to the independent topic index`);
+  assert.deepEqual([...topic.querySelectorAll('.breadcrumbs a')].map(link => link.getAttribute('href')), [base], `${filename}: only the actual homepage is linked in the breadcrumb`);
+  assert.ok(topic.querySelector('.breadcrumbs')?.textContent.includes(topicSlug === servingSlug ? '关联基础设施' : '主题导航'), `${filename}: breadcrumb preserves the topic grouping`);
+  assert.equal(topic.querySelector('.topic-menu summary > span')?.textContent, `切换主题 · ${topic.querySelector('h1').textContent}`, `${filename}: mobile topic switcher identifies the current topic`);
   const tree = parser.parse(await readFile(`../resources/${filename}`, 'utf8'));
   const anchors = new Set();
   const overviewLinks = new Set();
@@ -248,8 +263,8 @@ for (const filename of resourceFiles) {
 assert.equal(sourceCount, catalog.length, 'Generated topic indexes and the single resource catalog have the same count');
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');
 const searchItems = JSON.parse(home.getElementById('search-data').textContent);
-assert.equal(searchItems.find(item => item.title === '主题导航')?.url, `${base}topics/`, 'Search opens the independent topic index');
-assert.equal(searchItems.find(item => item.title === '关联基础设施')?.url, `${base}topics/#related-infrastructure`, 'Related-infrastructure search opens its group in the topic index');
+assert.equal(searchItems.find(item => item.title === '主题导航')?.url, defaultTopicPath, 'Search opens topic content directly');
+assert.equal(searchItems.find(item => item.title === '关联基础设施')?.url, servingPath, 'Related-infrastructure search opens the Serving content directly');
 for (const resource of catalog) {
   const card = explorer.getElementById(`${resource.topic}-${resource.anchor}`);
   assert.ok(card, `${resource.slug}: catalog record has a resource card`);
@@ -398,9 +413,9 @@ assert.equal(sitemap.documentElement.localName, 'urlset', 'Sitemap root is prese
 assert.equal(sitemap.documentElement.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9', 'Sitemap declares the standard namespace');
 const sitemapUrls = [...sitemap.querySelectorAll('url > loc')].map(node => node.textContent);
 assert.equal(new Set(sitemapUrls).size, sitemapUrls.length, 'Sitemap URLs are unique');
-const expectedSitemapUrls = pages.filter(file => path.relative(root, file) !== '404.html')
+const expectedSitemapUrls = pages.filter(file => path.relative(root, file) !== '404.html' && file !== topicRedirectFile)
   .map(file => absolute(base + path.relative(root, file).replace(/index\.html$/u, ''))).sort();
-assert.deepEqual([...sitemapUrls].sort(), expectedSitemapUrls, 'Sitemap lists every published page except the error page');
+assert.deepEqual([...sitemapUrls].sort(), expectedSitemapUrls, 'Sitemap lists content pages and excludes error and compatibility pages');
 for (const url of sitemapUrls) {
   const parsed = new URL(url);
   assert.ok(!parsed.search && !parsed.hash, 'Sitemap lists canonical pages without filters or anchors');

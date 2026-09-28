@@ -40,7 +40,7 @@ const resourceGroups = resourceTypes.map((kind) => {
   <main id="main-content" class="topic-shell">
     <aside class="topic-sidebar" aria-label="主题导航">
       <details class="topic-menu" open>
-        <summary>主题导航 <span aria-hidden="true">⌄</span></summary>
+        <summary><span>切换主题 · {topic.zhTitle}</span><span aria-hidden="true">⌄</span></summary>
         <nav aria-label="主题导航">
           {topicGroups.map((group) => <div class="topic-nav-group" data-topic-group={group.id}>
           <p class="sidebar-label">{group.title}</p>
@@ -63,7 +63,7 @@ const resourceGroups = resourceTypes.map((kind) => {
     <div class="topic-content">
       <nav class="breadcrumbs" aria-label="面包屑">
         <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
-        <a href={sitePath(isRelated ? 'topics/#related-infrastructure' : 'topics/')}>{sectionLabel}</a><span aria-hidden="true">/</span>
+        <span>{sectionLabel}</span><span aria-hidden="true">/</span>
         <span aria-current="page">{topic.zhTitle}</span>
       </nav>
       <header class="topic-header">

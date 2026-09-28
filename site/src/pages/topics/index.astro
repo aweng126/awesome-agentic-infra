@@ -1,89 +1,46 @@
 ---
-import SiteLayout from '../../layouts/SiteLayout.astro';
-import Icon from '../../components/Icon.astro';
-import { getTopics, sitePath } from '../../lib/content';
+import { sitePath } from '../../lib/content';
 
-const topics = await getTopics();
-const groups = [
-  { id: 'agent-core', scope: 'core', title: 'Agent 核心能力', description: '围绕 Agent 的任务执行、状态维护与工具调用。' },
-  { id: 'cross-cutting', scope: 'crossCutting', title: '跨领域支撑', description: '关注部署、观测与治理在 Agent 工作负载中的应用。' },
-  { id: 'related-infrastructure', scope: 'serving', title: '关联基础设施', description: '从 Agent 的模型调用需求了解推理与模型服务。' },
-].map((group) => ({ ...group, topics: topics.filter((topic) => topic.scope === group.scope) }));
+const defaultPath = sitePath('topics/runtime-and-orchestration/');
+const crossCuttingPath = sitePath('topics/deployment-and-scheduling/');
+const servingPath = sitePath('topics/inference-and-model-serving/');
 ---
 
-<SiteLayout title="主题导航" description="按核心能力、跨领域支撑与关联基础设施浏览 Agent 基础设施项目、平台、论文和文档。" active="topics">
-  <main id="main-content" class="topic-directory container">
-    <header class="directory-header">
-      <p class="eyebrow">BROWSE BY TOPIC</p>
-      <h1>主题导航<span class="accent-dot">。</span></h1>
-      <p class="directory-description">按主题查找项目、平台、论文与文档，进入各主题后继续查看资源介绍。</p>
-      <nav class="directory-links" aria-label="其他浏览方式">
-        <a href={sitePath('notes/')}>先看资源导览 <Icon name="arrow" size={15} /></a>
-        <a href={sitePath('resources/')}>搜索与筛选全部资源 <Icon name="arrow" size={15} /></a>
-      </nav>
-    </header>
-
-    {groups.map((group) => (
-      <section class:list={['topic-directory-group', `group-${group.scope}`]} id={group.id} aria-labelledby={`${group.id}-title`}>
-        <header class="directory-group-header">
-          <div><h2 id={`${group.id}-title`}>{group.title}</h2><p>{group.description}</p></div>
-          <span class="directory-group-count">{group.topics.length} 个主题</span>
-        </header>
-        <div class="topic-directory-grid">
-          {group.topics.map((topic) => (
-            <a class="topic-directory-card" href={sitePath(`topics/${topic.slug}/`)} data-topic={topic.slug} data-topic-scope={topic.scope}>
-              <h3>{topic.zhTitle}</h3>
-              <p class="directory-topic-english" lang="en">{topic.title}</p>
-              <p class="directory-topic-description">{topic.description}</p>
-              <div class="directory-card-footer">
-                <span><strong data-resource-count={topic.entries.length}>{topic.entries.length}</strong> 条资料</span>
-                <span class="directory-card-action">浏览主题 <Icon name="arrow" size={16} /></span>
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
-    ))}
-  </main>
-</SiteLayout>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={new URL(defaultPath, Astro.site)} />
+    <title>进入主题内容 · Agentic Infra</title>
+    <script id="topic-redirect" is:inline define:vars={{ defaultPath, crossCuttingPath, servingPath }}>
+      const destinations = {
+        '#agent-core': defaultPath,
+        '#cross-cutting': crossCuttingPath,
+        '#related-infrastructure': servingPath,
+      };
+      const destination = destinations[location.hash] || defaultPath;
+      const hash = Object.hasOwn(destinations, location.hash) ? '' : location.hash;
+      location.replace(destination + location.search + hash);
+    </script>
+  </head>
+  <body>
+    <main id="main-content">
+      <h1>主题导航已直接进入内容页</h1>
+      <p>从运行时与编排开始阅读，通过页面侧栏切换其他主题。</p>
+      <ul>
+        <li id="agent-core"><a href={defaultPath}>运行时与编排</a></li>
+        <li id="cross-cutting"><a href={crossCuttingPath}>部署与调度</a></li>
+        <li id="related-infrastructure"><a href={servingPath}>推理与模型服务</a></li>
+      </ul>
+    </main>
+  </body>
+</html>
 
 <style>
-  .topic-directory { padding-top: 56px; padding-bottom: 70px; }
-  .directory-header { margin-bottom: 42px; }
-  .directory-header .eyebrow { margin-bottom: 14px; }
-  h1 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -.045em; line-height: 1.4; }
-  .directory-description { max-width: 720px; margin-top: 16px; color: var(--muted); font-size: 14px; line-height: 1.9; }
-  .directory-links { display: flex; flex-wrap: wrap; gap: 12px 26px; margin-top: 20px; color: var(--accent); font-size: 13px; }
-  .directory-links a { display: inline-flex; align-items: center; gap: 9px; }
-  .directory-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .topic-directory-group + .topic-directory-group { margin-top: 38px; }
-  .directory-group-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
-  .directory-group-header h2 { font-size: 23px; line-height: 1.5; }
-  .directory-group-header p { margin-top: 7px; color: var(--muted); font-size: 13px; line-height: 1.8; }
-  .directory-group-count { flex-shrink: 0; color: var(--muted); font-size: 12px; }
-  .topic-directory-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-  .group-crossCutting .topic-directory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .group-serving .topic-directory-grid { grid-template-columns: minmax(0, 1fr); }
-  .topic-directory-card { display: flex; flex-direction: column; min-width: 0; padding: 23px 25px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: border-color .2s, background .2s; }
-  .topic-directory-card:hover { border-color: var(--accent); background: var(--surface-alt); }
-  .topic-directory-card h3 { font-size: 20px; line-height: 1.5; }
-  .directory-topic-english { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.7; }
-  .directory-topic-description { margin-top: 16px; margin-bottom: 22px; color: var(--muted); font-size: 13px; line-height: 1.85; }
-  .directory-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-  .directory-card-footer strong { color: var(--text); font-weight: 550; }
-  .directory-card-action { display: inline-flex; align-items: center; gap: 9px; color: var(--accent); }
-  @media (max-width: 900px) {
-    .group-crossCutting .topic-directory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 600px) {
-    .topic-directory { padding-top: 34px; padding-bottom: 48px; }
-    .directory-header { margin-bottom: 32px; }
-    .directory-group-header { align-items: flex-start; }
-    .directory-group-header h2 { font-size: 21px; }
-    .directory-group-count { padding-top: 5px; }
-    .topic-directory-grid, .group-crossCutting .topic-directory-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-    .topic-directory-card { padding: 20px; }
-    .topic-directory-card h3 { font-size: 18px; }
-    .topic-directory-group + .topic-directory-group { margin-top: 30px; }
-  }
+  body { margin: 0; background: #f7f8f2; color: #222d27; font: 16px/1.8 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 12vh auto; padding: 24px; }
+  h1 { font-size: 24px; line-height: 1.5; }
+  a { color: #215b49; text-underline-offset: 4px; }
 </style>

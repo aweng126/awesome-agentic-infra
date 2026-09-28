@@ -60,7 +60,7 @@ const topicIcons: Record<string, string> = {
           ))}
         </div>
         <ul class="resource-stats" aria-label="资源收录概况">
-          <li><a href={sitePath('topics/')} data-stat="topics"><strong>{primaryTopics.length}</strong> 个主要主题</a></li>
+          <li><a href={sitePath('topics/runtime-and-orchestration/')} data-stat="topics"><strong>{primaryTopics.length}</strong> 个主要主题</a></li>
           <li><a href={sitePath('resources/')} data-stat="resources"><strong>{resources.length}</strong> 条精选资源</a></li>
           <li><a class="profile-stat-link" href={sitePath('resources/?type=project')} data-stat="projects"><strong>{projectProfileCount}</strong> 篇项目介绍 <Icon name="arrow" size={13}/></a></li>
         </ul>
@@ -70,7 +70,7 @@ const topicIcons: Record<string, string> = {
     <section class="topics-section container" id="topics" aria-labelledby="topics-title">
       <div class="section-heading">
         <div><p class="eyebrow">BROWSE BY TOPIC</p><h2 id="topics-title">按主题探索资源<span class="accent-dot">。</span></h2><p class="topics-description">从核心执行能力，到围绕 Agent 任务展开的部署、观测与治理。</p></div>
-        <a class="inline-link" href={sitePath('topics/')}>查看全部主题 <Icon name="arrow" size={17}/></a>
+        <a class="inline-link" href={sitePath('topics/runtime-and-orchestration/')}>按主题浏览 <Icon name="arrow" size={17}/></a>
       </div>
       <div class="topic-grid">
         {primaryTopics.map((topic, i) => (
