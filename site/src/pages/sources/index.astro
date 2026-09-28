@@ -1,0 +1,86 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { getSources, sitePath, repoUrl } from '../../lib/content';
+
+const sources = await getSources();
+---
+
+<SiteLayout title={sources.title} description={sources.description} active="sources">
+  <main id="main-content" class="sources-page">
+    <header class="sources-heading">
+      <p class="eyebrow">SOURCES TO FOLLOW</p>
+      <h1>{sources.title}<span class="accent-dot">。</span></h1>
+      <p>{sources.description}</p>
+    </header>
+
+    <nav class="source-navigation" aria-label="信息源分类">
+      {sources.groups.map((group) => <a href={`#${group.id}`}>{group.title}</a>)}
+    </nav>
+
+    <div class="source-groups">
+      {sources.groups.map((group) => (
+        <section id={group.id} class:list={['source-group', { 'frequent-sources': group.title === '常读' }]} aria-labelledby={`heading-${group.id}`}>
+          <h2 id={`heading-${group.id}`}>{group.title}</h2>
+          <ul class="source-list">
+            {group.entries.map((source) => (
+              <li>
+                <a class="source-name" href={source.url} target="_blank" rel="noopener noreferrer">
+                  <span>{source.name}</span>
+                  <Icon name="external" size={13} />
+                  <span class="sr-only">（新窗口）</span>
+                </a>
+                <p>{source.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <footer class="sources-footer">
+      <a href={sitePath('resources/')}>查找已收录的资源 <span aria-hidden="true">→</span></a>
+      <a href={`${repoUrl}/edit/main/SOURCES.md`} target="_blank" rel="noopener noreferrer">编辑此页 <span aria-hidden="true">↗</span><span class="sr-only">（新窗口）</span></a>
+    </footer>
+  </main>
+</SiteLayout>
+
+<style>
+  .sources-page { max-width: 1000px; margin: 0 auto; padding: 56px 36px 72px; }
+  .sources-heading .eyebrow { margin-bottom: 15px; }
+  .sources-heading h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.4; letter-spacing: -.045em; }
+  .sources-heading > p:last-child { max-width: 720px; margin-top: 16px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+  .source-navigation { display: flex; flex-wrap: wrap; gap: 5px 23px; margin-top: 25px; padding-bottom: 25px; color: var(--muted); font-size: 12px; }
+  .source-navigation a { padding-block: 5px; }
+  .source-navigation a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
+  .source-groups { border-top: 1px solid var(--line); }
+  .source-group { padding-top: 27px; scroll-margin-top: 135px; }
+  .source-group + .source-group { margin-top: 16px; }
+  .source-group h2 { margin-bottom: 11px; color: var(--text); font-size: 17px; font-weight: 600; letter-spacing: -.02em; line-height: 1.65; }
+  .frequent-sources { margin-top: 23px; padding: 18px 22px 4px; border-radius: 8px; background: var(--accent-soft); }
+  .frequent-sources h2 { color: var(--accent); }
+  .source-list { padding: 0; list-style: none; }
+  .source-list li { display: grid; grid-template-columns: minmax(180px, .8fr) minmax(0, 1.7fr); align-items: baseline; gap: 7px 25px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+  .frequent-sources li:last-child { border-bottom: 0; }
+  .source-name { display: inline-flex; align-items: baseline; justify-self: start; gap: 7px; max-width: 100%; color: var(--text); font-size: 14px; font-weight: 550; line-height: 1.8; }
+  .source-name > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .source-name :global(svg) { align-self: center; color: var(--muted); }
+  .source-name:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .source-list p { min-width: 0; color: var(--muted); font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; }
+  .sources-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 28px; font-size: 12px; }
+  .sources-footer a:first-child { color: var(--accent); }
+  .sources-footer a:last-child { color: var(--muted); }
+  .sources-footer a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .sources-footer a > span[aria-hidden] { margin-left: 5px; }
+  @media (max-width: 600px) {
+    .sources-page { padding: 38px 20px 54px; }
+    .sources-heading > p:last-child { font-size: 13px; }
+    .source-navigation { column-gap: 17px; margin-top: 19px; padding-bottom: 18px; }
+    .source-group { padding-top: 23px; }
+    .source-group + .source-group { margin-top: 11px; }
+    .frequent-sources { margin-top: 19px; padding: 15px 16px 2px; }
+    .source-list li { grid-template-columns: minmax(0, 1fr); gap: 5px; padding-block: 13px; }
+    .source-name { font-size: 14px; }
+    .sources-footer { margin-top: 24px; }
+  }
+</style>

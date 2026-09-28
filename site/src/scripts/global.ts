@@ -14,7 +14,7 @@ themeButton?.addEventListener('click',()=>{
   renderDiagrams();
 });
 
-type SearchItem = {title:string;description:string;category:string;url:string;keywords:string};
+type SearchItem = {title:string;description:string;category:string;url:string;keywords:string;external?:boolean};
 const items: SearchItem[] = JSON.parse(document.querySelector('#search-data')?.textContent || '[]');
 const dialog = document.querySelector<HTMLDialogElement>('#search-dialog')!;
 const input = document.querySelector<HTMLInputElement>('#global-search')!;
@@ -28,8 +28,10 @@ function search() {
   results.replaceChildren();
   shown.forEach(item=>{
     const link=document.createElement('a');link.href=item.url;link.className='search-result';
+    if (item.external) { link.target='_blank'; link.rel='noopener noreferrer'; link.setAttribute('aria-label',`${item.title}（外部网站，新窗口）`); }
     const category=document.createElement('span');category.className='search-result-category';category.textContent=item.category;
     const title=document.createElement('strong');title.textContent=item.title;
+    if (item.external) { const arrow=document.createElement('span'); arrow.textContent=' ↗'; arrow.setAttribute('aria-hidden','true'); title.append(arrow); }
     const description=document.createElement('p');description.textContent=item.description;
     link.append(category,title,description);results.append(link);
   });

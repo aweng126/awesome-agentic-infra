@@ -61,8 +61,11 @@ for(const [file,document] of documents){
       const navigation = document.querySelector(selector);
       const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
       assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
-        ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', defaultTopicPath], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
-      ], `${relative}: ${selector} exposes the five resource-focused navigation entries`);
+        ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', defaultTopicPath], ['资源库', `${base}resources/`], ['信息源', `${base}sources/`], ['更新日志', `${base}changelog/`],
+      ], `${relative}: ${selector} exposes the six direct navigation entries`);
+      if (relative === path.join('sources', 'index.html')) {
+        assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}sources/`], `${relative}: sources has its own active navigation entry in ${selector}`);
+      }
       if (relative.startsWith(`notes${path.sep}`)) {
         assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}notes/`], `${relative}: guides have their own active navigation entry in ${selector}`);
       }
@@ -263,6 +266,41 @@ for (const filename of resourceFiles) {
 assert.equal(sourceCount, catalog.length, 'Generated topic indexes and the single resource catalog have the same count');
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');
 const searchItems = JSON.parse(home.getElementById('search-data').textContent);
+const sourcesPage = documents.get(path.join(root, 'sources/index.html'));
+assert.ok(sourcesPage, 'The information-source directory is generated');
+const sourceGroups = [];
+for (const node of parser.parse(await readFile('../SOURCES.md', 'utf8')).children) {
+  if (node.type === 'heading' && node.depth === 2) sourceGroups.push({ title: textContent(node), entries: [] });
+  if (node.type === 'list') {
+    for (const item of node.children) {
+      const [link, ...description] = item.children[0].children;
+      sourceGroups.at(-1).entries.push({ name: textContent(link), url: link.url, description: description.map(textContent).join('').replace(/^\s*—\s*/u, '') });
+    }
+  }
+}
+const renderedGroups = [...sourcesPage.querySelectorAll('.source-group')];
+assert.deepEqual(renderedGroups.map(group => group.querySelector('h2').textContent), sourceGroups.map(group => group.title), 'The source directory preserves Markdown group order');
+assert.equal(searchItems.find(item => item.title === '信息源')?.url, `${base}sources/`, 'Search opens the source directory directly');
+assert.equal(searchItems.filter(item => item.external).length, sourceGroups.reduce((count, group) => count + group.entries.length, 0), 'Only directory sources become external search results');
+for (const [index, group] of sourceGroups.entries()) {
+  const rendered = renderedGroups[index];
+  assert.equal(rendered.id, group.title, 'Source groups retain their Markdown anchors');
+  const rows = [...rendered.querySelectorAll('.source-list li')];
+  assert.equal(rows.length, group.entries.length, `${group.title}: every source is visible without expanding a list`);
+  for (const [entryIndex, entry] of group.entries.entries()) {
+    const row = rows[entryIndex];
+    const link = row.querySelector('a.source-name');
+    assert.equal(link?.querySelector('span')?.textContent, entry.name, 'Source names match Markdown');
+    assert.equal(link?.getAttribute('href'), entry.url, `${entry.name}: source name opens the original website directly`);
+    assert.equal(link.getAttribute('target'), '_blank', `${entry.name}: external source opens a new tab`);
+    assert.ok(link.getAttribute('rel').split(/\s+/u).includes('noopener'), `${entry.name}: external source isolates the opener`);
+    assert.equal(row.querySelector('p')?.textContent, entry.description, `${entry.name}: reading reason matches Markdown`);
+    const matches = searchItems.filter(item => item.external && item.url === entry.url);
+    assert.equal(matches.length, 1, `${entry.name}: global search includes the source exactly once`);
+    assert.equal(matches[0].title, entry.name, `${entry.name}: search uses the source name`);
+    assert.equal(matches[0].description, entry.description, `${entry.name}: search uses the reading reason`);
+  }
+}
 assert.equal(searchItems.find(item => item.title === '主题导航')?.url, defaultTopicPath, 'Search opens topic content directly');
 assert.equal(searchItems.find(item => item.title === '关联基础设施')?.url, servingPath, 'Related-infrastructure search opens the Serving content directly');
 for (const resource of catalog) {

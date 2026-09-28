@@ -91,6 +91,24 @@ export interface ChangelogEntry {
   feedId: string;
 }
 
+export interface SourceEntry {
+  name: string;
+  url: string;
+  description: string;
+}
+
+export interface SourceGroup {
+  id: string;
+  title: string;
+  entries: SourceEntry[];
+}
+
+export interface SourceDirectory {
+  title: string;
+  description: string;
+  groups: SourceGroup[];
+}
+
 export const topicScopeLabels = {
   core: 'Agentic 核心能力',
   crossCutting: '跨领域能力 · Agent 场景',
@@ -191,6 +209,7 @@ export function rewriteMarkdownUrl(url: string, sourcePath: string): string | nu
   if (/^README\.md$/iu.test(localPath)) return `${sitePath()}${suffix}`;
   if (/^CONTRIBUTING\.md$/iu.test(localPath)) return `${sitePath('contributing/')}${suffix}`;
   if (/^CHANGELOG\.md$/iu.test(localPath)) return `${sitePath('changelog/')}${suffix}`;
+  if (/^SOURCES\.md$/iu.test(localPath)) return `${sitePath('sources/')}${suffix}`;
   if (/^notes\/README\.md$/iu.test(localPath)) return `${sitePath('notes/')}${suffix}`;
 
   const profile = localPath.match(/^resources\/items\/([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/u);
@@ -432,6 +451,73 @@ export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]
 
 export async function getChangelog(): Promise<ChangelogEntry[]> {
   return parseChangelog(await readFile(`${repositoryRoot}/CHANGELOG.md`, 'utf8'));
+}
+
+// These headings also serve as GitHub Markdown anchors. Keep the same IDs on
+// the site so links such as SOURCES.md#常读 continue to reach their section.
+const sourceGroupTitles = new Set(['常读', '工程博客', '产品与版本更新', '研究与论文', '社区精选']);
+
+export function parseSources(markdown: string): SourceDirectory {
+  const [heading, introduction, ...nodes] = parse(markdown).children;
+  if (heading?.type !== 'heading' || heading.depth !== 1 || !readableText(heading)) {
+    throw new Error('SOURCES.md needs a nonempty level-one title.');
+  }
+  if (introduction?.type !== 'paragraph' || !readableText(introduction)) {
+    throw new Error('SOURCES.md needs an introduction immediately after its title.');
+  }
+
+  const groups: SourceGroup[] = [];
+  const seenUrls = new Set<string>();
+  let group: SourceGroup | undefined;
+  for (const node of nodes) {
+    if (node.type === 'heading' && node.depth === 2) {
+      const title = readableText(node);
+      if (!sourceGroupTitles.has(title)) throw new Error(`SOURCES.md has an unknown group: ${title}`);
+      if (groups.some(existing => existing.title === title)) throw new Error(`SOURCES.md has a duplicate group: ${title}`);
+      group = { id: title, title, entries: [] };
+      groups.push(group);
+      continue;
+    }
+    if (node.type !== 'list' || node.ordered || !group) {
+      throw new Error('SOURCES.md entries must be bullet lists beneath a supported level-two group.');
+    }
+    for (const item of node.children) {
+      const paragraph = item.children[0];
+      const link = paragraph?.type === 'paragraph' ? paragraph.children[0] : undefined;
+      if (item.children.length !== 1 || paragraph?.type !== 'paragraph' || link?.type !== 'link') {
+        throw new Error(`SOURCES.md group ${group.title}: use - [name](https://...) — description without nested content.`);
+      }
+      let links = 0;
+      visit(paragraph, 'link', () => { links += 1; });
+      const name = readableText(link);
+      const description = readableText(paragraph, link).match(/^—\s*(.+)$/u)?.[1]?.trim();
+      if (links !== 1 || !name || !description) {
+        throw new Error(`SOURCES.md group ${group.title}: each entry needs one named link and a description after —.`);
+      }
+      let url: URL;
+      try {
+        url = new URL(link.url);
+      } catch {
+        throw new Error(`SOURCES.md has an invalid HTTP(S) URL: ${link.url}`);
+      }
+      if (!/^https?:\/\//iu.test(link.url) || !['http:', 'https:'].includes(url.protocol)
+        || /[\u0000-\u0020\u007f]/u.test(link.url)) {
+        throw new Error(`SOURCES.md only accepts absolute HTTP(S) URLs: ${link.url}`);
+      }
+      if (seenUrls.has(url.href)) throw new Error(`SOURCES.md has a duplicate URL: ${link.url}`);
+      seenUrls.add(url.href);
+      group.entries.push({ name, url: link.url, description });
+    }
+  }
+  if (!groups.length) throw new Error('SOURCES.md needs at least one source group.');
+  for (const entryGroup of groups) {
+    if (!entryGroup.entries.length) throw new Error(`SOURCES.md group ${entryGroup.title} needs at least one entry.`);
+  }
+  return { title: readableText(heading), description: readableText(introduction), groups };
+}
+
+export async function getSources(): Promise<SourceDirectory> {
+  return parseSources(await readFile(`${repositoryRoot}/SOURCES.md`, 'utf8'));
 }
 
 function noteDescription(tree: MarkdownRoot): string {
