@@ -4,6 +4,16 @@
 
 ## 2026-09-28
 
+### 16:56 · 突出资源导览入口
+
+[首页](https://blog.kingwen.cn/awesome-agentic-infra/)直接展示[领域导览](notes/agentic-infra-overview.md)与 [Runtime 全景](notes/agent-runtime-landscape.md)，从了解领域全貌进入主题资源与项目介绍。
+
+#### 站点改进
+
+- 主导航新增[资源导览](notes/README.md)，导览列表与文章统一显示当前栏目，文档侧栏前移导览入口。
+- 首页在主题列表之前展示两篇总览，首屏提供“浏览资源导览”和“探索资源库”两个入口；手机端先展示导览，再展示基础设施关系图。
+- 缩减首屏留白，将资源统计与范围说明合并进导览区，保留原有主题、页面地址及定位链接。
+
 ### 16:38 · 完善 Strands Harness 介绍
 
 更新 [Strands Agents（Harness SDK）](resources/items/strands-agents.md) 介绍，区分用于自行组合 Agent 的 Harness SDK 与预装配的 Strands harness，补充主要能力和官方接入入口。

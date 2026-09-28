@@ -56,8 +56,11 @@ for(const [file,document] of documents){
     const navigation = document.querySelector(selector);
     const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
     assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
-      ['首页', base], ['主题导航', `${base}#topics`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
-    ], `${relative}: ${selector} exposes the four resource-focused navigation entries`);
+      ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', `${base}#topics`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
+    ], `${relative}: ${selector} exposes the five resource-focused navigation entries`);
+    if (relative.startsWith(`notes${path.sep}`)) {
+      assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}notes/`], `${relative}: guides have their own active navigation entry in ${selector}`);
+    }
     const changelogLink = links
       .find((link) => link.getAttribute('href') === `${base}changelog/`);
     if (!changelogLink) problems.push(`${relative}: missing changelog link in ${selector}`);
@@ -120,13 +123,21 @@ assert.ok(home, 'Homepage must be generated');
 const homeTopicCards = [...home.querySelectorAll('.topic-card')];
 assert.equal(homeTopicCards.length, 7, 'Homepage highlights seven primary topic cards');
 assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))), primaryTopicPaths, 'Homepage primary cards include all Agent topics and exclude Serving');
-const primaryTopicStat = [...home.querySelectorAll('.stats-strip > div')]
-  .find((stat) => [...stat.querySelectorAll('span')].some((label) => label.textContent.trim() === '主要主题'));
-assert.equal(primaryTopicStat?.querySelector('strong')?.textContent.trim(), '07', 'Homepage reports 07 primary topics');
-assert.equal(home.querySelector('.stats-strip > div:nth-child(2) strong')?.textContent.trim(), String(catalog.length), 'Homepage resource count comes from the catalog');
-assert.equal(home.querySelector('.profile-stat-link strong')?.textContent.trim(), String(profiles.filter(resource => resource.type === 'project').length), 'Homepage project count excludes other resource guides');
+assert.equal(home.querySelector('[data-stat="topics"] strong')?.textContent.trim(), String(primarySlugs.length), 'Homepage reports the primary topic count');
+assert.equal(home.querySelector('[data-stat="resources"] strong')?.textContent.trim(), String(catalog.length), 'Homepage resource count comes from the catalog');
+assert.equal(home.querySelector('[data-stat="projects"] strong')?.textContent.trim(), String(profiles.filter(resource => resource.type === 'project').length), 'Homepage project count excludes other resource guides');
+assert.equal(home.querySelector('[data-stat="projects"]')?.getAttribute('href'), `${base}resources/?type=project`, 'Project count opens the project resource filter');
 assert.ok(!home.querySelector('.reading-section'), 'Homepage omits the previous research reading column');
-assert.ok(!home.querySelector('.stats-strip').textContent.includes('研究笔记'), 'Homepage statistics describe resources');
+const featuredGuides = [...home.querySelectorAll('#guides .guide-card')];
+assert.deepEqual(featuredGuides.map(guide => guide.getAttribute('href')), [`${base}notes/agentic-infra-overview/`, `${base}notes/agent-runtime-landscape/`], 'Homepage exposes both existing guides directly');
+for (const guide of featuredGuides) {
+  const guideFile = path.join(root, guide.getAttribute('href').slice(base.length), 'index.html');
+  assert.equal(guide.querySelector('h3')?.textContent, documents.get(guideFile)?.querySelector('h1')?.textContent, 'Homepage guide titles match their source articles');
+}
+assert.equal(home.querySelector('.hero-buttons .primary')?.getAttribute('href'), `${base}notes/`, 'Primary homepage entry opens all resource guides');
+const homeSections = [...home.querySelectorAll('section')];
+assert.ok(homeSections.indexOf(home.getElementById('guides')) < homeSections.indexOf(home.getElementById('topics')), 'Resource guides precede topic browsing');
+assert.ok(home.getElementById('scope'), 'Homepage keeps the existing scope anchor');
 assert.ok(home.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Homepage retains a Serving entry under related infrastructure');
 
 for (const [groupName, expectedSlugs] of [['primary', primarySlugs], ['related', [servingSlug]]]) {
@@ -391,7 +402,7 @@ for (let offset = 8; offset < socialImage.length;) {
 assert.ok(imageEnd && compressedImage.length, 'PNG contains image data and its terminating chunk');
 assert.ok(inflateSync(Buffer.concat(compressedImage)).length > 0, 'PNG image data can be decompressed');
 const guideIndex = documents.get(path.join(root, 'notes/index.html'));
-assert.ok(guideIndex?.querySelector('h1')?.textContent.includes('资源导览'), 'The existing notes address is a secondary resource-guide index');
+assert.ok(guideIndex?.querySelector('h1')?.textContent.includes('资源导览'), 'The existing notes address remains the resource-guide index');
 for (const [file, document] of documents) {
   if (path.relative(root, file).startsWith(`notes${path.sep}`)) {
     assert.ok(!document.querySelector('.reading-navigation'), `${file}: resource guides do not have an automatic article sequence`);

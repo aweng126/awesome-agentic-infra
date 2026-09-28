@@ -42,6 +42,19 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
         <a class="all-resources" href={sitePath('resources/')}>
           <span>搜索与筛选全部资源</span><span aria-hidden="true">→</span>
         </a>
+        <div class="guide-nav-group">
+          <p class="sidebar-label category-label"><a class="guide-index-link" href={sitePath('notes/')} aria-label="查看全部资源导览">资源导览 <span aria-hidden="true">→</span></a></p>
+          {notes.map((note) => (
+            <a
+              href={sitePath(`notes/${note.slug}/`)}
+              class:list={['chapter-link', 'note-link', { selected: kind === 'note' && note.slug === slug }]}
+              aria-current={kind === 'note' && note.slug === slug ? 'page' : undefined}
+            >
+              <span class="note-mark" aria-hidden="true">↳</span>
+              <span>{note.title}</span>
+            </a>
+          ))}
+        </div>
         {topicGroups.map((group) => <div class="topic-nav-group" data-topic-group={group.id}>
         <p class="sidebar-label category-label">{group.title}</p>
         <ol class="chapter-list">
@@ -59,17 +72,6 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
           ))}
         </ol>
         </div>)}
-        <p class="sidebar-label category-label">资源导览</p>
-        {notes.map((note) => (
-          <a
-            href={sitePath(`notes/${note.slug}/`)}
-            class:list={['chapter-link', 'note-link', { selected: kind === 'note' && note.slug === slug }]}
-            aria-current={kind === 'note' && note.slug === slug ? 'page' : undefined}
-          >
-            <span class="note-mark" aria-hidden="true">↳</span>
-            <span>{note.title}</span>
-          </a>
-        ))}
         <p class="sidebar-label category-label">维护资源</p>
         <a
           href={sitePath('contributing/')}
@@ -165,7 +167,8 @@ const editUrl = `${repoUrl}/edit/main/${sourcePath}`;
   .chapter-link.selected { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
   .chapter-number { font: 10px/1.6 var(--font-mono); opacity: .6; }
   .note-mark { width: 13px; flex-shrink: 0; text-align: center; }
-  .note-link { font-size: 11px; }
+  .guide-index-link { display: flex; align-items: center; justify-content: space-between; color: var(--accent); text-decoration: none; }
+  .guide-index-link:hover { text-decoration: underline; text-underline-offset: 3px; }
   .sidebar-source { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding: 20px 12px 0; margin-top: 30px; font-size: 11px; text-decoration: none; color: var(--muted); }
   .sidebar-source:hover { color: var(--accent); }
   .document-column { min-width: 0; }

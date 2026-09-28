@@ -6,7 +6,7 @@ const notes = await getNotes();
 const guides = [...notes].sort((left, right) => Number(right.slug === 'agentic-infra-overview') - Number(left.slug === 'agentic-infra-overview'));
 ---
 
-<SiteLayout title="资源导览" description="了解 Agentic Infra 的分类范围，浏览开源项目、运行平台与云厂商方案总览。" active="topics">
+<SiteLayout title="资源导览" description="了解 Agentic Infra 的分类范围，浏览开源项目、运行平台与云厂商方案总览。" active="guides">
   <main id="main-content" class="notes-page">
     <header class="guides-header">
       <p class="eyebrow">RESOURCE GUIDES</p>

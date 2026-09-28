@@ -2,7 +2,7 @@
 import SiteLayout from '../layouts/SiteLayout.astro';
 import Icon from '../components/Icon.astro';
 import InfrastructureMap from '../components/InfrastructureMap.astro';
-import { getTopics, getResources, getChangelog, groupTopics, sitePath, topicScopeLabels } from '../lib/content';
+import { getTopics, getResources, getNotes, getChangelog, groupTopics, resourceGuideLabel, sitePath, topicScopeLabels } from '../lib/content';
 const topics = await getTopics();
 const resources = await getResources();
 const updates = await getChangelog();
@@ -11,6 +11,15 @@ const projectProfileCount = resources.filter((resource) => resource.type === 'pr
 const topicGroups = groupTopics(topics);
 const primaryTopics = topicGroups.find((group) => group.id === 'primary')?.topics ?? [];
 const relatedTopics = topicGroups.find((group) => group.id === 'related')?.topics ?? [];
+const notes = await getNotes();
+const featuredGuides = [
+  { slug: 'agentic-infra-overview', icon: 'stack', description: '了解 Agentic、Serving 与 Training 的职责，以及各个基础设施主题之间的关系。' },
+  { slug: 'agent-runtime-landscape', icon: 'runtime', description: '浏览开源框架、自托管运行平台与云厂商产品，了解代表方案的定位、特点和官方入口。' },
+].map((featured) => {
+  const note = notes.find((note) => note.slug === featured.slug);
+  if (!note) throw new Error(`Missing homepage resource guide: ${featured.slug}`);
+  return { ...note, ...featured };
+});
 const topicIcons: Record<string, string> = {
   'runtime-and-orchestration': 'runtime',
   'sandbox-and-execution': 'sandbox',
@@ -24,13 +33,43 @@ const topicIcons: Record<string, string> = {
 ---
 <SiteLayout title="理解 Agent 背后的基础设施" active="home">
   <main id="main-content">
-    <section class="hero container" aria-labelledby="hero-title">
-      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p><h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1><p class="hero-description">汇集 Agent 基础设施项目、云平台与参考资料。<br/>通过中文项目介绍，了解各个方案的定位、<br class="desktop-break"/>核心能力与接入方式。</p><div class="hero-buttons"><a class="button primary" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a><a class="button text-button" href={sitePath('notes/agentic-infra-overview/')}>阅读领域导览 <Icon name="book" size={18}/></a></div><p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p></div>
-      <InfrastructureMap />
-    </section>
+    <div class="hero container">
+      <section class="hero-copy" aria-labelledby="hero-title">
+        <p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO AGENTIC INFRASTRUCTURE</p>
+        <h1 id="hero-title">理解 Agent 背后的<br/><span>基础设施。</span></h1>
+        <p class="hero-description">从领域划分与方案全景，认识 Agent 基础设施。<br/>按主题发现项目、云平台与参考资料，<br class="desktop-break"/>通过中文介绍了解定位、能力与接入方式。</p>
+        <div class="hero-buttons">
+          <a class="button primary" href={sitePath('notes/')}>浏览资源导览 <Icon name="book" size={18}/></a>
+          <a class="button outline" href={sitePath('resources/')}>探索资源库 <Icon name="arrow" size={18}/></a>
+        </div>
+        <p class="hero-small">开源共建 <span>·</span> 中文导读 <span>·</span> 一手来源</p>
+      </section>
+      <section class="home-guides" id="guides" aria-labelledby="guides-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">RESOURCE GUIDES / 资源导览</p><h2 id="guides-title">先了解全貌，再探索具体方案<span class="accent-dot">。</span></h2></div>
+          <a class="inline-link" href={sitePath('notes/')}>查看全部导览 <Icon name="arrow" size={17}/></a>
+        </div>
+        <p class="guides-description" id="scope">了解领域组成与方案分布，再按七个主题查找资源；模型服务单列为关联基础设施。</p>
+        <div class="guide-grid">
+          {featuredGuides.map((guide) => (
+            <a class="guide-card" href={sitePath(`notes/${guide.slug}/`)}>
+              <div class="guide-card-label"><Icon name={guide.icon} size={18}/><span>{resourceGuideLabel(guide.slug)}</span><Icon name="arrow" size={18}/></div>
+              <h3>{guide.title}</h3>
+              <p>{guide.description}</p>
+            </a>
+          ))}
+        </div>
+        <ul class="resource-stats" aria-label="资源收录概况">
+          <li><a href="#topics" data-stat="topics"><strong>{primaryTopics.length}</strong> 个主要主题</a></li>
+          <li><a href={sitePath('resources/')} data-stat="resources"><strong>{resources.length}</strong> 条精选资源</a></li>
+          <li><a class="profile-stat-link" href={sitePath('resources/?type=project')} data-stat="projects"><strong>{projectProfileCount}</strong> 篇项目介绍 <Icon name="arrow" size={13}/></a></li>
+        </ul>
+      </section>
+      <div class="hero-map"><InfrastructureMap /></div>
+    </div>
     <section class="topics-section container" id="topics" aria-labelledby="topics-title">
       <div class="section-heading">
-        <div><p class="eyebrow">EXPLORE THE LANDSCAPE</p><h2 id="topics-title">探索 Agent 基础设施<span class="accent-dot">。</span></h2><p class="topics-description">从核心执行能力，到围绕 Agent 任务展开的部署、观测与治理。</p></div>
+        <div><p class="eyebrow">BROWSE BY TOPIC</p><h2 id="topics-title">按主题探索资源<span class="accent-dot">。</span></h2><p class="topics-description">从核心执行能力，到围绕 Agent 任务展开的部署、观测与治理。</p></div>
         <a class="inline-link" href={sitePath('resources/')}>搜索全部资源 <Icon name="arrow" size={17}/></a>
       </div>
       <div class="topic-grid">
@@ -54,12 +93,6 @@ const topicIcons: Record<string, string> = {
         ))}
       </aside>
     </section>
-    <section class="stats-strip container" aria-label="资源收录概况">
-      <div><strong>{String(primaryTopics.length).padStart(2,'0')}</strong><span>主要主题</span></div>
-      <div><strong>{resources.length}</strong><span>精选资源</span></div>
-      <div><a class="profile-stat-link" href={sitePath('resources/?type=project')} aria-label={`浏览 ${projectProfileCount} 篇项目介绍`}><strong>{projectProfileCount}</strong><span>项目介绍 <Icon name="arrow" size={13}/></span></a></div>
-      <div class="stat-statement"><span class="live-dot"></span><span>发现相关方案，<br/><b>了解项目定位。</b></span></div>
-    </section>
     {recentChanges.length > 0 && (
       <section class="recent-updates container" aria-labelledby="recent-updates-title">
         <div class="section-heading">
@@ -76,19 +109,34 @@ const topicIcons: Record<string, string> = {
         </div>
       </section>
     )}
-    <section class="scope-section container" id="scope"><p class="eyebrow">WHAT BELONGS HERE</p><h2>围绕 Agent 运行，保持清晰的边界。</h2><p>收录支撑 Agent 运行的项目、产品、论文与文档，按七个主题组织；模型服务单列为关联基础设施。<a href={sitePath('notes/agentic-infra-overview/')}>领域导览 <Icon name="arrow" size={14}/></a>介绍分类与领域之间的关系。</p></section>
     <section class="contribute-banner container"><span class="topic-icon"><Icon name="stack" size={26}/></span><div><h2>让资源库持续丰富。</h2><p>分享值得关注的资源，纠正事实，或修复失效链接。</p></div><a class="button outline" href={sitePath('contributing/')}>一起完善 <Icon name="arrow" size={17}/></a></section>
   </main>
 </SiteLayout>
 
 <style>
+  .hero { grid-template-areas: 'copy map' 'guides guides'; gap: 36px 35px; padding-top: 38px; padding-bottom: 0; }
+  .hero-copy { grid-area: copy; min-width: 0; }
+  .hero-map { grid-area: map; min-width: 0; }
+  .home-guides { grid-area: guides; min-width: 0; padding: 28px; background: var(--surface-alt); border: 1px solid var(--line); border-radius: var(--radius); }
+  .home-guides .section-heading { margin-bottom: 12px; gap: 16px; }
+  .home-guides .section-heading h2 { font-size: 25px; margin-top: 8px; text-wrap: balance; }
+  .home-guides .section-heading .inline-link { flex-shrink: 0; }
+  .guides-description { color: var(--muted); font-size: 13px; line-height: 1.8; margin-bottom: 22px; }
+  .guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .guide-card { display: block; min-width: 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); transition: border-color .2s, background .2s; }
+  .guide-card:hover { border-color: var(--accent); }
+  .guide-card-label { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--accent); margin-bottom: 12px; }
+  .guide-card-label :global(svg:last-child) { margin-left: auto; }
+  .guide-card h3 { font-size: 19px; line-height: 1.5; margin-bottom: 9px; }
+  .guide-card p { color: var(--muted); font-size: 13px; line-height: 1.8; }
+  .resource-stats { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px; padding: 0; margin-top: 20px; color: var(--muted); font-size: 12px; }
+  .resource-stats a { display: inline-flex; align-items: center; gap: 5px; }
+  .resource-stats strong { color: var(--text); font-weight: 600; }
+  .resource-stats a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .topics-section { padding-top: 52px; padding-bottom: 40px; }
   .recent-update-title { display: inline-block; color: var(--text); font-weight: 600; margin-bottom: 7px; }
   .recent-update-summary { color: var(--muted); }
-  .profile-stat-link { display: flex; align-items: center; gap: 15px; }
-  .profile-stat-link > span { display: inline-flex; align-items: center; gap: 5px; }
-  .profile-stat-link:hover, .profile-stat-link:hover > span { color: var(--accent); }
-  .profile-stat-link:hover > span { text-decoration: underline; text-underline-offset: 4px; }
-  .recent-updates { padding-top: 60px; padding-bottom: 54px; }
+  .recent-updates { padding-top: 20px; padding-bottom: 54px; }
   .recent-update-list { border-top: 1px solid var(--line); }
   .recent-update { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
   .recent-update-date { padding-top: 3px; color: var(--muted); font: 11px/1.9 var(--font-mono); }
@@ -96,8 +144,8 @@ const topicIcons: Record<string, string> = {
   .recent-update-body { min-width: 0; font-size: 13px; line-height: 1.9; color: var(--muted); overflow-wrap: anywhere; }
   .recent-update-summary > :global(ul), .recent-update-summary > :global(ol) { padding: 0; list-style: none; }
   .recent-update-body :global(li > ul), .recent-update-body :global(li > ol) { margin-top: 8px; padding-left: 20px; }
-  .recent-update-body :global(a), .scope-section a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
-  .recent-update-body :global(a:hover), .scope-section a:hover { text-decoration-color: var(--accent); }
+  .recent-update-body :global(a) { color: var(--accent); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+  .recent-update-body :global(a:hover) { text-decoration-color: var(--accent); }
 
   .topics-description { margin-top: 14px; max-width: 520px; color: var(--muted); font-size: 13px; line-height: 1.8; }
   .topic-scope { color: var(--muted); font-size: 10px; line-height: 1.6; margin-bottom: 9px; }
@@ -116,7 +164,6 @@ const topicIcons: Record<string, string> = {
   .related-topic:hover h4 { color: var(--accent); }
   .related-topic:hover .related-topic-action { text-decoration: underline; text-underline-offset: 4px; }
   @media (max-width: 1050px) {
-    .profile-stat-link { gap: 10px; }
     .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .topic-card { grid-column: auto; }
     .topic-card:last-child { grid-column: 1 / -1; }
@@ -124,10 +171,22 @@ const topicIcons: Record<string, string> = {
     .related-topic { width: 100%; }
   }
   @media (max-width: 760px) {
-    .profile-stat-link { flex-direction: column; gap: 10px; }
+    .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'copy' 'guides' 'map'; padding-top: 30px; gap: 30px; }
+    .hero h1 { margin-top: 18px; }
+    .hero-description br { display: none; }
+    .hero-small { margin-top: 18px; }
+    .home-guides { padding: 22px; }
+    .home-guides .section-heading { display: block; }
+    .home-guides .section-heading h2 { font-size: 23px; }
+    .home-guides .section-heading .inline-link { margin-top: 12px; font-size: 12px; }
+    .guide-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .guide-card { padding: 18px; }
+    .guide-card h3 { font-size: 18px; }
+    .resource-stats { gap: 8px 18px; }
   }
   @media (max-width: 600px) {
-    .recent-updates { padding-top: 38px; padding-bottom: 36px; }
+    .topics-section { padding-top: 38px; padding-bottom: 26px; }
+    .recent-updates { padding-top: 16px; padding-bottom: 36px; }
     .recent-update { grid-template-columns: 1fr; gap: 7px; padding: 18px 0; }
 
     .topic-grid { grid-template-columns: minmax(0, 1fr); }
