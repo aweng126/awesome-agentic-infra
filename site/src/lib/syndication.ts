@@ -8,7 +8,7 @@ export function absoluteSiteUrl(path: string): string {
   return new URL(path, siteConfig.origin).href;
 }
 
-/** Feed readers need absolute URLs, including links to anchors within a batch. */
+/** Feed readers need absolute URLs, including links to anchors within a daily update. */
 export function absoluteFeedHtml(html: string, permalink: string): string {
   return html.replace(/\b(href|src)="([^"]*)"/gu, (_match, attribute, value: string) => {
     const decoded = value.replace(/&amp;/gu, '&');

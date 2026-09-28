@@ -103,9 +103,9 @@ npm run resources:audit -- --out-dir /tmp/agentic-infra-audit
 
 ### 维护更新日志
 
-导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取内容；首页和订阅源按发布批次展示摘要，不再从类别列表中截取前三条。
+导航中的“更新日志”指向 `/changelog/`，部署后完整路径为 `/awesome-agentic-infra/changelog/`。页面从根目录 [CHANGELOG.md](../CHANGELOG.md) 读取每日要点；首页展示最近三个日期，每天取前两条作为摘要，RSS 每天提供一项更新。
 
-每批发布内容时，同时更新日志：以 `## YYYY-MM-DD` 记录本站实际发布日，日期倒序、同一天一组；每批使用 `### HH:mm · 批次标题`，紧接一段包含直达链接的简短摘要，再按需要用 `#### 新增内容`、`#### 内容更新` 和 `#### 站点改进` 展开列表。同日批次时间倒序，使用北京时间；旧的无时间分类保留为当日早期记录，不追填推测的发布时间。省略空类别，资源移除时说明原因并提供仍可访问的相关说明。
+发布内容时同步更新日志：以 `## YYYY-MM-DD` 记录按北京时间确定的实际发布日，日期倒序、同一天一组，标题下直接使用平铺的无序列表。重要资源和内容更新放在前面，每条说明读者能看到的变化，并附相关内容的直达链接。同一天继续发布时直接补充或合并当天列表，同一功能的反复调整只保留最终结果。保留真实发布日期；资源移除时说明原因，并提供仍可访问的相关内容。
 
 资源条目通过主题 Markdown 中的固定锚点定位，格式为 `- <a id="resource-langgraph"></a> [LangGraph](https://...) — 简介`，锚点与名称链接放在同一列表项中。标识以 `resource-` 开头，仅使用小写 ASCII 字母、数字与连字符，在本主题内唯一，更名时保留。根目录日志可写 `[LangGraph](resources/runtime-and-orchestration.md#resource-langgraph)`；从本说明链接同一条目则使用 [LangGraph](../resources/runtime-and-orchestration.md#resource-langgraph)。导览更新可直接链接到对应章节。构建验证会检查生成页面中的内部链接与锚点。
 

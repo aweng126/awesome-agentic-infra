@@ -40,32 +40,50 @@ test('updates sort by publication date and retain direct links with unique secti
   assert.ok(links.includes(sitePath('changelog/')));
 });
 
-test('publication batches sort within a day, preserve legacy anchors, and share summaries with the feed', async () => {
-  const [entry] = await parseChangelog(`## 2026-09-27
-### 09:30 · 新资源
-新增 [MCP](resources/items/mcp.md) 导读。
-#### 新增内容
-- MCP 导读。
-### 18:05 · 检索更新
-可以按交付方式筛选。
-#### 站点改进
-- 完善搜索。
-### 新增内容
-- 旧版更新。
-`);
-  assert.deepEqual(entry.batches.map(batch => batch.id), ['update-2026-09-27-1805', 'update-2026-09-27-0930', 'update-2026-09-27-earlier']);
-  assert.deepEqual(entry.batches.map(batch => batch.changes.length), [1, 1, 1]);
-  assert.match(entry.batches[1].summaryHtml, /href="\/awesome-agentic-infra\/resources\/mcp\/"/u);
-  assert.doesNotMatch(entry.batches[1].summaryHtml, /<li>/u);
-  const { document } = parseHTML(entry.batches.map(batch => batch.html).join(''));
-  const ids = [...document.querySelectorAll('[id]')].map(element => element.id);
-  assert.equal(new Set(ids).size, ids.length);
-  assert.ok(ids.includes('update-2026-09-27-新增内容'), 'existing published category anchors survive');
-  for (const time of ['24:00', '12:60', '9:30']) {
-    await assert.rejects(parseChangelog(`## 2026-09-27\n### ${time} · 更新\n摘要。\n- 改进。`), /Invalid changelog batch/);
+test('daily summaries retain the first two complete updates and their direct links', async () => {
+  const source = `## 2026-09-29
+- 新增 [MCP](resources/items/mcp.md) 导读。
+  - 介绍协议能力。
+- 完善[资源库](https://blog.kingwen.cn/awesome-agentic-infra/resources/)筛选。
+- 精简主题介绍。
+`;
+  const [entry] = await parseChangelog(source);
+  assert.equal(entry.id, 'update-2026-09-29');
+  assert.equal(entry.feedId, entry.id, 'new dates use a stable daily feed identity');
+  assert.equal(entry.changeCount, 3, 'nested details do not create extra updates');
+  const summary = parseHTML(`<main>${entry.summaryHtml}</main>`).document;
+  assert.equal(summary.querySelectorAll('main > ul > li').length, 2);
+  assert.equal(summary.querySelectorAll('main > ul > li li').length, 1, 'summary keeps details with their parent update');
+  assert.equal(summary.querySelector('a')?.getAttribute('href'), sitePath('resources/mcp/'));
+  assert.doesNotMatch(summary.querySelector('main')!.textContent, /精简主题介绍/u);
+  const [amended] = await parseChangelog(source + '- 补充当日内容。\n');
+  assert.equal(amended.id, entry.id);
+  assert.equal(amended.feedId, entry.feedId, 'same-day edits do not create new subscriptions');
+  assert.equal(amended.changeCount, 4);
+  assert.equal(amended.summaryHtml, entry.summaryHtml);
+  const [single] = await parseChangelog('## 2026-09-30\n- 一项更新。');
+  assert.equal(parseHTML(single.summaryHtml).document.querySelectorAll('li').length, 1);
+});
+
+test('daily migration preserves published bookmarks and feed identities without duplicate anchors', async () => {
+  const [entry] = await parseChangelog('## 2026-09-27\n### 新增内容\n- 合并后的内容。');
+  assert.equal(entry.feedId, 'update-2026-09-27-2200');
+  assert.ok(entry.legacyIds.includes('update-2026-09-27-2140'));
+  assert.ok(entry.legacyIds.includes('update-2026-09-27-2110-站点改进'));
+  assert.ok(entry.legacyIds.includes('update-2026-09-27-earlier'));
+  const renderedIds = [...parseHTML(entry.html).document.querySelectorAll('[id]')].map(node => node.id);
+  assert.ok(renderedIds.includes('update-2026-09-27-新增内容'));
+  assert.ok(!entry.legacyIds.includes('update-2026-09-27-新增内容'));
+  const allIds = [entry.id, ...entry.legacyIds, ...renderedIds];
+  assert.equal(new Set(allIds).size, allIds.length);
+  const [amended] = await parseChangelog('## 2026-09-27\n- 内容重新归并。');
+  assert.equal(amended.feedId, entry.feedId);
+});
+
+test('timed batch headings are rejected in a daily changelog', async () => {
+  for (const label of ['09:30 · 新资源', '9:30 · 新资源', '18:05 · 调整', '24:00 · 错误时间']) {
+    await assert.rejects(parseChangelog(`## 2026-09-29\n### ${label}\n- 更新。`), /daily list/);
   }
-  await assert.rejects(parseChangelog('## 2026-09-27\n### 09:30 · 更新\n- 改进。'), /needs a summary/);
-  await assert.rejects(parseChangelog('## 2026-09-27\n### 09:30 · 更新\n摘要。\n- 改进。\n### 09:30 · 重复\n摘要。\n- 改进。'), /Duplicate changelog batch time/);
 });
 
 test('invalid, duplicate, or empty publication groups fail before deployment', async () => {

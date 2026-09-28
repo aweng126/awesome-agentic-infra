@@ -315,58 +315,48 @@ for (const [index, entry] of entries.entries()) {
 }
 const normalizeText = (text) => text.replace(/\s+/gu, ' ').trim();
 const linkHrefs = (node) => [...node.querySelectorAll('a[href]')].map((link) => link.getAttribute('href'));
-const expectedSourceBatches = new Map(dateHeadings.map((heading, index) => {
+const legacyChangelog = JSON.parse(await readFile(new URL('../src/lib/changelog-legacy.json', import.meta.url), 'utf8'));
+const sourceDays = new Map(dateHeadings.map((heading, index) => {
   const date = textContent(heading);
   const body = changelogMarkdown.slice(heading.position.end.offset, dateHeadings[index + 1]?.position.start.offset ?? changelogMarkdown.length);
-  const batches = [];
-  let inTimedBatch = false;
-  let hasEarlierUpdates = false;
-  for (const node of parser.parse(body).children) {
-    if (node.type === 'heading' && node.depth === 3) {
-      const match = /^(\d{2}:\d{2})\s*·\s*(.+)$/u.exec(textContent(node));
-      inTimedBatch = Boolean(match);
-      if (match) batches.push({ id: `update-${date}-${match[1].replace(':', '')}`, date, time: match[1], title: match[2] });
-    }
-    if (node.type === 'list' && !inTimedBatch) hasEarlierUpdates = true;
-  }
-  batches.sort((a, b) => b.time.localeCompare(a.time));
-  if (hasEarlierUpdates) batches.push({ id: `update-${date}-earlier`, date, time: undefined, title: batches.length ? '当日较早更新' : '资源与站点更新' });
-  return [date, batches];
+  const tree = parser.parse(body);
+  const items = tree.children.flatMap(node => node.type === 'list' ? node.children : []);
+  assert.ok(items.length, `${date}: daily source contains changes`);
+  assert.ok(!tree.children.some(node => node.type === 'heading' && /^\d{1,2}:\d{2}/u.test(textContent(node))), `${date}: no timed batch headings remain`);
+  return [date, items];
 }));
-const batches = entries.flatMap((entry) => {
+assert.equal(changelog.querySelectorAll('.changelog-batch').length, 0, 'Changelog renders daily lists without batch sections');
+const dailyUpdates = entries.map(entry => {
   const date = entry.querySelector('.changelog-date time').getAttribute('datetime');
-  const published = [...entry.querySelectorAll('.changelog-batch')].map((batch) => {
-    const heading = batch.querySelector('h3');
-    assert.ok(batch.id && heading, `${date}: every batch has a stable ID and heading`);
-    const headingCopy = heading.cloneNode(true);
-    const timeElement = headingCopy.querySelector('time');
-    const time = timeElement?.textContent.replace(/\s*·\s*$/u, '').trim();
-    timeElement?.remove();
-    if (time) assert.equal(heading.querySelector('time').getAttribute('datetime'), `${date}T${time}:00+08:00`, `${batch.id}: batch time uses Beijing time`);
-    assert.equal(heading.querySelector('a')?.getAttribute('href'), `#${batch.id}`, `${batch.id}: batch heading links to its stable anchor`);
-    const details = batch.querySelector('.batch-details');
-    assert.ok(details?.querySelector('li'), `${batch.id}: batch details retain the individual changes`);
-    const summary = time
-      ? [...details.children].find((node) => node.localName === 'p')
-      : details.querySelector('ul > li, ol > li');
-    assert.ok(summary && normalizeText(summary.textContent), `${batch.id}: visible batch details contain the summary`);
-    return { id: batch.id, date, time, title: normalizeText(headingCopy.textContent),
-      text: normalizeText(summary.textContent), links: linkHrefs(summary), details };
-  });
-  assert.deepEqual(published.map(({ id, date, time, title }) => ({ id, date, time, title })), expectedSourceBatches.get(date), `${date}: published batches preserve source titles, times and descending order`);
-  return published;
+  assert.equal(entry.querySelectorAll('time').length, 1, `${date}: only the day is displayed`);
+  const details = entry.querySelector('.changelog-body');
+  const items = [...details.querySelectorAll(':scope > ul > li, :scope > ol > li')];
+  assert.deepEqual(items.map(item => normalizeText(item.textContent)), sourceDays.get(date).map(item => normalizeText(textContent(item))), `${date}: daily list preserves source order and content`);
+  assert.equal(entry.querySelector('.changelog-date-meta')?.textContent.replace(/最新/u, '').trim(), `${items.length} 项更新`, `${date}: count reflects the merged points`);
+  for (const id of legacyChangelog[date]?.legacyIds ?? []) {
+    const alias = changelog.getElementById(id);
+    assert.ok(alias && entry.contains(alias), `${id}: old bookmarks still locate the corresponding day`);
+  }
+  return { id: entry.id, date, items, details };
 });
-assert.ok(batches.length > 0, 'Changelog exposes at least one release batch');
-const expectedChanges = batches.slice(0, 3).map(batch => ({ date: batch.date, title: batch.title,
-  href: `${base}changelog/#${batch.id}`, text: batch.text, links: batch.links }));
-const recentChanges = [...home.querySelectorAll('.recent-update')].map((item) => ({
-  date: item.querySelector('time').getAttribute('datetime'),
-  title: normalizeText(item.querySelector('.recent-update-title').textContent),
-  href: item.querySelector('.recent-update-title').getAttribute('href'),
-  text: normalizeText(item.querySelector('.recent-update-summary').textContent),
-  links: linkHrefs(item.querySelector('.recent-update-summary')),
+const expectedChanges = dailyUpdates.slice(0, 3).map(day => ({ date: day.date,
+  href: `${base}changelog/#${day.id}`,
+  text: normalizeText(day.items.slice(0, 2).map(item => item.textContent).join(' ')),
+  links: day.items.slice(0, 2).flatMap(linkHrefs),
+  count: Math.min(2, day.items.length),
 }));
-assert.deepEqual(recentChanges, expectedChanges, 'Homepage recent updates preserve the latest three release batches, summaries and links');
+const recentChanges = [...home.querySelectorAll('.recent-update')].map(item => {
+  const summary = item.querySelector('.recent-update-summary');
+  assert.equal(item.querySelectorAll('time').length, 1, 'Homepage shows one date per daily summary');
+  assert.equal(item.querySelector('time').textContent, item.querySelector('time').getAttribute('datetime'), 'Homepage date omits time');
+  assert.equal(item.querySelector('.recent-update-date').getAttribute('href'), item.querySelector('.recent-update-link').getAttribute('href'), 'Date and read-more link reach the same daily update');
+  return { date: item.querySelector('time').getAttribute('datetime'),
+    href: item.querySelector('.recent-update-link').getAttribute('href'),
+    text: normalizeText(summary.textContent), links: linkHrefs(summary),
+    count: summary.querySelectorAll(':scope > ul > li, :scope > ol > li').length,
+  };
+});
+assert.deepEqual(recentChanges, expectedChanges, 'Homepage shows the latest three distinct dates with two complete, linked points per day');
 
 const feedSource = await readFile(path.join(root, 'feed.xml'), 'utf8');
 assert.match(feedSource, /^<\?xml version="1\.0" encoding="UTF-8"\?>/u, 'RSS declares its encoding');
@@ -376,33 +366,31 @@ assert.equal(feed.documentElement.getAttribute('version'), '2.0', 'Feed uses RSS
 assert.equal(feed.querySelector('channel > link')?.textContent, absolute(base), 'RSS channel links to the configured homepage');
 assert.equal(feed.getElementsByTagName('atom:link')[0]?.getAttribute('href'), absolute(`${base}feed.xml`), 'RSS self-link uses the configured feed URL');
 const feedItems = [...feed.querySelectorAll('channel > item')];
-assert.equal(feedItems.length, batches.length, 'RSS includes each release batch once');
+assert.equal(feedItems.length, dailyUpdates.length, 'RSS includes one item per day');
 const feedGuids = new Set();
 for (const [index, item] of feedItems.entries()) {
-  const batch = batches[index];
-  const permalink = absolute(`${base}changelog/#${batch.id}`);
-  assert.equal(item.querySelector('title')?.textContent, `${batch.date} · ${batch.title}`, `${batch.id}: RSS preserves the batch title`);
-  assert.equal(item.querySelector('link')?.textContent, permalink, `${batch.id}: RSS links directly to the batch`);
+  const day = dailyUpdates[index];
+  const permalink = absolute(`${base}changelog/#${day.id}`);
+  assert.equal(item.querySelector('title')?.textContent, `${day.date} · 资源与站点更新`, `${day.id}: RSS uses a daily title`);
+  assert.equal(item.querySelector('link')?.textContent, permalink, `${day.id}: RSS links directly to the daily update`);
   const guid = item.querySelector('guid');
-  assert.equal(guid?.textContent, permalink, `${batch.id}: RSS GUID is the stable permalink`);
-  assert.equal(guid?.getAttribute('isPermaLink'), 'true', `${batch.id}: RSS GUID is explicitly a permalink`);
-  assert.ok(!feedGuids.has(guid.textContent), `${batch.id}: RSS GUID is unique`);
+  const expectedGuid = absolute(`${base}changelog/#${legacyChangelog[day.date]?.feedId ?? day.id}`);
+  assert.equal(guid?.textContent, expectedGuid, `${day.id}: RSS reuses published identity or the stable daily ID`);
+  assert.equal(guid?.getAttribute('isPermaLink'), 'true', `${day.id}: RSS GUID remains a permalink`);
+  assert.ok(!feedGuids.has(guid.textContent), `${day.id}: RSS GUID is unique`);
   feedGuids.add(guid.textContent);
-  if (batch.time) {
-    assert.equal(item.querySelector('pubDate')?.textContent, new Date(`${batch.date}T${batch.time}:00+08:00`).toUTCString(), `${batch.id}: RSS publication time preserves the recorded batch time and timezone`);
-  } else {
-    assert.equal(item.querySelector('pubDate'), null, `${batch.id}: legacy RSS entries do not invent a precise publication time`);
-  }
-  await verifyLocalUrl(permalink, `${batch.id}: RSS permalink`);
+  assert.equal(item.querySelector('pubDate'), null, `${day.id}: date-only records do not invent a publication time`);
+  await verifyLocalUrl(permalink, `${day.id}: RSS permalink`);
+  await verifyLocalUrl(guid.textContent, `${day.id}: RSS GUID bookmark`);
   const description = item.querySelector('description')?.textContent;
-  assert.ok(description, `${batch.id}: RSS contains readable details`);
+  assert.ok(description, `${day.id}: RSS contains readable details`);
   const body = parseHTML(`<main>${description}</main>`).document.querySelector('main');
-  assert.equal(normalizeText(body.textContent), normalizeText(batch.details.textContent), `${batch.id}: RSS description preserves the complete batch details`);
+  assert.equal(normalizeText(body.textContent), normalizeText(day.details.textContent), `${day.id}: RSS preserves all daily updates`);
   for (const element of body.querySelectorAll('a[href],img[src]')) {
     const raw = element.getAttribute('href') ?? element.getAttribute('src');
     const url = new URL(raw);
-    assert.ok(['https:', 'http:'].includes(url.protocol), `${batch.id}: feed links are absolute HTTP(S) URLs`);
-    if (url.origin === origin && url.pathname.startsWith(base)) await verifyLocalUrl(raw, `${batch.id}: RSS content`);
+    assert.ok(['https:', 'http:'].includes(url.protocol), `${day.id}: feed links are absolute HTTP(S) URLs`);
+    if (url.origin === origin && url.pathname.startsWith(base)) await verifyLocalUrl(raw, `${day.id}: RSS content`);
   }
 }
 
@@ -448,4 +436,4 @@ for (const [file, document] of documents) {
   }
 }
 assert.deepEqual(problems,[],'Generated site link/semantic checks');
-console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, ${profiles.length} resource introductions, ${batches.length} release batches, RSS, sitemap, and the sharing PNG.`);
+console.log(`Verified ${pages.length} HTML pages, ${checkedLinks} internal links/assets, ${sourceCount} resource anchors/cards, ${profiles.length} resource introductions, ${dailyUpdates.length} daily updates, RSS, sitemap, and the sharing PNG.`);

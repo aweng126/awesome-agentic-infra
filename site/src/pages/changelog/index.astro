@@ -15,20 +15,18 @@ const formatDate = (date: string) => {
       <p class="eyebrow"><span class="live-dot" /> CHANGELOG</p>
       <h1>最近更新<span class="accent-dot">。</span></h1>
       <p>新增资源、内容补充与站点改进。</p>
-      <div class="changelog-meta"><span>按发布批次倒序 · 北京时间</span><span aria-hidden="true">/</span><a href={sitePath('feed.xml')}>RSS 订阅更新 ↗</a></div>
+      <div class="changelog-meta"><span>按日期倒序</span><span aria-hidden="true">/</span><a href={sitePath('feed.xml')}>RSS 订阅更新 ↗</a></div>
     </header>
 
     <div class="changelog-timeline" aria-label="网站更新记录">
       {updates.map((update, index) => (
-        <article id={`update-${update.date}`} class="changelog-entry" aria-labelledby={update.date}>
+        <article id={update.id} class="changelog-entry" aria-labelledby={update.date}>
+          {update.legacyIds.map((legacyId) => <span id={legacyId} class="changelog-alias" aria-hidden="true" />)}
           <div class="changelog-date">
-            <h2 id={update.date}><a href={`#update-${update.date}`} aria-label={`链接到 ${formatDate(update.date)} 的更新`}><time datetime={update.date}>{update.date}</time></a></h2>
-            <div class="changelog-date-meta">{index === 0 && <span class="changelog-latest">最近一次</span>}<span>{update.changeCount} 项更新</span></div>
+            <h2 id={update.date}><a href={`#${update.id}`} aria-label={`链接到 ${formatDate(update.date)} 的更新`}><time datetime={update.date}>{update.date}</time></a></h2>
+            <div class="changelog-date-meta">{index === 0 && <span class="changelog-latest">最新</span>}<span>{update.changeCount} 项更新</span></div>
           </div>
-          <div class="changelog-body prose">{update.batches.map(batch => <section class="changelog-batch" id={batch.id}>
-            <h3><a href={`#${batch.id}`}>{batch.time && <time datetime={`${batch.date}T${batch.time}:00+08:00`}>{batch.time} · </time>}{batch.title}</a></h3>
-            <div class="batch-details" set:html={batch.html}/>
-          </section>)}</div>
+          <div class="changelog-body prose" set:html={update.html} />
         </article>
       ))}
     </div>
@@ -37,10 +35,6 @@ const formatDate = (date: string) => {
 
 <style>
   .changelog-meta a { color: var(--accent); }
-  .changelog-batch { scroll-margin-top: 130px; }
-  .changelog-batch + .changelog-batch { margin-top: 28px; padding-top: 8px; border-top: 1px solid var(--line); }
-  .changelog-batch > h3 { font-size: 15px; color: var(--text); }
-  .changelog-batch :global(h4) { font-size: 13px; color: var(--accent); margin-block: 22px 8px; }
   .changelog-page { max-width: 1080px; margin: 0 auto; padding: 56px 36px 76px; }
   .changelog-heading { padding-bottom: 34px; }
   .changelog-heading h1 { font-size: clamp(32px, 4vw, 42px); margin: 15px 0 15px; }
@@ -48,7 +42,8 @@ const formatDate = (date: string) => {
   .changelog-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 21px; color: var(--muted); font-size: 11px; }
   .changelog-meta > span[aria-hidden] { color: var(--line); }
   .changelog-timeline { border-top: 1px solid var(--line); }
-  .changelog-entry { display: grid; grid-template-columns: 164px minmax(0, 1fr); gap: 30px; padding-top: 34px; scroll-margin-top: 122px; }
+  .changelog-entry { position: relative; display: grid; grid-template-columns: 164px minmax(0, 1fr); gap: 30px; padding-top: 34px; scroll-margin-top: 122px; }
+  .changelog-alias { position: absolute; top: 34px; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); scroll-margin-top: 130px; pointer-events: none; }
   .changelog-date { padding-top: 2px; }
   .changelog-date h2 { font: 14px/1.6 var(--font-mono); letter-spacing: -.02em; }
   .changelog-date h2 a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
@@ -57,18 +52,18 @@ const formatDate = (date: string) => {
   .changelog-body { position: relative; min-width: 0; padding: 0 0 38px 29px; border-left: 1px solid var(--line); }
   .changelog-body::before { content: ''; position: absolute; left: -4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
   .changelog-entry:first-child .changelog-body::before { background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
-  .changelog-body :global(h3) { font-size: 13px; line-height: 1.6; letter-spacing: 0; color: var(--accent); margin: 26px 0 10px; }
   .changelog-body > :global(:first-child) { margin-top: 0; }
   .changelog-body :global(ul) { margin-top: 10px; }
   .changelog-body :global(li) { font-size: 13px; line-height: 1.95; }
   .changelog-body :global(li + li) { margin-top: 12px; }
   .changelog-entry:last-child .changelog-body { padding-bottom: 8px; }
-  .changelog-entry:target .changelog-date h2 { color: var(--accent); }
+  .changelog-entry:target .changelog-date h2, .changelog-entry:has(.changelog-alias:target) .changelog-date h2 { color: var(--accent); }
   @media (max-width: 760px) {
     .changelog-page { padding: 37px 22px 56px; }
     .changelog-heading { padding-bottom: 27px; }
     .changelog-heading > p:not(.eyebrow) { font-size: 13px; }
     .changelog-entry { grid-template-columns: 1fr; gap: 20px; padding-top: 26px; }
+    .changelog-alias { top: 26px; }
     .changelog-date { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
     .changelog-date-meta { margin-top: 0; }
     .changelog-body { margin-left: 3px; padding-left: 20px; padding-bottom: 28px; }

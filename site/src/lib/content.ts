@@ -12,6 +12,7 @@ import type { Root as MarkdownRoot, Link, ListItem } from 'mdast';
 import type { Root as HtmlRoot } from 'hast';
 import { topics } from './topic-metadata';
 import siteConfig from '../../site.config.json';
+import changelogLegacy from './changelog-legacy.json';
 import type { ResourceRole, ResourceDelivery } from './resource-taxonomy';
 export { resourceIntroLabel } from './resource-taxonomy';
 import { loadResourceCatalog, parseResourceDocument, syncTopicMarkdown, type CatalogResource, type ResourceLink, type ResourceStatus } from './resource-catalog';
@@ -80,23 +81,15 @@ export function resourcePath(resource: Pick<Resource, 'topicSlug' | 'anchor'> & 
 }
 
 export interface ChangelogEntry {
+  id: string;
   date: string;
   html: string;
   changes: string[];
   changeCount: number;
-  batches: ChangelogBatch[];
-}
-
-export interface ChangelogBatch {
-  id: string;
-  date: string;
-  time?: string;
-  title: string;
   summaryHtml: string;
-  html: string;
-  changes: string[];
+  legacyIds: string[];
+  feedId: string;
 }
-
 
 export const topicScopeLabels = {
   core: 'Agentic 核心能力',
@@ -410,52 +403,28 @@ export async function parseChangelog(markdown: string): Promise<ChangelogEntry[]
     const tree = parse(body);
     const items = tree.children.flatMap((node) => node.type === 'list' ? node.children : []);
     if (!items.length) throw new Error(`Changelog ${date} needs at least one change.`);
-    const [rendered, changes] = await Promise.all([
-      renderMarkdown(body, 'CHANGELOG.md', `update-${date}-`),
-      Promise.all(items.map(async (item, itemIndex) => {
-        const markdown = body.slice(item.position!.start.offset!, item.position!.end.offset!);
-        return (await renderMarkdown(markdown, 'CHANGELOG.md', `update-${date}-change-${itemIndex}-`)).html;
-      })),
-    ]);
-    const batchHeadings = tree.children.filter(node => node.type === 'heading' && node.depth === 3);
-    const batches: ChangelogBatch[] = [];
-    const legacyParts = [body.slice(0, batchHeadings[0]?.position?.start.offset ?? body.length)];
-    const times = new Set<string>();
-    for (const [batchIndex, batchHeading] of batchHeadings.entries()) {
-      const label = readableText(batchHeading);
-      const match = /^(\d{2}:\d{2})\s*·\s*(.+)$/u.exec(label);
-      const end = batchHeadings[batchIndex + 1]?.position?.start.offset ?? body.length;
-      if (!match) {
-        if (/^\d{1,2}:/u.test(label)) throw new Error(`Invalid changelog batch: ${label}. Use HH:mm · Title.`);
-        legacyParts.push(body.slice(batchHeading.position!.start.offset!, end));
-        continue;
+    visit(tree, 'heading', (node) => {
+      if (/^\d{1,2}:\d{2}/u.test(readableText(node))) {
+        throw new Error(`Changelog ${date} uses a timed batch. Combine changes in the daily list.`);
       }
-      const [, time, title] = match;
-      if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/u.test(time)) throw new Error(`Invalid changelog batch time: ${time}.`);
-      if (times.has(time)) throw new Error(`Duplicate changelog batch time: ${date} ${time}.`);
-      times.add(time);
-      const batchBody = body.slice(batchHeading.position!.end.offset!, end);
-      const batchTree = parse(batchBody);
-      const summary = batchTree.children.find(node => node.type === 'paragraph');
-      const batchItems = batchTree.children.flatMap(node => node.type === 'list' ? node.children : []);
-      if (!summary || !batchItems.length) throw new Error(`Changelog batch ${date} ${time} needs a summary and at least one change.`);
-      const id = `update-${date}-${time.replace(':', '')}`;
-      const summaryMarkdown = batchBody.slice(summary.position!.start.offset!, summary.position!.end.offset!);
-      batches.push({ id, date, time, title,
-        summaryHtml: (await renderMarkdown(summaryMarkdown, 'CHANGELOG.md')).html,
-        html: (await renderMarkdown(batchBody, 'CHANGELOG.md', `${id}-`)).html,
-        changes: await Promise.all(batchItems.map(async item => (await renderMarkdown(batchBody.slice(item.position!.start.offset!, item.position!.end.offset!), 'CHANGELOG.md')).html)),
-      });
-    }
-    batches.sort((a, b) => b.time!.localeCompare(a.time!));
-    const legacyBody = legacyParts.join('\n');
-    const legacyItems = parse(legacyBody).children.flatMap(node => node.type === 'list' ? node.children : []);
-    if (legacyItems.length) {
-      const legacyChanges = await Promise.all(legacyItems.map(async item => (await renderMarkdown(legacyBody.slice(item.position!.start.offset!, item.position!.end.offset!), 'CHANGELOG.md')).html));
-      batches.push({ id: `update-${date}-earlier`, date, title: batches.length ? '当日较早更新' : '资源与站点更新',
-        summaryHtml: legacyChanges[0], html: (await renderMarkdown(legacyBody, 'CHANGELOG.md', `update-${date}-`)).html, changes: legacyChanges });
-    }
-    return { date, html: rendered.html, changes, changeCount: changes.length, batches };
+    });
+    const id = `update-${date}`;
+    const changeMarkdown = items.map(item => body.slice(item.position!.start.offset!, item.position!.end.offset!));
+    const [rendered, changes, summary] = await Promise.all([
+      renderMarkdown(body, 'CHANGELOG.md', `${id}-`),
+      Promise.all(changeMarkdown.map(async (markdown, itemIndex) =>
+        (await renderMarkdown(markdown, 'CHANGELOG.md', `${id}-change-${itemIndex}-`)).html)),
+      renderMarkdown(changeMarkdown.slice(0, 2).join('\n\n'), 'CHANGELOG.md'),
+    ]);
+    // Preserve published bookmarks and reuse one existing feed identity per day.
+    // New dates need no migration metadata or artificial publication time.
+    const legacy = changelogLegacy[date as keyof typeof changelogLegacy];
+    const headingIds = new Set(rendered.headings.map(heading => heading.id));
+    return { id, date, html: rendered.html, changes, changeCount: changes.length,
+      summaryHtml: summary.html,
+      legacyIds: (legacy?.legacyIds ?? []).filter(anchor => !headingIds.has(anchor)),
+      feedId: legacy?.feedId ?? id,
+    };
   }));
   if (!entries.length) throw new Error('CHANGELOG.md needs at least one dated update.');
   return entries.sort((a, b) => b.date.localeCompare(a.date));
