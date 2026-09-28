@@ -4,6 +4,15 @@
 
 ## 2026-09-28
 
+### 17:15 · 新增独立主题导航页
+
+[主题导航](https://blog.kingwen.cn/awesome-agentic-infra/topics/)现在进入独立总览页，按 Agent 核心能力、跨领域支撑和关联基础设施选择具体主题。
+
+#### 站点改进
+
+- 各主题展示范围说明、资源数量及对应页面入口；主导航、搜索和主题面包屑统一连接总览页。
+- 首页保留具体主题的快捷入口，并提供“查看全部主题”链接；原有页面地址与首页定位锚点继续可用。
+
 ### 16:56 · 突出资源导览入口
 
 [首页](https://blog.kingwen.cn/awesome-agentic-infra/)直接展示[领域导览](notes/agentic-infra-overview.md)与 [Runtime 全景](notes/agent-runtime-landscape.md)，从了解领域全貌进入主题资源与项目介绍。

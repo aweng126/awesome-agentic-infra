@@ -56,10 +56,13 @@ for(const [file,document] of documents){
     const navigation = document.querySelector(selector);
     const links = [...(navigation?.querySelectorAll('a[href]') ?? [])];
     assert.deepEqual(links.map((link) => [link.textContent.trim(), link.getAttribute('href')]), [
-      ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', `${base}#topics`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
+      ['首页', base], ['资源导览', `${base}notes/`], ['主题导航', `${base}topics/`], ['资源库', `${base}resources/`], ['更新日志', `${base}changelog/`],
     ], `${relative}: ${selector} exposes the five resource-focused navigation entries`);
     if (relative.startsWith(`notes${path.sep}`)) {
       assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}notes/`], `${relative}: guides have their own active navigation entry in ${selector}`);
+    }
+    if (relative.startsWith(`topics${path.sep}`)) {
+      assert.deepEqual(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.getAttribute('href')), [`${base}topics/`], `${relative}: topic index and detail pages share the active topic navigation entry in ${selector}`);
     }
     const changelogLink = links
       .find((link) => link.getAttribute('href') === `${base}changelog/`);
@@ -111,19 +114,36 @@ const catalog = await Promise.all((await readdir('../resources/items')).filter((
 const profiles = catalog.filter((resource) => resource.hasProfile);
 const detailPages = pages.filter((file) => path.relative(root, file).startsWith(`resources${path.sep}`) && file !== path.join(root, 'resources/index.html'));
 assert.equal(detailPages.length, profiles.length, 'Only resources with substantive introductions have detail pages');
-assert.equal(pages.filter(p=>path.relative(root,p).startsWith(`topics${path.sep}`)).length,resourceFiles.length,'Each source topic needs a page');
+assert.equal(pages.filter(p=>path.relative(root,p).startsWith(`topics${path.sep}`) && p !== path.join(root, 'topics/index.html')).length,resourceFiles.length,'Each source topic needs a detail page');
 const servingSlug = 'inference-and-model-serving';
 const servingPath = `${base}topics/${servingSlug}/`;
 const primarySlugs = resourceFiles.map((filename) => filename.slice(0, -3)).filter((slug) => slug !== servingSlug);
 assert.equal(primarySlugs.length, 7, 'The collection has seven primary Agent infrastructure topics');
 assert.ok(resourceFiles.includes(`${servingSlug}.md`), 'Serving remains a source topic with its existing address');
 const primaryTopicPaths = new Set(primarySlugs.map((slug) => `${base}topics/${slug}/`));
+const topicIndex = documents.get(path.join(root, 'topics/index.html'));
+assert.ok(topicIndex, 'An independent topic index must be generated');
+const directoryCards = [...topicIndex.querySelectorAll('.topic-directory-card')];
+assert.equal(directoryCards.length, resourceFiles.length, 'Topic index includes every topic once');
+assert.deepEqual(new Set(directoryCards.map(card => card.getAttribute('href'))), new Set([...primaryTopicPaths, servingPath]), 'Topic index links directly to the existing topic pages');
+const directoryScopes = new Map();
+for (const card of directoryCards) {
+  const slug = card.getAttribute('data-topic');
+  const scope = card.getAttribute('data-topic-scope');
+  directoryScopes.set(scope, (directoryScopes.get(scope) ?? 0) + 1);
+  assert.equal(card.getAttribute('href'), `${base}topics/${slug}/`, `${slug}: topic card URL matches its identifier`);
+  assert.equal(Number.parseInt(card.querySelector('[data-resource-count]')?.textContent, 10), catalog.filter(resource => resource.topic === slug).length, `${slug}: directory count matches the resource catalog`);
+}
+assert.deepEqual(directoryScopes, new Map([['core', 4], ['crossCutting', 3], ['serving', 1]]), 'Topic index distinguishes core capabilities, cross-cutting support and Serving');
+assert.ok(topicIndex.querySelector(`#related-infrastructure a[href="${servingPath}"]`), 'Related infrastructure has a direct topic-index anchor');
 const home = documents.get(path.join(root, 'index.html'));
 assert.ok(home, 'Homepage must be generated');
 const homeTopicCards = [...home.querySelectorAll('.topic-card')];
 assert.equal(homeTopicCards.length, 7, 'Homepage highlights seven primary topic cards');
 assert.deepEqual(new Set(homeTopicCards.map((card) => card.getAttribute('href'))), primaryTopicPaths, 'Homepage primary cards include all Agent topics and exclude Serving');
 assert.equal(home.querySelector('[data-stat="topics"] strong')?.textContent.trim(), String(primarySlugs.length), 'Homepage reports the primary topic count');
+assert.equal(home.querySelector('[data-stat="topics"]')?.getAttribute('href'), `${base}topics/`, 'Homepage topic count opens the independent index');
+assert.equal(home.querySelector('#topics .section-heading .inline-link')?.getAttribute('href'), `${base}topics/`, 'Homepage offers a link to all topics');
 assert.equal(home.querySelector('[data-stat="resources"] strong')?.textContent.trim(), String(catalog.length), 'Homepage resource count comes from the catalog');
 assert.equal(home.querySelector('[data-stat="projects"] strong')?.textContent.trim(), String(profiles.filter(resource => resource.type === 'project').length), 'Homepage project count excludes other resource guides');
 assert.equal(home.querySelector('[data-stat="projects"]')?.getAttribute('href'), `${base}resources/?type=project`, 'Project count opens the project resource filter');
@@ -173,6 +193,7 @@ for (const filename of resourceFiles) {
   const currentTopicLinks = [...topic.querySelectorAll('.topic-sidebar a[aria-current="page"]')];
   assert.equal(currentTopicLinks.length, 1, `${filename}: navigation marks only the current topic`);
   assert.equal(currentTopicLinks[0]?.getAttribute('href'), `${base}topics/${topicSlug}/`, `${filename}: the current topic remains active in its group`);
+  assert.equal(topic.querySelectorAll('.breadcrumbs a')[1]?.getAttribute('href'), `${base}topics/${topicSlug === servingSlug ? '#related-infrastructure' : ''}`, `${filename}: breadcrumb returns to the independent topic index`);
   const tree = parser.parse(await readFile(`../resources/${filename}`, 'utf8'));
   const anchors = new Set();
   const overviewLinks = new Set();
@@ -227,6 +248,8 @@ for (const filename of resourceFiles) {
 assert.equal(sourceCount, catalog.length, 'Generated topic indexes and the single resource catalog have the same count');
 assert.equal(explorer.querySelectorAll('.resource-card').length,sourceCount,'Every source resource must appear in the explorer');
 const searchItems = JSON.parse(home.getElementById('search-data').textContent);
+assert.equal(searchItems.find(item => item.title === '主题导航')?.url, `${base}topics/`, 'Search opens the independent topic index');
+assert.equal(searchItems.find(item => item.title === '关联基础设施')?.url, `${base}topics/#related-infrastructure`, 'Related-infrastructure search opens its group in the topic index');
 for (const resource of catalog) {
   const card = explorer.getElementById(`${resource.topic}-${resource.anchor}`);
   assert.ok(card, `${resource.slug}: catalog record has a resource card`);

@@ -12,14 +12,14 @@ const notes = await getNotes();
 const navigation = [
   { id: 'home', label: '首页', href: sitePath() },
   { id: 'guides', label: '资源导览', href: sitePath('notes/') },
-  { id: 'topics', label: '主题导航', href: `${sitePath()}#topics` },
+  { id: 'topics', label: '主题导航', href: sitePath('topics/') },
   { id: 'resources', label: '资源库', href: sitePath('resources/') },
   { id: 'changelog', label: '更新日志', href: sitePath('changelog/') },
 ];
 const searchItems = [
   {title:'资源导览', description:'从领域划分了解基础设施，通过方案全景浏览开源框架、运行平台与云厂商产品。', category:'站点导航', url:sitePath('notes/'), keywords:'领域 概览 全景 方案 总览 导览 guides landscape'},
-  {title:'主题导航', description:'按七个主要主题浏览 Agent 基础设施项目、平台与参考资料。', category:'站点导航', url:`${sitePath()}#topics`, keywords:'主题 导航 项目 topics'},
-  {title:'关联基础设施', description:'了解 Agent 与推理、模型服务基础设施的连接。', category:'站点导航', url:`${sitePath()}#related-infrastructure`, keywords:'模型 推理 serving 关联'},
+  {title:'主题导航', description:'按七个主要主题浏览 Agent 基础设施项目、平台与参考资料。', category:'站点导航', url:sitePath('topics/'), keywords:'主题 导航 项目 topics'},
+  {title:'关联基础设施', description:'了解 Agent 与推理、模型服务基础设施的连接。', category:'站点导航', url:sitePath('topics/#related-infrastructure'), keywords:'模型 推理 serving 关联'},
   {title:'更新日志', description:'查看最近新增的资源、内容更新与站点改进。', category:'站点导航', url:sitePath('changelog/'), keywords:'更新 最近更新 新增 changelog updates'},
   ...resources.map(r => ({title:r.name, description:r.description, category:r.topicZhTitle, url:resourcePath(r), keywords:[r.topicTitle, r.type, r.maintainer, r.form, ...r.aliases, ...r.keywords, r.role && roleLabels[r.role], r.delivery && deliveryLabels[r.delivery]].filter(Boolean).join(' ')})),
   ...notes.map(n => ({title:n.title, description:n.description, category:resourceGuideLabel(n.slug), url:sitePath(`notes/${n.slug}/`), keywords:'资源导览 方案总览 guide'})),

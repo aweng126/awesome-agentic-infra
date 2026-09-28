@@ -63,7 +63,7 @@ const resourceGroups = resourceTypes.map((kind) => {
     <div class="topic-content">
       <nav class="breadcrumbs" aria-label="面包屑">
         <a href={sitePath()}>首页</a><span aria-hidden="true">/</span>
-        <a href={`${sitePath()}#${isRelated ? 'related-infrastructure' : 'topics'}`}>{sectionLabel}</a><span aria-hidden="true">/</span>
+        <a href={sitePath(isRelated ? 'topics/#related-infrastructure' : 'topics/')}>{sectionLabel}</a><span aria-hidden="true">/</span>
         <span aria-current="page">{topic.zhTitle}</span>
       </nav>
       <header class="topic-header">

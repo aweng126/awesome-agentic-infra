@@ -4,7 +4,7 @@ import { absoluteSiteUrl, xmlEscape } from '../lib/syndication';
 
 export const GET: APIRoute = async () => {
   const [topics, profiles, notes] = await Promise.all([getTopics(), getResourceProfiles(), getNotes()]);
-  const paths = ['', 'resources/', 'notes/', 'changelog/', 'contributing/',
+  const paths = ['', 'topics/', 'resources/', 'notes/', 'changelog/', 'contributing/',
     ...topics.map(item => `topics/${item.slug}/`),
     ...profiles.map(item => `resources/${item.slug}/`),
     ...notes.map(item => `notes/${item.slug}/`),
