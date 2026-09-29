@@ -14,7 +14,7 @@ const relatedTopics = topicGroups.find((group) => group.id === 'related')?.topic
 const notes = await getNotes();
 const featuredGuides = [
   { slug: 'agentic-infra-overview', icon: 'stack', description: '了解 Agentic、Serving 与 Training 的职责，以及各个基础设施主题之间的关系。' },
-  { slug: 'agent-runtime-landscape', icon: 'runtime', description: '浏览开发框架、Coding Agent 执行系统与运行平台，了解代表方案的定位、特点和接入入口。' },
+  { slug: 'agent-runtime-landscape', icon: 'runtime', description: '浏览开发框架、Coding Agent 执行系统、运行平台与通用 Agent 产品，了解代表方案的定位和接入入口。' },
 ].map((featured) => {
   const note = notes.find((note) => note.slug === featured.slug);
   if (!note) throw new Error(`Missing homepage resource guide: ${featured.slug}`);

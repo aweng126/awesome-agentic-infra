@@ -2,6 +2,7 @@
 export const roleLabels = {
   'agent-framework': 'Agent 开发框架',
   'agent-harness': 'Agent Harness（执行系统）',
+  'agent-product': 'Agent 产品',
   'workflow-engine': '持久工作流引擎',
   'collaboration-platform': '组织协作平台',
   'sandbox-service': '沙箱环境与服务',

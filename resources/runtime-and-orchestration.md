@@ -2,6 +2,8 @@
 
 收录 Agent 开发框架、Agent Harness、工作流引擎与多 Agent 协作平台，覆盖执行循环、上下文与会话管理、任务编排和恢复。
 
+同时介绍代表性的通用与个人 Agent 产品，了解这些执行能力如何组合成可直接委派任务的产品。
+
 <!-- resources:start -->
 
 ## Projects & Platforms
@@ -27,11 +29,14 @@
 - <a id="resource-codebuddy-code"></a> [CodeBuddy Code](https://www.codebuddy.cn/docs/cli/quickstart) — 腾讯的本地 Coding Agent CLI，支持无头执行、会话恢复、MCP 与权限控制，并提供 TypeScript、Python Agent SDK 接入研发自动化。 [项目介绍](items/codebuddy-code.md)
 - <a id="resource-zcode"></a> [ZCode](https://github.com/zai-org/ZCode) — 智谱 Z.ai 的开源编程 Agent Harness，提供桌面、Web 与终端入口，公开 Agent CLI 和运行时源码，支持通过插件、MCP 与 Hooks 扩展执行能力。 [项目介绍](items/zcode.md)
 - <a id="resource-trae-code-cli"></a> [TraeCode CLI](https://docs.trae.cn/cli_about-trae-code-cli-2) — 字节跳动 TRAE 的本地编程 Agent，支持交互式终端、脚本与 CI 非交互执行，通过 ACP 接入编辑器，并提供会话管理、工具扩展和权限控制。 [项目介绍](items/trae-code-cli.md)
+- <a id="resource-muse-code"></a> [Muse Code](https://dev.meta.ai/docs/muse-code) — Meta 面向终端与 CI 的编程 Agent，提供本地执行、审批和沙箱，并通过会话协议及 SDK 支持应用驱动、任务控制与会话恢复。 [项目介绍](items/muse-code.md)
+- <a id="resource-meta-muse"></a> [Meta Muse](https://muse.ai/) — Meta 的托管个人 Agent，结合专属云端运行环境、长期记忆、浏览器与连接器，持续推进日常任务，并提供操作审批和活动记录。 [项目介绍](items/meta-muse.md)
+- <a id="resource-manus-cue"></a> [Manus Cue](https://cue.im/) — Manus 的托管个人 Agent 产品，为 Agent 配备邮箱、电话号码、钱包与电脑，支持独立执行任务及在群聊中围绕共同目标分工协作。 [项目介绍](items/manus-cue.md)
 
 <!-- resources:end -->
 
 ## 方案总览
 
-- [Agent Runtime 全景：框架、Agent Harness 与运行平台](../notes/agent-runtime-landscape.md) — 汇总开发框架、Coding Agent 执行系统、自托管平台与云厂商产品，介绍各方案的定位、特点和接入入口。
+- [Agent Runtime 全景：框架、Harness、平台与产品](../notes/agent-runtime-landscape.md) — 汇总开发框架、Coding Agent 执行系统、运行平台与通用 Agent 产品，介绍各方案的定位、特点和接入入口。
 
 [返回首页](../README.md)

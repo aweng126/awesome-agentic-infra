@@ -35,7 +35,7 @@ const deliveries = Object.entries(deliveryLabels).filter(([delivery]) => resourc
           </div>
         </div>)}
         <div class="product-filters">
-          <label for="resource-role">组件角色</label>
+          <label for="resource-role">资源角色</label>
           <select id="resource-role"><option value="all">全部角色</option>{roles.map(([value, label]) => <option value={value}>{label}</option>)}</select>
           <label for="resource-delivery">交付方式</label>
           <select id="resource-delivery"><option value="all">全部交付方式</option>{deliveries.map(([value, label]) => <option value={value}>{label}</option>)}</select>

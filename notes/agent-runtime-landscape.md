@@ -1,8 +1,8 @@
-# Agent Runtime 全景：框架、Agent Harness 与运行平台
+# Agent Runtime 全景：框架、Harness、平台与产品
 
-Agent Runtime 生态涵盖开发框架、可以直接使用或集成的 Agent Harness、自托管运行平台，以及云厂商的托管产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
+Agent Runtime 生态涵盖开发框架、可以直接使用或集成的 Agent Harness、自托管与云端运行平台，以及将这些能力组合起来的通用与个人 Agent 产品。本文汇总代表性方案，帮助读者了解有哪些项目、由谁维护、各自提供什么，以及从哪里继续阅读。
 
-下面按主要使用方式组织清单：开发框架供开发者组合 Agent 行为；Harness 提供已经组合好的执行系统，包含许多 Coding Agent；运行平台管理工作负载和运行环境；云厂商产品提供托管能力。随后补充围绕目标、分工与交付协调多个 Agent 的上层协作平台。分类之间可能有能力重叠，同一厂商也可能同时提供 SDK、本地产品与云端服务。
+下面按主要使用方式组织清单：开发框架供开发者组合 Agent 行为；Harness 提供已经组合好的执行系统，包含许多 Coding Agent；运行平台管理工作负载和运行环境；云厂商产品提供托管能力。随后补充协调 Agent 团队的上层协作平台，以及供用户直接委派任务的 Agent 产品。分类之间可能有能力重叠，同一厂商也可能同时提供 SDK、本地产品与云端服务。
 
 ## 开源框架与项目
 
@@ -37,6 +37,7 @@ Agent Runtime 生态涵盖开发框架、可以直接使用或集成的 Agent Ha
 | [CodeBuddy Code](../resources/items/codebuddy-code.md) | 腾讯 | 可接入研发流程的编程 Agent | Headless CLI、Agent SDK、工具与会话控制 | [CLI 文档](https://www.codebuddy.cn/docs/cli/quickstart) |
 | [ZCode](../resources/items/zcode.md) | 智谱 Z.ai | 开源编程 Harness 与多入口工作台 | 桌面、Web 与 CLI；公开运行时源码、插件、MCP 与 Hooks | [仓库](https://github.com/zai-org/ZCode) |
 | [TraeCode CLI](../resources/items/trae-code-cli.md) | 字节跳动 TRAE 团队 | 用于终端和自动化流程的编程 Agent | 非交互 `exec`、ACP、插件与 MCP；CLI 2.0 面向企业版旗舰版客户 | [CLI 文档](https://docs.trae.cn/cli_about-trae-code-cli-2) |
+| [Muse Code](../resources/items/muse-code.md) | Meta | 面向终端与 CI 的编程 Agent Harness | 本地 CLI、`muse serve` 会话协议、TypeScript / Python SDK；开发者文档处于预览阶段 | [官方文档](https://dev.meta.ai/docs/muse-code) · [SDK 文档](https://meta-models.github.io/muse-code-sdk/next/) |
 
 前述 [Strands Agents](../resources/items/strands-agents.md) 同时提供可组合的 Harness SDK 与预装配 Harness，因此保留在开发框架分组介绍。SDK 是否开源、Agent 在何处运行以及模型如何接入，是需要分别了解的三个方面。
 
@@ -81,6 +82,17 @@ AX 当前接口为 `v1alpha1`，核心概念与规范仍在演进，见 [项目�
 
 Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/reference/adapters/sandbox-providers/) 接入和管理外部执行环境。阅读时可区分两类编排：Paperclip 主要协调 Agent 团队的任务与组织规则，AX 主要管理任务执行单元及其工作环境。
 
+## 通用与个人 Agent 产品
+
+这一组将任务执行、工具、状态与运行环境组合成面向用户的完整产品。用户通过应用委派目标并参与授权，服务方负责运行 Agent；公开的开发者接入方式在各产品介绍中单独说明。
+
+| 产品 | 维护方 | 一句话定位 | 主要能力与使用入口 | 官方入口 |
+| --- | --- | --- | --- | --- |
+| [Meta Muse](../resources/items/meta-muse.md) | Meta | 在专属云端环境中持续工作的个人 Agent | 后台任务、记忆、浏览器与应用连接、操作审批；通过网页、App 与 WhatsApp 交互 | [产品介绍](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) · [设计概览](https://introducing.muse.ai/) |
+| [Manus Cue](../resources/items/manus-cue.md) | Manus | 具有独立身份、工作环境与协作能力的个人 Agent 产品 | 每个 Agent 拥有邮箱、电话、钱包与电脑，可围绕群聊中的共同目标分工；通过 Cue 应用使用 | [官网](https://cue.im/) · [发布说明](https://manus.im/blog/introducing-manus-2-0) |
+
+Muse Secure VM 是 Muse 的内置运行环境；Manus 将 Cascade 称为内部 Agent Harness，Cue 与 Manus 共用基础设施。各产品介绍分别说明内置组件、使用入口和公开的扩展方式。
+
 ## 参考清单与延伸阅读
 
 以下两个社区清单可用于继续发现 Agent 基础设施与 Runtime 相关项目：
@@ -88,7 +100,7 @@ Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/refe
 - [Awesome Agent Infrastructure](https://github.com/backblaze-labs/awesome-agent-infrastructure)
 - [Awesome Agent Runtime](https://github.com/sandbaseai/awesome-agent-runtime)
 
-本篇及上层协作平台的主条目归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，AX 与云端产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
+本篇、上层协作平台及通用与个人 Agent 产品的主条目归属于 [运行时与编排](../resources/runtime-and-orchestration.md)，AX 与云端运行托管产品的资源索引在 [部署与调度](../resources/deployment-and-scheduling.md)。进一步阅读：
 
 - **相关基础组件**：[Temporal](../resources/items/temporal.md) 是持久工作流平台，其官方 [AI 应用文档](https://docs.temporal.io/ai) 提供 Agent 集成入口。
 

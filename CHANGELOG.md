@@ -2,6 +2,11 @@
 
 按日期记录新增资源、内容更新与站点改进，最新记录在前。点击条目链接可直接阅读相关内容。
 
+## 2026-09-29
+
+- [Runtime 全景](notes/agent-runtime-landscape.md#通用与个人-agent-产品)新增“通用与个人 Agent 产品”分组，收录 [Meta Muse](resources/items/meta-muse.md) 与 [Manus Cue](resources/items/manus-cue.md) 的完整介绍；在运行时主题与资源库中区分产品层、Agent Harness 和运行平台。
+- 新增 [Muse Code](resources/items/muse-code.md) 介绍，归入 Agent Harness，补充编程执行、会话管理与程序化接入入口。
+
 ## 2026-09-28
 
 - 新增一级导航[信息源](SOURCES.md)，直接浏览常读网址及工程博客、产品更新、研究与社区入口；名称直达原站，全站搜索同步支持查找信息源。
