@@ -6,6 +6,7 @@
 
 - [Runtime 全景](notes/agent-runtime-landscape.md#通用与个人-agent-产品)新增“通用与个人 Agent 产品”分组，收录 [Meta Muse](resources/items/meta-muse.md) 与 [Manus Cue](resources/items/manus-cue.md) 的完整介绍；在运行时主题与资源库中区分产品层、Agent Harness 和运行平台。
 - 新增 [Muse Code](resources/items/muse-code.md) 介绍，归入 Agent Harness，补充编程执行、会话管理与程序化接入入口。
+- [信息源](SOURCES.md#常读)的常读清单加入 Manus 官方博客，持续关注产品发布与 Agent 工程实践。
 
 ## 2026-09-28
 

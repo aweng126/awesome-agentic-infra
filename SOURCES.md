@@ -8,6 +8,7 @@
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — 阅读 Agent 执行、上下文管理、工具设计与评估的工程经验。
 - [OpenAI Developer Blog](https://developers.openai.com/blog) — 关注 Codex、Agent Harness、工具接入与开发工作流的官方实践。
 - [LangChain Blog](https://www.langchain.com/blog) — 跟进 LangGraph、Agent Harness、LangSmith 观测与评估的设计和实践。
+- [Manus Blog](https://manus.im/blog) — 关注 Manus 与 Cue 的产品发布、Agent 上下文工程、云电脑和工具集成实践。
 
 ## 工程博客
 
