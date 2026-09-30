@@ -2,6 +2,11 @@
 
 按日期记录新增资源、内容更新与站点改进，最新记录在前。点击条目链接可直接阅读相关内容。
 
+## 2026-09-30
+
+- 新增 [OpenAI Dots](resources/items/openai-dots.md) 与腾讯 [LightVela](resources/items/lightvela.md) 的完整介绍，与 Muse、Cue 一同归入“运行时与编排”的 Agent 产品分组，并补充到 [Runtime 全景](notes/agent-runtime-landscape.md#通用与个人-agent-产品)。
+- [信息源](SOURCES.md#产品与版本更新)加入 LightVela 官方更新日志，便于持续跟进产品变化。
+
 ## 2026-09-29
 
 - [Runtime 全景](notes/agent-runtime-landscape.md#通用与个人-agent-产品)新增“通用与个人 Agent 产品”分组，收录 [Meta Muse](resources/items/meta-muse.md) 与 [Manus Cue](resources/items/manus-cue.md) 的完整介绍；在运行时主题与资源库中区分产品层、Agent Harness 和运行平台。

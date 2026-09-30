@@ -90,8 +90,10 @@ Paperclip 也可通过 [Sandbox Provider 插件](https://docs.paperclip.ing/refe
 | --- | --- | --- | --- | --- |
 | [Meta Muse](../resources/items/meta-muse.md) | Meta | 在专属云端环境中持续工作的个人 Agent | 后台任务、记忆、浏览器与应用连接、操作审批；通过网页、App 与 WhatsApp 交互 | [产品介绍](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) · [设计概览](https://introducing.muse.ai/) |
 | [Manus Cue](../resources/items/manus-cue.md) | Manus | 具有独立身份、工作环境与协作能力的个人 Agent 产品 | 每个 Agent 拥有邮箱、电话、钱包与电脑，可围绕群聊中的共同目标分工；通过 Cue 应用使用 | [官网](https://cue.im/) · [发布说明](https://manus.im/blog/introducing-manus-2-0) |
+| [OpenAI Dots](../resources/items/openai-dots.md) | OpenAI | ChatGPT 中持续处理事务的个人 Agent | 记忆、云电脑、应用连接与后台任务；可委派 Work 或 Codex，通过 ChatGPT、Slack 或 Teams 交互 | [产品概览](https://learn.chatgpt.com/docs/dots) · [入门文档](https://learn.chatgpt.com/docs/dots/getting-started) |
+| [LightVela](../resources/items/lightvela.md) | 腾讯轻量云团队 | 基于 Hermes Agent 的托管云端个人助理 | 云端常驻、长期记忆、定时任务与 Skills；通过网页配置并连接微信、QQ、企业微信、飞书或钉钉 | [官网](https://lightvela.com/) · [产品文档](https://lightvela.com/docs/overview) |
 
-Muse Secure VM 是 Muse 的内置运行环境；Manus 将 Cascade 称为内部 Agent Harness，Cue 与 Manus 共用基础设施。各产品介绍分别说明内置组件、使用入口和公开的扩展方式。
+这些产品提供完整的任务使用入口，底层执行组件各有分工：Muse 内置 Secure VM；Cue 与 Manus 共用基础设施，Manus 将 Cascade 称为内部 Harness；Dots 可委派 Work 或 Codex；LightVela 托管 Hermes Agent。各产品介绍分别说明运行方式、使用入口和公开的扩展方式。
 
 ## 参考清单与延伸阅读
 

@@ -23,6 +23,7 @@
 - [ZCode 更新日志](https://zcode.z.ai/cn/changelog) — 跟进智谱编程 Agent 的任务执行、工具扩展和工作台功能变化。
 - [Qwen Code Releases](https://github.com/QwenLM/qwen-code/releases) — 查看 Qwen Code 的版本说明，关注 CLI、SDK 与开发工具集成的变化。
 - [Kimi Code CLI Releases](https://github.com/MoonshotAI/kimi-code/releases) — 跟进 Kimi 编码执行引擎的工具、会话与自动化接口更新。
+- [LightVela 更新日志](https://lightvela.com/changelog) — 跟进云端个人 Agent 的聊天通道、定时任务、记忆与技能更新。
 - [Model Context Protocol Blog](https://blog.modelcontextprotocol.io/) — 了解 MCP 协议演进、SDK 变化及工具互操作生态的官方动态。
 
 ## 研究与论文

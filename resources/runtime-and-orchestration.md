@@ -32,6 +32,8 @@
 - <a id="resource-muse-code"></a> [Muse Code](https://dev.meta.ai/docs/muse-code) — Meta 面向终端与 CI 的编程 Agent，提供本地执行、审批和沙箱，并通过会话协议及 SDK 支持应用驱动、任务控制与会话恢复。 [项目介绍](items/muse-code.md)
 - <a id="resource-meta-muse"></a> [Meta Muse](https://muse.ai/) — Meta 的托管个人 Agent，结合专属云端运行环境、长期记忆、浏览器与连接器，持续推进日常任务，并提供操作审批和活动记录。 [项目介绍](items/meta-muse.md)
 - <a id="resource-manus-cue"></a> [Manus Cue](https://cue.im/) — Manus 的托管个人 Agent 产品，为 Agent 配备邮箱、电话号码、钱包与电脑，支持独立执行任务及在群聊中围绕共同目标分工协作。 [项目介绍](items/manus-cue.md)
+- <a id="resource-openai-dots"></a> [OpenAI Dots](https://learn.chatgpt.com/docs/dots) — ChatGPT 中持续处理事务的个人 Agent，结合记忆、云电脑、应用连接与后台任务，在多轮交流之间推进工作，并可委派 ChatGPT Work 或 Codex 执行任务。 [项目介绍](items/openai-dots.md)
+- <a id="resource-lightvela"></a> [LightVela](https://lightvela.com/) — 腾讯轻量云团队的托管个人 Agent 产品，在云端持续运行 Hermes Agent，通过网页和聊天软件接收任务，支持长期记忆、技能扩展与定时执行。 [项目介绍](items/lightvela.md)
 
 <!-- resources:end -->
 
